@@ -1,0 +1,22 @@
+{
+  "phase_metadata": { "phase_number": 1, "title": "HTML Basics: The Foundation of the Web", "estimated_time": "2 Hours" },
+  "learning_objectives": ["Understand the role of HTML", "Master the boilerplate structure"],
+  "prerequisites": ["Basic computer literacy"],
+  "introduction": "HTML is the skeleton of every webpage.",
+  "syntax": "<html>\n<head></head>\n<body></body>\n</html>",
+  "rules_and_key_points": ["Always close your tags", "Use lowercase tag names"],
+  "code_example_1": { "title": "Basic Boilerplate", "code": "<!DOCTYPE html>\n<html>\n<body>\n<h1>Hello World</h1>\n</body>\n</html>", "output": "Hello World heading rendered" },
+  "common_mistakes": ["Forgetting DOCTYPE"],
+  "best_practices": ["Always include a lang attribute"],
+  "key_takeaways": ["HTML defines structure, not style"],
+  "questions_and_answers": [
+    { "question": "What does HTML stand for?", "answer": "HyperText Markup Language.", "difficulty": "Easy" }
+  ],
+  "multiple_choice_questions": [
+    {
+      "question": "Which tag is used for the largest heading?",
+      "options": { "A": "<heading>", "B": "<h6>", "C": "<h1>", "D": "<head>" },
+      "answer": "C"
+    }
+  ]
+}

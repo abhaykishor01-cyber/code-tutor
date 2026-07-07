@@ -1,0 +1,14 @@
+{
+  "phaseMetadata": { "phaseNumber": 1, "phaseName": "Python Basics: Introduction to Python" },
+  "learningObjectives": ["Understand Python's philosophy", "Write your first script"],
+  "prerequisites": [],
+  "introduction": "Python is a readable, beginner-friendly language.",
+  "syntax": "print('Hello, World!')",
+  "rulesAndKeyPoints": ["Indentation defines blocks in Python"],
+  "codeExample1": { "title": "Hello World", "code": "print('Hello, Python!')", "output": "Hello, Python!" },
+  "commonMistakes": ["Mixing tabs and spaces"],
+  "bestPractices": ["Follow PEP-8 styling"],
+  "keyTakeaways": ["Python uses indentation instead of braces"],
+  "questionsAndAnswers": [{ "question": "How do you print in Python?", "answer": "Using the print() function.", "difficulty": "Easy" }],
+  "mcqs": [{ "question": "Which symbol starts a comment in Python?", "options": {"A":"//","B":"#","C":"--","D":"/*"}, "answer": "B" }]
+}

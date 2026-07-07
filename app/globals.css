@@ -1,0 +1,264 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------
+   Theme tokens. Default (no attribute) = dark "ink & gold" theme.
+   [data-theme="light"] swaps to the "parchment" light theme.
+   Everything else in the app reads these CSS vars, so components
+   never need light/dark conditionals of their own.
+----------------------------------------------------------------*/
+:root {
+  --bg: #0a0e1a;
+  --bg-elevated: rgba(255, 255, 255, 0.035);
+  --bg-elevated-strong: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  --text: #e8ecf4;
+  --text-muted: rgba(232, 236, 244, 0.6);
+  --text-faint: rgba(232, 236, 244, 0.4);
+  --accent: #d4af37;
+  --accent-soft: rgba(212, 175, 55, 0.12);
+  --accent-contrast: #0a0e1a;
+  --shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] {
+  --bg: #faf7f0;
+  --bg-elevated: rgba(10, 14, 26, 0.035);
+  --bg-elevated-strong: rgba(10, 14, 26, 0.06);
+  --border: rgba(10, 14, 26, 0.1);
+  --border-strong: rgba(10, 14, 26, 0.18);
+  --text: #1a1d29;
+  --text-muted: rgba(26, 29, 41, 0.62);
+  --text-faint: rgba(26, 29, 41, 0.42);
+  --accent: #b8862c;
+  --accent-soft: rgba(184, 134, 44, 0.12);
+  --accent-contrast: #fff8ea;
+  --shadow: 0 20px 50px -25px rgba(26, 20, 5, 0.25);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  backdrop-filter: blur(6px);
+}
+
+.card-hover {
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+.glass {
+  background: var(--bg-elevated-strong);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(14px) saturate(140%);
+}
+
+.progress-track {
+  width: 100%;
+  height: 0.75rem;
+  border-radius: 999px;
+  background: var(--bg-elevated-strong);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 70%, white));
+  transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 75%, black));
+  color: var(--accent-contrast);
+  font-weight: 600;
+  padding: 0.65rem 1.35rem;
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-primary:focus-visible, .btn-secondary:focus-visible, a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-weight: 500;
+  padding: 0.65rem 1.35rem;
+  transition: background-color 0.2s ease;
+}
+.btn-secondary:hover { background: var(--bg-elevated-strong); }
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-elevated-strong);
+  border-radius: 0.75rem;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--bg-elevated), transparent);
+  animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+pre code {
+  font-family: "Fira Code", ui-monospace, monospace;
+}
+
+@media print {
+  header, footer, .print\:hidden {
+    display: none !important;
+  }
+  body, main {
+    background: white !important;
+  }
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Light theme overrides. The app's existing markup uses fixed
+   Tailwind utilities (bg-navy-950, text-white/70, border-white/10,
+   text-gold-400, ...) written against the dark theme. Rather than
+   rewrite every component, `.light` on <html> re-points those exact
+   utilities so all existing pages get a real light mode for free.
+----------------------------------------------------------------*/
+html.light body { background: #faf7f0; color: #1a1d29; }
+html.light .bg-navy-950,
+html.light .bg-navy-950\/80,
+html.light .bg-navy-900,
+html.light .bg-navy-800,
+html.light .bg-navy-800\/60,
+html.light .bg-navy-700 { background-color: #fff8ea !important; }
+html.light .border-white\/10,
+html.light .border-white\/15,
+html.light .border-white\/20 { border-color: rgba(26,29,41,0.12) !important; }
+html.light .text-white,
+html.light .text-white\/90,
+html.light .text-white\/80 { color: #1a1d29 !important; }
+html.light .text-white\/70,
+html.light .text-white\/60 { color: rgba(26,29,41,0.65) !important; }
+html.light .text-white\/50,
+html.light .text-white\/40,
+html.light .text-white\/30 { color: rgba(26,29,41,0.45) !important; }
+html.light .bg-white\/5,
+html.light .bg-white\/10 { background-color: rgba(26,29,41,0.05) !important; }
+html.light .hover\:bg-white\/5:hover { background-color: rgba(26,29,41,0.06) !important; }
+html.light .text-gold-400 { color: #a5751f !important; }
+html.light .bg-gold-500,
+html.light .bg-gold-500\/20 { background-color: rgba(165,117,31,0.15) !important; }
+html.light [class*="from-gold"] { --tw-gradient-from: #a5751f; }
+html.light .shadow-lg,
+html.light .shadow-xl { box-shadow: 0 20px 50px -25px rgba(26,20,5,0.2) !important; }
+
+/* ---------------------------------------------------------------
+   Syntax highlighting (Prism.js) — code blocks always use a dark
+   "editor" background regardless of site theme, matching common
+   code-editor conventions, so token colors are tuned for that dark
+   background only rather than duplicated per theme.
+----------------------------------------------------------------*/
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #e8ecf4;
+  background: none;
+  text-shadow: none;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.token.keyword,
+.token.selector,
+.token.important,
+.token.atrule {
+  color: #d4af37;
+}
+
+.token.string,
+.token.attr-value {
+  color: #a3d977;
+}
+
+.token.number,
+.token.boolean,
+.token.constant {
+  color: #f0a860;
+}
+
+.token.function,
+.token.class-name {
+  color: #7db6f0;
+}
+
+.token.operator,
+.token.punctuation {
+  color: rgba(232, 236, 244, 0.6);
+}
+
+.token.tag,
+.token.attr-name {
+  color: #e392c2;
+}

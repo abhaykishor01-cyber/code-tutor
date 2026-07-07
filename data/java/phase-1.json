@@ -1,0 +1,14 @@
+{
+  "phase_metadata": { "phase_number": 1, "phase_name": "Introduction to Java" },
+  "learning_objectives": ["Understand JVM, JRE, JDK"],
+  "prerequisites": [],
+  "introduction": "Java follows Write Once, Run Anywhere.",
+  "syntax": "public class HelloWorld {\n  public static void main(String[] args) {\n    System.out.println(\"Hello\");\n  }\n}",
+  "rules_and_key_points": ["Class name must match filename"],
+  "code_example_1": { "title": "Hello World", "code": "public class HelloWorld {\n public static void main(String[] args) {\n  System.out.println(\"Hello, Java!\");\n }\n}", "output": "Hello, Java!" },
+  "common_mistakes": ["Mismatched class/file names"],
+  "best_practices": ["Use PascalCase for class names"],
+  "key_takeaways": ["JVM makes Java platform-independent"],
+  "questions_and_answers": [{ "difficulty": "Easy", "question": "What is JVM?", "answer": "Java Virtual Machine, which runs bytecode." }],
+  "multiple_choice_questions": [{ "question": "Who created Java?", "options": {"A":"Bjarne Stroustrup","B":"James Gosling","C":"Guido van Rossum","D":"Dennis Ritchie"}, "answer": "B" }]
+}

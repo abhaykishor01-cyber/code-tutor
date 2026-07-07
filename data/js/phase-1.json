@@ -1,0 +1,14 @@
+{
+  "phaseMetadata": { "phaseNumber": 1, "phaseTitle": "Introduction to JavaScript" },
+  "learningObjectives": ["Understand JS's role in the browser"],
+  "prerequisites": [],
+  "introduction": "JavaScript brings interactivity to web pages.",
+  "syntax": "console.log('Hello, World!');",
+  "rulesAndKeyPoints": ["JS is dynamically typed"],
+  "codeExample1": { "title": "Hello World", "code": "console.log('Hello, JS!');", "output": "Hello, JS!" },
+  "commonMistakes": ["Forgetting semicolons in ambiguous cases"],
+  "bestPractices": ["Use const/let, avoid var"],
+  "keyTakeaways": ["JS runs in the browser and in Node.js"],
+  "frequentlyAskedQuestions": [{ "question": "Is JavaScript the same as Java?", "answer": "No, they are unrelated languages despite the similar name." }],
+  "mcqs": [{ "question": "Which keyword declares a constant?", "options": {"A":"var","B":"let","C":"const","D":"static"}, "answer": "C" }]
+}

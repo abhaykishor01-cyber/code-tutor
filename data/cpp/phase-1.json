@@ -1,0 +1,22 @@
+{
+  "phase_metadata": { "phase_number": 1, "title": "C++ Basics: Getting Started", "estimated_time": "2 Hours" },
+  "learning_objectives": ["Understand compilation", "Write your first C++ program"],
+  "prerequisites": ["None"],
+  "introduction": "C++ is a compiled, high-performance language.",
+  "syntax": "#include <iostream>\nint main() {\n  std::cout << \"Hello\";\n  return 0;\n}",
+  "rules_and_key_points": ["Every program needs a main() function", "Statements end in semicolons"],
+  "code_example_1": { "title": "Hello World", "code": "#include <iostream>\nint main() {\n std::cout << \"Hello, C++!\";\n return 0;\n}", "output": "Hello, C++!" },
+  "common_mistakes": ["Forgetting semicolons"],
+  "best_practices": ["Always return 0 from main"],
+  "key_takeaways": ["C++ requires compilation before running"],
+  "questions_and_answers": [
+    { "question": "What does #include do?", "answer": "It brings in code from another file/library.", "difficulty": "Easy" }
+  ],
+  "multiple_choice_questions": [
+    {
+      "question": "Which symbol ends a C++ statement?",
+      "options": { "A": ".", "B": ";", "C": ":", "D": "," },
+      "answer": "B"
+    }
+  ]
+}

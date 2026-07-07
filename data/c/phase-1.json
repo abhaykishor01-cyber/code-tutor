@@ -1,0 +1,14 @@
+{
+  "metadata": { "phaseNumber": 1, "title": "C Basics: Getting Started" },
+  "learningObjectives": ["Understand C program structure"],
+  "prerequisites": [],
+  "introduction": "C is the foundation of modern systems programming.",
+  "syntax": "#include <stdio.h>\nint main() {\n  printf(\"Hello\");\n  return 0;\n}",
+  "rulesAndKeyPoints": ["main() is the entry point"],
+  "codeExample1": { "title": "Hello World", "code": "#include <stdio.h>\nint main(){ printf(\"Hello, C!\"); return 0; }", "expectedOutput": "Hello, C!" },
+  "commonMistakes": ["Forgetting return 0;"],
+  "bestPractices": ["Always include stdio.h for printf"],
+  "keyTakeaways": ["C compiles to native machine code"],
+  "questionsAndAnswers": [{ "id": "q1", "question": "What header is needed for printf?", "answer": "stdio.h", "difficulty": "Easy" }],
+  "mcqs": [{ "id": "m1", "question": "Which function is the entry point?", "options": {"A":"start","B":"main","C":"init","D":"run"}, "correctOption": "B" }]
+}
