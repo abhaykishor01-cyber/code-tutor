@@ -110,19 +110,75 @@ export default function HomePage() {
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           {nextPhase ? (
-            <Link href={`/${nextPhase.lang}/${nextPhase.phase}`} className="btn-primary text-base px-7 py-3">
+            <Link href={`/${nextPhase.lang}/${nextPhase.phase}`} className="btn-primary text-base px-7 py-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0">
               Resume Learning →
             </Link>
           ) : (
-            <Link href={`/${LANGUAGES[0].id}`} className="btn-primary text-base px-7 py-3">
+            <Link href={`/${LANGUAGES[0].id}`} className="btn-primary text-base px-7 py-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0">
               Start Learning Free →
             </Link>
           )}
-          <Link href="/dashboard" className="btn-secondary text-base px-7 py-3">
+          <Link href="/dashboard" className="btn-secondary text-base px-7 py-3 transition-all duration-300 hover:-translate-y-1 hover:bg-white/10">
             View Dashboard
           </Link>
         </div>
-      </section>
+
+<div className="mx-auto mt-16 max-w-5xl">
+  <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur">
+    <div className="flex items-center gap-2 border-b border-white/10 px-5 py-3">
+      <span className="h-3 w-3 rounded-full bg-red-400" />
+      <span className="h-3 w-3 rounded-full bg-yellow-400" />
+      <span className="h-3 w-3 rounded-full bg-green-400" />
+    </div>
+
+    <div className="grid gap-6 p-6 md:grid-cols-[260px_1fr]">
+      <aside className="rounded-2xl bg-white/5 p-4 text-left">
+        <p className="text-sm font-semibold text-white">
+          Learning Path
+        </p>
+
+        <div className="mt-4 space-y-3">
+          <div className="rounded-lg bg-gold-500/20 px-3 py-2 text-gold-300">
+            ✓ HTML & CSS
+          </div>
+
+          <div className="rounded-lg bg-white/5 px-3 py-2">
+            C Programming
+          </div>
+
+          <div className="rounded-lg bg-white/5 px-3 py-2">
+            Python
+          </div>
+
+          <div className="rounded-lg bg-white/5 px-3 py-2">
+            JavaScript
+          </div>
+        </div>
+      </aside>
+
+      <div className="rounded-2xl bg-black/20 p-6 text-left">
+        <p className="text-lg font-semibold">
+          Phase 5 — Functions
+        </p>
+
+        <p className="mt-2 text-white/60">
+          Complete lessons, practice coding questions, pass the quiz,
+          unlock the next phase, and earn your certificate.
+        </p>
+
+        <div className="mt-6 h-3 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full w-2/3 rounded-full bg-gold-400" />
+        </div>
+
+        <p className="mt-3 text-sm text-white/60">
+          Progress • 67%
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</section>
 
       {/* OVERALL PROGRESS */}
       {stats ? (
