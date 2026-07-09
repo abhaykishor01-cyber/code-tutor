@@ -307,17 +307,35 @@ export default function HomePage() {
       </section>
 
       {/* CURRICULUM AT A GLANCE — real numbers only, no invented statistics */}
-      <section className="card glass p-10 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gold-500/10 to-transparent" />
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] px-8 py-12 text-center shadow-xl backdrop-blur md:px-12 md:py-16">
+        <div className="absolute inset-0 bg-gradient-to-br from-gold-500/10 via-transparent to-transparent" />
         <div className="relative">
-          <p className="text-white/50 text-sm uppercase tracking-wide mb-6">Curriculum at a Glance</p>
-          <div className="grid sm:grid-cols-3 gap-8">
+          <div className="mb-10">
+  <span className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-400">
+    Platform Overview
+  </span>
+
+  <h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+    Everything you need to master programming
+  </h2>
+
+  <p className="mx-auto mt-3 max-w-2xl text-white/60">
+    Built around structured learning paths, practical coding exercises,
+    quizzes, and measurable progress across every language.
+  </p>
+</div>
+          <div className="grid gap-8 sm:grid-cols-3">
             {CURRICULUM_STATS.map((s) => (
-              <div key={s.label}>
+              <div
+  key={s.label}
+  className="rounded-2xl border border-white/10 bg-black/20 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-gold-400/30"
+>
                 <p className="text-4xl md:text-5xl font-bold text-gold-400 tabular-nums">
                   <AnimatedCounter value={s.getValue()} />
                 </p>
-                <p className="text-white/60 mt-2 text-sm">{s.label}</p>
+                <p className="mt-3 text-sm font-medium text-white/60">
+  {s.label}
+</p>
               </div>
             ))}
           </div>
