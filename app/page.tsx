@@ -252,19 +252,40 @@ export default function HomePage() {
 
       {/* ROADMAP */}
       <section>
-        <h2 className="text-2xl font-bold mb-1">How the path works</h2>
-        <p className="text-white/50 mb-6">The same four steps, repeated for every phase of every language.</p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="mb-8">
+  <span className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-400">
+    Learning Journey
+  </span>
+
+  <h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+    Learn with a structured roadmap
+  </h2>
+
+  <p className="mt-3 max-w-2xl text-white/60">
+    Every language follows the same proven workflow so you never skip
+    fundamentals and always know what comes next.
+  </p>
+</div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { step: "Learn", desc: "Read the concept, syntax, examples, and common mistakes." },
             { step: "Practice", desc: "Work through code-writing exercises — mostly real code, not just MCQs." },
             { step: "Quiz", desc: "Confirm understanding with an instant-feedback quiz for the phase." },
             { step: "Unlock", desc: "Mark the phase complete to unlock the next one in the path." },
           ].map((s, i) => (
-            <div key={s.step} className="card p-5">
-              <div className="text-gold-400 text-xs font-semibold mb-2">STEP {i + 1}</div>
-              <h3 className="font-bold">{s.step}</h3>
-              <p className="text-white/50 text-sm mt-1">{s.desc}</p>
+            <div
+  key={s.step}
+  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-300 hover:-translate-y-2 hover:border-gold-400/40 hover:shadow-2xl"
+>
+              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-gold-500/10 font-bold text-gold-400">
+  {i + 1}
+</div>
+              <h3 className="text-lg font-bold tracking-tight">
+  {s.step}
+</h3>
+              <p className="mt-3 text-sm leading-7 text-white/60">
+  {s.desc}
+</p>
             </div>
           ))}
         </div>
