@@ -95,20 +95,20 @@ export default function HomePage() {
   return (
     <div className="space-y-24">
       {/* HERO */}
-      <section className="text-center pt-6 pb-4 animate-fade-up">
-        <div className="inline-flex items-center gap-2 text-xs font-medium text-gold-400 bg-gold-500/10 border border-gold-500/20 rounded-full px-3 py-1 mb-6">
+      <section className="relative text-center pt-12 md:pt-20 pb-10 md:pb-16 animate-fade-up">
+        <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-gold-300 shadow-sm backdrop-blur-sm mb-8">
           <span aria-hidden="true">✦</span> Six languages · One locked path · Zero skipped fundamentals
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1]">
+        <h1 className="mx-auto max-w-5xl text-4xl font-extrabold tracking-tight leading-[1.05] sm:text-5xl md:text-6xl lg:text-7xl">
           Master programming,
           <br />
           <span className="text-gold-400">one locked step at a time.</span>
         </h1>
-        <p className="text-white/60 mt-5 max-w-xl mx-auto text-lg">
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-white/70 sm:text-lg">
           A structured, no-skipping curriculum for HTML, C, C++, Python, JavaScript, and Java — with
           real code practice and a certificate waiting at the end of each one.
         </p>
-        <div className="flex items-center justify-center gap-4 mt-8">
+        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           {nextPhase ? (
             <Link href={`/${nextPhase.lang}/${nextPhase.phase}`} className="btn-primary text-base px-7 py-3">
               Resume Learning →
