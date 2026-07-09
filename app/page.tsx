@@ -200,9 +200,21 @@ export default function HomePage() {
 
       {/* LANGUAGE CARDS */}
       <section>
-        <h2 className="text-2xl font-bold mb-1">Choose your path</h2>
-        <p className="text-white/50 mb-6">Every language is open now — start any of them from Phase 1.</p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="mb-8">
+  <span className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-400">
+    Programming Languages
+  </span>
+
+  <h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+    Choose your learning path
+  </h2>
+
+  <p className="mt-3 max-w-2xl text-white/60">
+    Every course follows the same structured roadmap. Learn concepts, solve coding exercises,
+    complete quizzes, and unlock the next phase at your own pace.
+  </p>
+</div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {!stats
             ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
             : LANGUAGES.map((lang) => {
@@ -212,11 +224,15 @@ export default function HomePage() {
                   <Link
                     key={lang.id}
                     href={`/${lang.id}`}
-                    className="card p-6 relative overflow-hidden group card-hover"
+                    className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-300 hover:-translate-y-2 hover:border-gold-400/40 hover:shadow-2xl"
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${lang.color} opacity-10`} />
+                    <div
+  className={`absolute inset-0 bg-gradient-to-br ${lang.color} opacity-0 transition-opacity duration-300 group-hover:opacity-15`}
+/>
                     <div className="relative">
-                      <div className="text-3xl mb-2">{lang.icon}</div>
+                      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-3xl transition-colors duration-300 group-hover:bg-gold-500/10">
+  {lang.icon}
+</div>
                       <h3 className="font-bold text-lg">{lang.name}</h3>
                       <p className="text-white/50 text-sm mt-1">{lang.totalPhases} phases</p>
                       {langStats && (
