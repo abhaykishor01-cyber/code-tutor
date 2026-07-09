@@ -406,10 +406,22 @@ export default function HomePage() {
       </section>
 
       {/* FAQ */}
-      <section>
-        <h2 className="text-2xl font-bold mb-1">Frequently Asked Questions</h2>
-        <p className="text-white/50 mb-6">Common questions about how the platform works.</p>
-        <div className="max-w-2xl">
+      <section className="py-4">
+        <div className="mb-8 text-center">
+  <span className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-400">
+    Support
+  </span>
+
+  <h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+    Frequently Asked Questions
+  </h2>
+
+  <p className="mx-auto mt-3 max-w-2xl text-white/60">
+    Everything you need to know before starting your programming journey with
+    CodeTutor.
+  </p>
+</div>  
+        <div className="mx-auto max-w-3xl">
           <Accordion items={FAQS} />
         </div>
       </section>
