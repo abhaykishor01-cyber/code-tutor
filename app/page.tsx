@@ -293,14 +293,32 @@ export default function HomePage() {
 
       {/* FEATURES */}
       <section>
-        <h2 className="text-2xl font-bold mb-1">Why CodeTutor</h2>
-        <p className="text-white/50 mb-6">Built around actually learning, not just clicking through slides.</p>
-        <div className="grid sm:grid-cols-2 gap-5">
+       <div className="mb-8">
+  <span className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-400">
+    Why Choose CodeTutor
+  </span>
+
+  <h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+    Learn smarter, not harder
+  </h2>
+
+  <p className="mt-3 max-w-2xl text-white/60">
+    Every feature is designed to keep you focused on building real programming
+    skills through structured learning, practice, and measurable progress.
+  </p>
+</div>
+        <div className="grid gap-6 sm:grid-cols-2">
           {FEATURES.map((f) => (
-            <div key={f.title} className="card p-6 card-hover">
-              <div className="text-2xl mb-3">{f.icon}</div>
-              <h3 className="font-bold">{f.title}</h3>
-              <p className="text-white/60 text-sm mt-2 leading-relaxed">{f.desc}</p>
+            <div key={f.title} className="group rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-300 hover:-translate-y-2 hover:border-gold-400/40 hover:shadow-2xl">
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-500/10 text-2xl transition-all duration-300 group-hover:bg-gold-500/20 group-hover:scale-110">
+  {f.icon}
+</div>
+              <h3 className="text-lg font-bold tracking-tight">
+  {f.title}
+</h3>
+              <p className="mt-3 text-sm leading-7 text-white/60">
+  {f.desc}
+</p>
             </div>
           ))}
         </div>
