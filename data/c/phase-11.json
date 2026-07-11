@@ -1,0 +1,330 @@
+{
+  "metadata": {
+    "phaseNumber": 11,
+    "title": "File Handling in C",
+    "duration": "4 Hours",
+    "difficulty": "Intermediate"
+  },
+  "learningObjectives": [
+    "Differentiate between stream-based I/O, text modes, and binary modes of file access.",
+    "Master opening and closing files robustly with dynamic error-checking protocols.",
+    "Employ formatted, character, and line-based I/O operations using fprintf, fscanf, fgets, fputs, fgetc, and fputc.",
+    "Read and write complex structured memory layouts to disk with fread and fwrite.",
+    "Manipulate the internal file position indicator using fseek, ftell, and rewind to implement random-access file systems."
+  ],
+  "prerequisites": [
+    "Pointers and Indirection (Phase 6)",
+    "Structures (Phase 9)",
+    "Dynamic Memory Allocation (Phase 10)"
+  ],
+  "introduction": "In computational systems, variables and structures reside in transient RAM, meaning their lifetime is bound to the lifespan of the running process. To persist state across runs, process massive datasets, or communicate with other software, we must interact with non-volatile physical storage. In C, file handling acts as an interface layer over the hardware. The operating system handles low-level sector mapping, while C provides a unified abstraction: the stream. A stream is an ordered sequence of bytes associated with a file, device, or network socket. Working with files in C involves binding a file on disk to a stream in memory, using buffered read/write pointers, and manipulating the stream location indicator.",
+  "conceptExplanation": "File handling in C is centered around the opaque structures handled by the `FILE` typedef declared in `<stdio.h>`. When you open a file, the Operating System allocates a file descriptor and returns a pointer to a `FILE` control block. This block tracks state variables, including the current stream pointer position, error indicators, End-Of-File flags, and buffers.\n\n### Streams: Text vs. Binary\nThere is a fundamental difference in how files are read or written:\n1. **Text Files (.txt, .json, .csv):** Data is organized as sequences of printable characters grouped into lines. Internally, physical operating systems handle line terminators differently (Linux uses LF, Windows uses CRLF). On non-POSIX environments (like Windows), when a file is opened in text mode, the standard library silently translates CRLF ('\\r\\n') on disk to LF ('\\n') in RAM during reads, and vice versa on writes. Furthermore, a Ctrl+Z character (0x1A) can act as an EOF indicator in legacy environments.\n2. **Binary Files (.dat, .png, .bin):** Data is processed byte-by-byte exactly as it exists in physical RAM, with no translation. A newline sequence or null terminator has no special meaning; they are treated as raw bytes. This mode is critical for structured object serialization to prevent data corruption caused by text translation routines.\n\n### File I/O Operations Flow:\n1. **Establishment:** `fopen()` requests the OS to locate/create the target path and return a stream pointer. If the process lacks permissions or the path is invalid, it returns `NULL`.\n2. **Transfer:** Use sequential functions (`fprintf`, `fscanf`, `fgetc`, `fgets`) for text streams, or raw memory copies (`fread`, `fwrite`) for binary structures.\n3. **Navigation (Random Access):** The stream maintains an internal cursor (position indicator). Functions like `fseek()` allow instant repositioning, and `ftell()` reports the current displacement from the origin.\n4. **Release:** `fclose()` flushes buffered memory changes to disk and relinquishes the OS file lock. Failing to close can lead to data loss and resource exhaustion.",
+  "syntax": "FILE *fp = fopen(const char *filename, const char *mode);\nint fclose(FILE *stream);\nint fprintf(FILE *stream, const char *format, ...);\nint fscanf(FILE *stream, const char *format, ...);\nchar *fgets(char *str, int n, FILE *stream);\nint fputs(const char *str, FILE *stream);\nsize_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);\nsize_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);\nint fseek(FILE *stream, long offset, int whence);\nlong ftell(FILE *stream);\nvoid rewind(FILE *stream);",
+  "syntaxBreakdown": [
+    "FILE *fp: An opaque pointer to a FILE control block in memory containing stream buffers and flags.",
+    "fopen(\"filename\", \"mode\"): Connects physical file to stream. Common modes include \"r\" (read-only), \"w\" (write and truncate), \"a\" (append), \"rb\" (read-binary), \"wb\" (write-binary), and \"r+b\" (read/write-binary).",
+    "fclose(fp): Flushes the output buffer, closes the descriptor, and invalidates the pointer (returns 0 on success, EOF on failure).",
+    "fread(ptr, size, nmemb, fp): Reads 'nmemb' items, each of 'size' bytes, from the stream to block pointer 'ptr'. Returns the count of successfully read items.",
+    "fwrite(ptr, size, nmemb, fp): Writes 'nmemb' elements from 'ptr' memory address to the stream. Returns written elements.",
+    "fseek(fp, offset, whence): Shifts current pointer. 'whence' dictates origin: SEEK_SET (start), SEEK_CUR (current offset), or SEEK_END (end of file).",
+    "ftell(fp): Returns current byte position offset from the beginning of the stream, or -1L on failure.",
+    "rewind(fp): Resets stream pointer to the beginning of the file, clearing error and EOF flags."
+  ],
+  "rulesAndKeyPoints": [
+    "Always check the return value of fopen() against NULL before reading/writing. Null dereferencing crashes your system.",
+    "Binary operations require the 'b' character in mode specifiers (e.g., 'rb', 'wb'). Forgetting 'b' on Windows corrupts structural representations of structs due to CR/LF manipulation.",
+    "Never check loop termination with while(!feof(fp)). The EOF flag is only set AFTER a read operation hits the boundary. Check the return value of the read function instead.",
+    "Always invoke fclose() when finished. Leftover unwritten buffers exist in RAM; if a crash occurs, data is permanently lost.",
+    "Ensure the structure alignment padding is uniform when transferring raw struct structs between systems (typically using compiler directives like #pragma pack(1))."
+  ],
+  "codeExample1": {
+    "title": "Robust Text File Processing (Writing and Parsing User Records)",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n\n#define MAX_NAME 50\n\ntypedef struct {\n    char name[MAX_NAME];\n    int age;\n    double score;\n} Record;\n\nint main(void) {\n    const char *filepath = \"records.txt\";\n    \n    // 1. Write structured data to a text file safely\n    FILE *fp_out = fopen(filepath, \"w\");\n    if (fp_out == NULL) {\n        perror(\"Error opening file for writing\");\n        return EXIT_FAILURE;\n    }\n    \n    Record r1 = {\"Alice Smith\", 23, 94.5};\n    Record r2 = {\"Bob Jones\", 29, 88.2};\n    \n    // Using fprintf to format structural representation into text stream\n    fprintf(fp_out, \"%s|%d|%.2f\\n\", r1.name, r1.age, r1.score);\n    fprintf(fp_out, \"%s|%d|%.2f\\n\", r2.name, r2.age, r2.score);\n    \n    fclose(fp_out);\n    printf(\"Records exported to %s successfully.\\n\\n\", filepath);\n    \n    // 2. Read back structured format via string parsing\n    FILE *fp_in = fopen(filepath, \"r\");\n    if (fp_in == NULL) {\n        perror(\"Error opening file for reading\");\n        return EXIT_FAILURE;\n    }\n    \n    char buffer[256];\n    printf(\"Reading records:\\n\");\n    printf(\"-----------------------------\\n\");\n    \n    // Read line-by-line using fgets to prevent buffer exploits, then scan memory with sscanf\n    while (fgets(buffer, sizeof(buffer), fp_in) != NULL) {\n        Record temp;\n        // Parse token-delimited fields securely via format parameters\n        int scanned = sscanf(buffer, \"%[^|]|%d|%lf\", temp.name, &temp.age, &temp.score);\n        if (scanned == 3) {\n            printf(\"Name: %s\\nAge: %d\\nScore: %.2f\\n\\n\", temp.name, temp.age, temp.score);\n        } else {\n            fprintf(stderr, \"Warning: Found corrupt line segment on file parsing\\n\");\n        }\n    }\n    \n    fclose(fp_in);\n    return EXIT_SUCCESS;\n}",
+    "explanation": "This text execution begins by writing formatted representations of struct variables using a pipe delimiter ('|'). When reading, we do not use while(!feof(fp_in)). Instead, we pull safely buffered lines through 'fgets', capturing maximum line sizes, and process parsing calculations locally using 'sscanf'. This architecture is safer than direct 'fscanf' since it handles whitespace strings correctly and isolates formatting failures from stream progression."
+  },
+  "codeExample2": {
+    "title": "Random Access and Binary Serialization with Structures",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\ntypedef struct {\n    int id;\n    char grade;\n    float balance;\n} Account;\n\nint main(void) {\n    const char *filepath = \"accounts.bin\";\n    \n    // 1. Write an array of structures directly to binary\n    FILE *fp = fopen(filepath, \"wb+\"); // Open for read and write in binary mode\n    if (!fp) {\n        perror(\"Binary initialization error\");\n        return EXIT_FAILURE;\n    }\n    \n    Account clients[3] = {\n        {101, 'A', 2500.50f},\n        {102, 'B', 120.75f},\n        {103, 'C', 9990.00f}\n    };\n    \n    size_t written = fwrite(clients, sizeof(Account), 3, fp);\n    printf(\"Successfully wrote %zu records to %s.\\n\", written, filepath);\n    \n    // 2. Read the 2nd record directly using random access seeking\n    long offset = 1 * sizeof(Account); // Locate index 1 (0-based indexing)\n    \n    if (fseek(fp, offset, SEEK_SET) != 0) {\n        perror(\"Seeking location failure\");\n        fclose(fp);\n        return EXIT_FAILURE;\n    }\n    \n    // Confirm stream position indicator using ftell\n    long current_pos = ftell(fp);\n    printf(\"Stream cursor successfully verified at byte %ld.\\n\", current_pos);\n    \n    Account single_client;\n    size_t read_count = fread(&single_client, sizeof(Account), 1, fp);\n    if (read_count == 1) {\n        printf(\"\\n--- Loaded Record [Index 1] ---\\n\");\n        printf(\"ID: %d\\nGrade: %c\\nBalance: $%.2f\\n\\n\", \n               single_client.id, single_client.grade, single_client.balance);\n    }\n    \n    // 3. Mutate balance state on index 1 dynamically and write modifications back\n    single_client.balance += 5000.00f; // Increase balance\n    \n    // Reposition back to same record start point\n    fseek(fp, offset, SEEK_SET);\n    fwrite(&single_client, sizeof(Account), 1, fp);\n    \n    // Rewind back to read the entire set showing alterations\n    rewind(fp);\n    printf(\"--- Full Database Snapshot Post-Mutation ---\\n\");\n    Account reader;\n    while (fread(&reader, sizeof(Account), 1, fp) == 1) {\n        printf(\"ID: %d, Grade: %c, Balance: $%.2f\\n\", \n               reader.id, reader.grade, reader.balance);\n    }\n    \n    fclose(fp);\n    return EXIT_SUCCESS;\n}",
+    "explanation": "This module shows binary direct block serialization. Unlike text writing, we pass the direct memory pointer from memory blocks. The fread() and fwrite() structures parse strict chunks equivalent to structural allocations size. The program shifts the file cursor pointer directly to record index 1 via `fseek(fp, offset, SEEK_SET)`, reads it, mutates it, and commits updates in-place. Finally, `rewind(fp)` moves the file pointer back to byte offset 0 to output the final values.",
+    "expectedOutput": "Successfully wrote 3 records to accounts.bin.\nStream cursor successfully verified at byte 12.\n\n--- Loaded Record [Index 1] ---\nID: 102\nGrade: B\nBalance: $120.75\n\n--- Full Database Snapshot Post-Mutation ---\nID: 101, Grade: A, Balance: $2500.50\nID: 102, Grade: B, Balance: $5120.75\nID: 103, Grade: C, Balance: $9990.00"
+  },
+  "stepByStepDryRun": [
+    "Step 1: The OS allocation of FILE structures is requested through fopen(..., \"wb+\"). It succeeds and returns a descriptor pointing to a file buffer stream starting with cursor position 0.",
+    "Step 2: clients array initialization populates 3 structs. Under typical 4-byte padding alignments, each struct takes up roughly 12 bytes.",
+    "Step 3: fwrite(clients, sizeof(Account), 3, fp) copies 36 raw bytes from contiguous stack space into the system stream output buffer.",
+    "Step 4: The write position moves from offset 0 to offset 36.",
+    "Step 5: fseek(fp, 1 * 12, SEEK_SET) runs. It repositions the virtual file cursor exactly to the 12th index offset, matching record 2.",
+    "Step 6: ftell reports exact alignment (12 bytes).",
+    "Step 7: fread captures 1 element. The struct is decoded into RAM. Modifying properties doesn't impact file data yet.",
+    "Step 8: After single_client modification, another seek repositions stream cursor back to offset 12 from the file start.",
+    "Step 9: fwrite updates the target 12 bytes on disk, replacing the original values.",
+    "Step 10: rewind(fp) forces stream pointer coordinates back to 0, which allows loop evaluation with sequential reads."
+  ],
+  "memoryVisualization": {
+    "type": "Stack and Heap/OS Buffer Layout",
+    "description": "Visualizes how a variable representation pointing to a FILE instance acts as an abstract gateway to dynamic buffer configurations controlled in kernel-space.",
+    "nodes": [
+      {
+        "label": "Stack: FILE *fp",
+        "value": "0x55A7C0B0 (Points to File Control Block)",
+        "address": "0x7FFEEF5C",
+        "color": "emerald"
+      },
+      {
+        "label": "Heap/OS: File Control Block",
+        "value": "{ Descriptor: 3, Pos: 12, Buffer: 0x55A7D020, Flags: RW_BINARY }",
+        "address": "0x55A7C0B0",
+        "color": "sky"
+      },
+      {
+        "label": "Heap/OS Buffer Stream (Size 4096)",
+        "value": "[ Record 0 (0-11 bytes) | Record 1 (12-23 bytes) | Record 2 (24-35 bytes) ]",
+        "address": "0x55A7D020",
+        "color": "amber"
+      },
+      {
+        "label": "Kernel System Space",
+        "value": "Physical Disk Device Driver Mapping to 'accounts.bin'",
+        "address": "Hardware IO System",
+        "color": "rose"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Database Systems: Implementing customized B-Tree data indexing engines that store node structural positions on disk using custom offsets of fseek and fwrite.",
+    "Logging Engines: Building asynchronous crash diagnostic logging systems that write continuous debugging metrics with file-append mechanisms ('a').",
+    "Embedded IoT Node Serialization: Saving configuration layouts in byte arrays straight to EEPROM flash modules as binary footprints for fast microcontroller boot sequences."
+  ],
+  "commonMistakes": [
+    "Checking while(!feof(fp)) before loading a buffer. Because EOF flag checks look backwards, the last loop iteration repeats execution on corrupt or duplicate read states.",
+    "Mixing text parsing formats with raw binary data structures. This leads to garbage output and unpredictable buffer behavior.",
+    "Forgetting to check if fp == NULL when attempting to write or read. This generates segment violations and core-dumping conditions instantly.",
+    "Neglecting cross-platform padding rules. Reading direct struct representations on platforms with different alignments leads to byte-shift mutations."
+  ],
+  "bestPractices": [
+    "Always wrap open streams inside safety error traps. Always check for stream reference validation immediately.",
+    "Initialize file modifications inside localized routines and verify you close streams properly inside error fallback trees.",
+    "When tracking loops of unknown boundaries, verify validation straight through fread execution size constraints: while (fread(...) == expected_count).",
+    "Always run fflush() or close handles explicitly before switching operational access modes between reads and writes on double duplex pointers ('r+b')."
+  ],
+  "faqs": [
+    {
+      "question": "Why is the NULL validation of fopen necessary?",
+      "answer": "Operating systems can deny file access due to lock constraints, system permission barriers, or path faults. Dereferencing a NULL pointer leads to a crash."
+    },
+    {
+      "question": "What is the key difference between text mode ('r') and binary mode ('rb')?",
+      "answer": "On Windows, text mode ('r') parses stream contents, replacing character representations of CRLF ('\\r\\n') sequences with standard newline representation LF ('\\n'). Binary reads bypass this, saving exact matching bytes to memory."
+    },
+    {
+      "question": "Does calling fclose() execute a disk write flush?",
+      "answer": "Yes. When calling fclose(), all internal buffers held inside standard application libraries are flushed down to disk caches, and OS file locks are released."
+    }
+  ],
+  "summary": "File manipulation forms the cornerstone of application persistence, data pipeline processing, and state serialization. In C, interactions are mediated by the OS via standard structures defined under standard streams. Developers must handle pointers with safety traps, correctly choose text or binary structures, and make sure that opened file pointers are closed when they are no longer needed.",
+  "keyTakeaways": [
+    "All file access is mediated by a FILE structure pointer returned by fopen().",
+    "Never structure loops around while(!feof(fp)). Checking returned sizes of active read instructions is much safer.",
+    "Binary access is direct memory serialization (fread/fwrite), whereas text access performs line conversions.",
+    "Random access features (fseek, ftell, rewind) allow you to parse file systems using targeted byte offsets."
+  ],
+  "nextTopicPreview": "Phase 12 explores preprocessor pipelines, macros, conditional compilation directives, and structuring multi-file systems using modular headers and makefile compilation protocols.",
+  "questionsAndAnswers": [
+    {
+      "id": "q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What does a FILE pointer represent, and what does the OS use it for?",
+      "answer": "A FILE pointer is an abstract address tracking control specifications. The C Standard Library uses it to reference stream details, system flags, and underlying file descriptors.",
+      "explanation": "Rather than accessing low-level OS drivers directly, the standard library encapsulates stream operations inside a FILE structure. This structure tracks internal parameters such as block caching states and pointer indices."
+    },
+    {
+      "id": "q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Explain the differences between binary mode ('wb') and text mode ('w') on different platforms.",
+      "answer": "Text mode ('w') interprets newlines, transforming character groupings on some platforms (e.g., Windows converts '\\n' to '\\r\\n' on write). Binary mode ('wb') writes raw bytes directly from RAM with no alterations.",
+      "explanation": "Windows separates text lines with carriage return and line feed (CRLF), while POSIX uses line feed (LF). Using text mode ('w') on Windows converts these line endings. When handling structs, executable offsets, or image formats, this conversion corrupts files. Binary mode ('wb') avoids this translation."
+    },
+    {
+      "id": "q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a snippet that appends a log entry containing a timestamp and a message to 'log.txt'.",
+      "answer": "Ensure the file is opened with 'a' (append) mode:\n\n```c\n#include <stdio.h>\n#include <time.h>\n\nvoid append_log(const char *msg) {\n    FILE *fp = fopen(\"log.txt\", \"a\");\n    if (!fp) return;\n    time_t raw = time(NULL);\n    char *time_str = ctime(&raw);\n    time_str[24] = '\\0'; // Remove newline\n    fprintf(fp, \"[%s] %s\\n\", time_str, msg);\n    fclose(fp);\n}\n```",
+      "explanation": "Using append mode ('a') sets the stream pointer to the end of the file. All subsequent writes are appended, preserving the original data."
+    },
+    {
+      "id": "q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "How do you read the last 10 bytes of a file dynamically, and print them?",
+      "answer": "To do this, use fseek with SEEK_END to point from the end of the file:\n\n```c\n#include <stdio.h>\n#include <stdlib.h>\n\nvoid print_last_10(const char *filename) {\n    FILE *fp = fopen(filename, \"rb\");\n    if (!fp) return;\n    if (fseek(fp, -10, SEEK_END) == 0) {\n        unsigned char bytes[10];\n        size_t read = fread(bytes, 1, 10, fp);\n        for(size_t i = 0; i < read; ++i) {\n            printf(\"%02X \", bytes[i]);\n        }\n        printf(\"\\n\");\n    } else {\n        perror(\"File seek failed\");\n    }\n    fclose(fp);\n}\n```",
+      "explanation": "fseek(fp, -10, SEEK_END) moves the stream cursor back 10 bytes from the end of the file. From there, fread copies those 10 bytes into memory."
+    },
+    {
+      "id": "q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Why does using while(!feof(fp)) cause the last item in a file to be processed twice?",
+      "answer": "The EOF indicator is only set when a read operation attempts to read past the end of the file, not when the pointer reaches the end. Therefore, a loop condition using !feof(fp) evaluates to true even after the last character has been successfully read, causing a duplicate iteration.",
+      "explanation": "To fix this, check the return value of your read functions (e.g., fgets, fread, fgetc) directly inside the loop condition."
+    },
+    {
+      "id": "q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Find the resource leak in this code:\n\n```c\nint process_config(const char *path) {\n    FILE *fp = fopen(path, \"r\");\n    if (!fp) return -1;\n    char line[128];\n    if (fgets(line, sizeof(line), fp) == NULL) {\n        return -2;\n    }\n    // Processing\n    fclose(fp);\n    return 0;\n}\n```",
+      "answer": "If fgets fails and returns NULL, the function returns -2, exiting without closing fp. This leaves the file handle open, causing a resource leak.",
+      "explanation": "To fix this, structure your error pathways to close the file handle before returning: `if (fgets(line, sizeof(line), fp) == NULL) { fclose(fp); return -2; }`."
+    },
+    {
+      "id": "q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write a complete function to copy a source file 'src.bin' to 'dest.bin' using a buffer size of 4096 bytes.",
+      "answer": "```c\n#include <stdio.h>\n\nint copy_file(const char *src, const char *dest) {\n    FILE *f_src = fopen(src, \"rb\");\n    if (!f_src) return -1;\n    FILE *f_dest = fopen(dest, \"wb\");\n    if (!f_dest) { fclose(f_src); return -1; }\n    \n    unsigned char buffer[4096];\n    size_t bytes_read;\n    while ((bytes_read = fread(buffer, 1, sizeof(buffer), f_src)) > 0) {\n        fwrite(buffer, 1, bytes_read, f_dest);\n    }\n    fclose(f_src);\n    fclose(f_dest);\n    return 0;\n}\n```",
+      "explanation": "This function copies a source file to a destination file in binary mode ('rb' and 'wb') to prevent data alteration, using a 4KB chunk buffer to optimize I/O performance."
+    },
+    {
+      "id": "q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Write a function that updates the price in the structure at index 3 of a binary file 'items.bin' in-place without rewriting the rest of the file.",
+      "answer": "```c\n#include <stdio.h>\n\ntypedef struct { int id; float price; } Item;\n\nint update_item_price(int index, float new_price) {\n    FILE *fp = fopen(\"items.bin\", \"r+b\");\n    if (!fp) return -1;\n    \n    if (fseek(fp, index * sizeof(Item), SEEK_SET) != 0) {\n        fclose(fp);\n        return -1;\n    }\n    \n    Item current;\n    if (fread(&current, sizeof(Item), 1, fp) != 1) {\n        fclose(fp);\n        return -1;\n    }\n    \n    current.price = new_price;\n    \n    if (fseek(fp, index * sizeof(Item), SEEK_SET) != 0) {\n        fclose(fp);\n        return -1;\n    }\n    \n    if (fwrite(&current, sizeof(Item), 1, fp) != 1) {\n        fclose(fp);\n        return -1;\n    }\n    \n    fclose(fp);\n    return 0;\n}\n```",
+      "explanation": "Using 'r+b' mode enables in-place modifications. After reading structural elements at an offset, reposition the stream pointer to the same offset before writing the updated structure."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "category": "Theory",
+      "question": "What happens if you open an existing file in 'w' (write-only text) mode?",
+      "options": {
+        "A": "The file's existing data is preserved, and new data is appended.",
+        "B": "The operation fails, returning NULL.",
+        "C": "The file is truncated to 0 bytes, erasing all previous contents.",
+        "D": "The file pointer is initialized to the end of the file."
+      },
+      "correctOption": "C",
+      "explanation": "Opening a file in 'w' mode truncates it to zero length. If you want to append data, use 'a' mode instead."
+    },
+    {
+      "id": "m2",
+      "category": "Theory",
+      "question": "Which constant is used as the 'whence' argument in fseek() to position relative to the current position?",
+      "options": {
+        "A": "SEEK_SET",
+        "B": "SEEK_CUR",
+        "C": "SEEK_END",
+        "D": "SEEK_POS"
+      },
+      "correctOption": "B",
+      "explanation": "SEEK_SET positions relative to the start of the file, SEEK_CUR relative to the current position, and SEEK_END relative to the end of the file."
+    },
+    {
+      "id": "m3",
+      "category": "Output Prediction",
+      "question": "What is the output of the following code assuming 'out.txt' is opened successfully?\n\n```c\nFILE *fp = fopen(\"out.txt\", \"w\");\nfprintf(fp, \"Hello World\");\nlong pos = ftell(fp);\nprintf(\"%ld\", pos);\nfclose(fp);\n```",
+      "options": {
+        "A": "0",
+        "B": "11",
+        "C": "-1",
+        "D": "12"
+      },
+      "correctOption": "B",
+      "explanation": "Writing the string \"Hello World\" advances the file pointer by 11 bytes. Since it started at 0, ftell() returns 11."
+    },
+    {
+      "id": "m4",
+      "category": "Output Prediction",
+      "question": "If you write dynamic structures using raw memory block mechanisms on Windows without specifying 'b' (e.g. \"w+\"), what happens when 0x0A matches dynamic variables?",
+      "options": {
+        "A": "It crashes the runtime environment.",
+        "B": "It ignores the byte entirely.",
+        "C": "It writes 0x0D followed by 0x0A, corrupting byte alignments.",
+        "D": "It inserts a null terminator."
+      },
+      "correctOption": "C",
+      "explanation": "In text mode on Windows, the system translates '\\n' (0x0A) to CRLF (0x0D, 0x0A), which alters the written data and corrupts binary file structures."
+    },
+    {
+      "id": "m5",
+      "category": "Output Prediction",
+      "question": "What is the returned size value in bytes of the stream output when writing two structs of size 8:\n\n```c\nsize_t items = fwrite(my_structs, 8, 2, fp);\nprintf(\"%zu\", items);\n```",
+      "options": {
+        "A": "16",
+        "B": "8",
+        "C": "2",
+        "D": "1"
+      },
+      "correctOption": "C",
+      "explanation": "fwrite() returns the number of *elements* successfully written, not the number of bytes. Since 2 elements of size 8 were requested, it returns 2."
+    },
+    {
+      "id": "m6",
+      "category": "Find the Bug",
+      "question": "What is the bug in this code?\n\n```c\nFILE *fp = fopen(\"input.txt\", \"r\");\nif (fp) {\n    char buffer[100];\n    while (fgets(buffer, sizeof(buffer), fp) != NULL) {\n        printf(\"%s\", buffer);\n    }\n}\n```",
+      "options": {
+        "A": "The check for fgets return value is incorrect.",
+        "B": "The file pointer fp is never closed, causing a resource leak.",
+        "C": "fgets can cause buffer overflow.",
+        "D": "The file cannot be read line by line."
+      },
+      "correctOption": "B",
+      "explanation": "While this code safely reads and displays line contents without buffer overflows, it lacks a call to `fclose(fp)` before exiting."
+    },
+    {
+      "id": "m7",
+      "category": "Find the Bug",
+      "question": "Identify the critical flaw in the following code:\n\n```c\nchar data[] = \"Secret Data\";\nFILE *fp = fopen(\"auth.bin\", \"wb\");\n// Write data\nfwrite(data, sizeof(data), 1, fp);\nfseek(fp, 0, SEEK_SET);\nchar read_buf[20];\nfread(read_buf, sizeof(data), 1, fp);\nfclose(fp);\n```",
+      "options": {
+        "A": "You cannot fseek on binary files.",
+        "B": "The file was opened in 'wb' (write-only binary) mode, making fread fail.",
+        "C": "The call to fread should not specify 1 element.",
+        "D": "data size exceeds buffer bounds on write."
+      },
+      "correctOption": "B",
+      "explanation": "The file was opened with 'wb' (write-only binary). To both read and write, open with 'wb+' or 'r+b' instead."
+    },
+    {
+      "id": "m8",
+      "category": "Complete the Code",
+      "question": "Fill in the blank below to update record offset indices dynamically relative to the current file pointer position:\n\n`fseek(fp, 24, ________);`",
+      "options": {
+        "A": "SEEK_SET",
+        "B": "SEEK_CUR",
+        "C": "SEEK_END",
+        "D": "SEEK_BEG"
+      },
+      "correctOption": "B",
+      "explanation": "SEEK_CUR indicates that the offset calculation is relative to the current position of the file pointer."
+    },
+    {
+      "id": "m9",
+      "category": "Complete the Code",
+      "question": "Complete the statement to verify if a file opened successfully:\n\n```c\nFILE *fp = fopen(\"data.bin\", \"rb\");\nif (________) {\n    perror(\"Failed to open file\");\n    exit(EXIT_FAILURE);\n}\n```",
+      "options": {
+        "A": "fp == EOF",
+        "B": "fp != NULL",
+        "C": "fp == NULL",
+        "D": "fp == -1"
+      },
+      "correctOption": "C",
+      "explanation": "fopen() returns a pointer to a FILE object on success, or NULL on failure. Checking `fp == NULL` confirms whether the file failed to open."
+    },
+    {
+      "id": "m10",
+      "category": "Best Approach",
+      "question": "Which of these is the most robust approach to read unknown lengths of lines from a user configuration text file?",
+      "options": {
+        "A": "fscanf(fp, \"%s\", buffer) inside an EOF check.",
+        "B": "fgets(buffer, sizeof(buffer), fp) and processing buffers in increments.",
+        "C": "Repeated fgetc(fp) stored in statically sized arrays.",
+        "D": "fread(buffer, 1, 1, fp) evaluating character arrays for line returns manually."
+      },
+      "correctOption": "B",
+      "explanation": "Using fgets avoids buffer overflows by specifying buffer limits, and handles whitespaces properly. Any leftover bytes on a long line can be processed in subsequent reads."
+    }
+  ]
+}

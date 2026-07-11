@@ -1,14 +1,567 @@
 {
-  "phaseMetadata": { "phaseNumber": 1, "phaseName": "Python Basics: Introduction to Python" },
-  "learningObjectives": ["Understand Python's philosophy", "Write your first script"],
-  "prerequisites": [],
-  "introduction": "Python is a readable, beginner-friendly language.",
-  "syntax": "print('Hello, World!')",
-  "rulesAndKeyPoints": ["Indentation defines blocks in Python"],
-  "codeExample1": { "title": "Hello World", "code": "print('Hello, Python!')", "output": "Hello, Python!" },
-  "commonMistakes": ["Mixing tabs and spaces"],
-  "bestPractices": ["Follow PEP-8 styling"],
-  "keyTakeaways": ["Python uses indentation instead of braces"],
-  "questionsAndAnswers": [{ "question": "How do you print in Python?", "answer": "Using the print() function.", "difficulty": "Easy" }],
-  "mcqs": [{ "question": "Which symbol starts a comment in Python?", "options": {"A":"//","B":"#","C":"--","D":"/*"}, "answer": "B" }]
+  "phaseMetadata": {
+    "phaseNumber": 1,
+    "phaseName": "Basics: Introduction to Python",
+    "duration": "1 Week"
+  },
+  "learningObjectives": [
+    "Understand what Python is, its design principles, and major real-world applications.",
+    "Install Python 3.12+ and configure VS Code/IDLE as a development environment.",
+    "Write, save, and run your first Python program utilizing print() and comments.",
+    "Master variables, dynamic typing, and fundamental data types (int, float, str, bool, None).",
+    "Interact with users via input() and format console output elegantly.",
+    "Implement correct comments (single-line and multi-line docstrings).",
+    "Perform implicit and explicit type conversions safely without runtime errors."
+  ],
+  "prerequisites": [
+    "No prior programming experience required! Just a computer and curiosity."
+  ],
+  "introduction": "Welcome to Python! Python is a high-level, interpreted programming language known for its remarkable readability, simplicity, and versatility. Created by Guido van Rossum and released in 1991, Python's design philosophy emphasizes code readability with its notable use of significant whitespace. Today, Python is the leading language for Artificial Intelligence, Data Science, Web Development, Automation, and scripting, making it the perfect first language for beginners and an essential tool for veterans.",
+  "conceptExplanation": "At its core, Python is an interpreted language. Unlike compiled languages (like C++ or Java) where your code must be translated into machine code before running, a program called the Python Interpreter reads and executes your code line-by-line, top-to-bottom. Python uses 'dynamic typing', meaning you don't need to declare what kind of data a variable will hold ahead of time. The interpreter figures it out at runtime when you assign a value. Memory management is also automatic, handled by an built-in Garbage Collector, allowing you to focus on solving problems rather than managing computer memory blocks.",
+  "syntax": "variable_name = value\nprint(arguments, sep=' ', end='\\n')\nuser_input = input(prompt)",
+  "syntaxBreakdown": [
+    "variable_name: A descriptive label starting with a letter or underscore, following snake_case convention. Case-sensitive.",
+    "=: The assignment operator, which binds the value on the right-hand side to the variable name on the left.",
+    "value: Any valid Python data type or expression (e.g., 42, 'Hello', True).",
+    "print(): A built-in function that outputs text to the standard console. Accepts comma-separated values, inserting a space by default.",
+    "input(): A built-in function that pauses program execution, displays a prompt message, and always returns the user's keystrokes as a string (str)."
+  ],
+  "rulesAndKeyPoints": [
+    "Python is strictly case-sensitive. 'myVar' and 'myvar' are two completely separate variables.",
+    "Variable names cannot start with a number and must not contain spaces or special characters (except underscores).",
+    "You cannot use Python keywords (like 'if', 'while', 'def', 'class') as variable names.",
+    "The input() function ALWAYS returns a string (str). If you expect numbers, you must convert them explicitly.",
+    "Single-line comments start with a '#' hash symbol. Multi-line explanations are wrapped in triple quotes (''' or \"\"\").",
+    "Indentation in Python is not just for style; it defines structural code blocks.",
+    "Python 3.12+ features highly descriptive error messages that help you pinpoint syntax and runtime bugs quickly."
+  ],
+  "codeExample1": {
+    "title": "Basic Variable Assignment & Display",
+    "code": "# Step 1: Assign values to different data types\nname = \"Alice\"\nage = 25\ngpa = 3.85\nis_student = True\nprofile_completion = None\n\n# Step 2: Print variables and inspect their values\nprint(\"Student Name:\", name)\nprint(\"Age next year:\", age + 1)\nprint(\"GPA:\", gpa)\nprint(\"Enrolled:\", is_student)\nprint(\"Status:\", profile_completion)",
+    "explanation": "This basic example demonstrates Python's automatic dynamic typing. We assign text, integers, floats, booleans, and a NoneType placeholder. Python infers the type of each variable seamlessly, and the print() statement prints each value separated by spaces.",
+    "output": "Student Name: Alice\nAge next year: 26\nGPA: 3.85\nEnrolled: True\nStatus: None"
+  },
+  "codeExample2": {
+    "title": "Explicit Type Conversion & Interactive Calculation",
+    "code": "# Step 1: Query user for numbers (inputs are strings!)\nbirth_year_str = \"2001\"  # Simulated user input\ncurrent_year_str = \"2026\" # Simulated current year\n\n# Step 2: Explicitly cast strings to integers\nbirth_year = int(birth_year_str)\ncurrent_year = int(current_year_str)\n\n# Step 3: Perform math operation\nage = current_year - birth_year\n\n# Step 4: Display with formatted f-string\nprint(f\"Based on birth year {birth_year}, your age in {current_year} is {age}.\")",
+    "explanation": "Demonstrates how to handle user inputs. Because inputs from input() are strings, performing direct subtraction would crash Python with a TypeError. We explicitly cast them to integers using int(), perform the math, and display the result using an f-string.",
+    "output": "Based on birth year 2001, your age in 2026 is 25."
+  },
+  "dryRunSteps": [
+    {
+      "stepNumber": 1,
+      "lineOfCode": "birth_year_str = '2001'",
+      "lineNumber": 2,
+      "explanation": "The interpreter creates a string variable named birth_year_str and stores the characters '2001' in memory.",
+      "variablesState": {
+        "birth_year_str": "'2001'"
+      }
+    },
+    {
+      "stepNumber": 2,
+      "lineOfCode": "current_year_str = '2026'",
+      "lineNumber": 3,
+      "explanation": "A second string variable, current_year_str, is created and assigned '2026'.",
+      "variablesState": {
+        "birth_year_str": "'2001'",
+        "current_year_str": "'2026'"
+      }
+    },
+    {
+      "stepNumber": 3,
+      "lineOfCode": "birth_year = int(birth_year_str)",
+      "lineNumber": 6,
+      "explanation": "The interpreter fetches the string '2001', converts it into an integer (2001), and binds it to birth_year.",
+      "variablesState": {
+        "birth_year_str": "'2001'",
+        "current_year_str": "'2026'",
+        "birth_year": "2001"
+      }
+    },
+    {
+      "stepNumber": 4,
+      "lineOfCode": "current_year = int(current_year_str)",
+      "lineNumber": 7,
+      "explanation": "The string '2026' is fetched, cast to the integer 2026, and bound to current_year.",
+      "variablesState": {
+        "birth_year_str": "'2001'",
+        "current_year_str": "'2026'",
+        "birth_year": "2001",
+        "current_year": "2026"
+      }
+    },
+    {
+      "stepNumber": 5,
+      "lineOfCode": "age = current_year - birth_year",
+      "lineNumber": 10,
+      "explanation": "The interpreter evaluates the mathematical subtraction 2026 - 2001, yielding 25, and binds it to age.",
+      "variablesState": {
+        "birth_year_str": "'2001'",
+        "current_year_str": "'2026'",
+        "birth_year": "2001",
+        "current_year": "2026",
+        "age": "25"
+      }
+    }
+  ],
+  "memoryVisualization": {
+    "description": "In Python, variables are names pointing to objects in heap memory. Objects of primitive types like integers and strings are immutable and exist on the Heap, while names exist on the Stack frame.",
+    "elements": [
+      {
+        "id": "v1",
+        "label": "birth_year_str",
+        "type": "stack"
+      },
+      {
+        "id": "o1",
+        "label": "str: '2001'",
+        "type": "heap",
+        "value": "'2001'"
+      },
+      {
+        "id": "p1",
+        "label": "Points To",
+        "type": "pointer",
+        "pointsTo": "o1",
+        "value": "v1"
+      },
+      {
+        "id": "v2",
+        "label": "birth_year",
+        "type": "stack"
+      },
+      {
+        "id": "o2",
+        "label": "int: 2001",
+        "type": "heap",
+        "value": "2001"
+      },
+      {
+        "id": "p2",
+        "label": "Points To",
+        "type": "pointer",
+        "pointsTo": "o2",
+        "value": "v2"
+      },
+      {
+        "id": "v3",
+        "label": "age",
+        "type": "stack"
+      },
+      {
+        "id": "o3",
+        "label": "int: 25",
+        "type": "heap",
+        "value": "25"
+      },
+      {
+        "id": "p3",
+        "label": "Points To",
+        "type": "pointer",
+        "pointsTo": "o3",
+        "value": "v3"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Data Pipelines: Raw CSV database text values are fetched as strings and converted into numerical quantities for statistical summaries.",
+    "Web Scrapers: Text scraped from HTML tags (which is parsed as standard text strings) is cast to float to extract product pricing values.",
+    "Game Development: Storing player attributes (Health as int, Speed as float, Name as str, IsAlive as bool) for state machine engines."
+  ],
+  "commonMistakes": [
+    "Attempting mathematical operations directly on input() values: age = 2026 - input('Year: ') yields a TypeError.",
+    "Mixing lowercase and uppercase in variable names: assigning 'temp = 10' then printing 'TEMP' yields a NameError.",
+    "Using variable names starting with numbers: '1st_place = 100' yields a SyntaxError."
+  ],
+  "bestPractices": [
+    "Follow PEP-8: Use lowercase snake_case for variable names (e.g., student_gpa, not studentGpa).",
+    "Keep code safe: Always wrap explicit type castings inside try-except blocks when processing external inputs.",
+    "Be explicit: Prefer clear, descriptive names over generic variables like 'x', 'y', or 'data' to keep code self-documenting."
+  ],
+  "faqs": [
+    {
+      "question": "What is the difference between single and double quotes in Python strings?",
+      "answer": "In Python, there is absolutely no difference! 'Hello' and \"Hello\" are identical. Choose one convention and remain consistent, or use double quotes when your string contains a single-quote apostrophe (e.g., \"Python's beauty\")."
+    },
+    {
+      "question": "What is 'NoneType' and when should I use 'None'?",
+      "answer": "None is Python's native null value placeholder. It is an object of its own type (NoneType) used to indicate the absence of a value, empty status, or a default parameter before assignments are made."
+    }
+  ],
+  "summary": "You have completed the foundational phase of Python programming! You now understand Python's lineage as an interpreted language, how variables dynamically bind to typed objects on the Heap, and how to safely cast data types to ensure runtime stability.",
+  "keyTakeaways": [
+    "Python is an interpreted, dynamically-typed language with strong case-sensitivity.",
+    "The input() function always captures input as a string.",
+    "Implicit and explicit casting (like int(), str(), float()) are required to align mathematical boundaries."
+  ],
+  "previewOfNextTopic": "Next up is Phase 2: Operators! We will explore arithmetic, comparison, logical, membership, and identity operators to build dynamic algorithms.",
+  "mcqs": [
+    {
+      "id": "m1",
+      "type": "theory",
+      "question": "Which of the following is correct regarding Python variables and data types?",
+      "options": [
+        {
+          "key": "A",
+          "text": "You must declare variable types before assigning values to them."
+        },
+        {
+          "key": "B",
+          "text": "Python variables are dynamically typed and case-sensitive."
+        },
+        {
+          "key": "C",
+          "text": "Variables must be named using capital camelCase according to PEP-8."
+        },
+        {
+          "key": "D",
+          "text": "A variable type can never change once it is initialized with a value."
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Python is dynamically typed (interprets variable types at runtime upon assignment) and case-sensitive ('var' and 'Var' are distinct)."
+    },
+    {
+      "id": "m2",
+      "type": "theory",
+      "question": "What is the primary role of the Python Interpreter?",
+      "options": [
+        {
+          "key": "A",
+          "text": "To compile your Python program into a binary .exe executable prior to running."
+        },
+        {
+          "key": "B",
+          "text": "To format your Python files matching strict lint standards automatically."
+        },
+        {
+          "key": "C",
+          "text": "To read, parse, and execute Python statements sequentially line-by-line."
+        },
+        {
+          "key": "D",
+          "text": "To manage git repositories and upload your code files to Cloud storage."
+        }
+      ],
+      "correctAnswer": "C",
+      "explanation": "Python is an interpreted language, where its interpreter executes the instructions sequentially directly from source, line-by-line."
+    },
+    {
+      "id": "m3",
+      "type": "output_prediction",
+      "question": "What is the output of the following code?\n\nx = '10'\ny = 5\nprint(int(x) + y)",
+      "options": [
+        {
+          "key": "A",
+          "text": "105 as a string"
+        },
+        {
+          "key": "B",
+          "text": "15 as an integer"
+        },
+        {
+          "key": "C",
+          "text": "TypeError"
+        },
+        {
+          "key": "D",
+          "text": "SyntaxError"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "The string '10' is explicitly cast to an integer 10 using int(). Adding 5 yields 15, which print() displays."
+    },
+    {
+      "id": "m4",
+      "type": "output_prediction",
+      "question": "What is the output of the following Python block?\n\na = 10.5\nb = int(a)\nprint(type(b))",
+      "options": [
+        {
+          "key": "A",
+          "text": "<class 'float'>"
+        },
+        {
+          "key": "B",
+          "text": "<class 'str'>"
+        },
+        {
+          "key": "C",
+          "text": "<class 'int'>"
+        },
+        {
+          "key": "D",
+          "text": "<class 'NoneType'>"
+        }
+      ],
+      "correctAnswer": "C",
+      "explanation": "Casting a float (10.5) to an integer truncates the decimals resulting in the integer 10. Thus, type(b) yields <class 'int'>."
+    },
+    {
+      "id": "m5",
+      "type": "output_prediction",
+      "question": "What will print(5, 6, sep='-', end='*') display?",
+      "options": [
+        {
+          "key": "A",
+          "text": "5 6-*"
+        },
+        {
+          "key": "B",
+          "text": "5-6*"
+        },
+        {
+          "key": "C",
+          "text": "5-6-*"
+        },
+        {
+          "key": "D",
+          "text": "5 6 *\\n"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "The custom separator 'sep' inserts '-' between 5 and 6, while the custom ending 'end' puts '*' at the end of the printed sequence instead of a newline."
+    },
+    {
+      "id": "m6",
+      "type": "find_the_bug",
+      "question": "Identify the line with the syntax error in the following snippet:\n\n1: # User Profile Input\n2: 1st_user_name = 'Alice'\n3: user_age = 30\n4: print(user_age)",
+      "options": [
+        {
+          "key": "A",
+          "text": "Line 1"
+        },
+        {
+          "key": "B",
+          "text": "Line 2"
+        },
+        {
+          "key": "C",
+          "text": "Line 3"
+        },
+        {
+          "key": "D",
+          "text": "Line 4"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Line 2 contains a variable starting with a number ('1st_user_name'), which is a syntax violation in Python."
+    },
+    {
+      "id": "m7",
+      "type": "find_the_bug",
+      "question": "What is the issue with this cast code?\n\nage = input('Enter your age: ')\nyears_left = 100 - age",
+      "options": [
+        {
+          "key": "A",
+          "text": "The variable years_left is a protected keyword."
+        },
+        {
+          "key": "B",
+          "text": "The input() function crashes when a prompt is specified."
+        },
+        {
+          "key": "C",
+          "text": "The variable 'age' holds a string, resulting in a TypeError when subtracted from an integer."
+        },
+        {
+          "key": "D",
+          "text": "Variables must be declared using the let keyword."
+        }
+      ],
+      "correctAnswer": "C",
+      "explanation": "input() returns a string (e.g. '25'). Subtracting a string from an integer (100 - '25') causes a TypeError."
+    },
+    {
+      "id": "m8",
+      "type": "complete_the_code",
+      "question": "Which code block correctly converts a variable 'gpa = 3.9' into its string representation?",
+      "options": [
+        {
+          "key": "A",
+          "text": "gpa_str = cast_string(gpa)"
+        },
+        {
+          "key": "B",
+          "text": "gpa_str = str(gpa)"
+        },
+        {
+          "key": "C",
+          "text": "gpa_str = (str)gpa"
+        },
+        {
+          "key": "D",
+          "text": "gpa_str = gpa.to_string()"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Python uses the built-in str() function as an explicit cast method to convert inputs into string representations."
+    },
+    {
+      "id": "m9",
+      "type": "complete_the_code",
+      "question": "To print output without adding an automatic newline at the end, what parameter should be adjusted in print()?",
+      "options": [
+        {
+          "key": "A",
+          "text": "Set end=''"
+        },
+        {
+          "key": "B",
+          "text": "Set newline=False"
+        },
+        {
+          "key": "C",
+          "text": "Set sep=''"
+        },
+        {
+          "key": "D",
+          "text": "Set print_line=None"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "By default, print() terminates with end='\\n'. Overriding this with end='' removes the automatic trailing newline."
+    },
+    {
+      "id": "m10",
+      "type": "best_approach",
+      "question": "What is the recommended PEP-8 compliant way to define a constant and a variable in Python?",
+      "options": [
+        {
+          "key": "A",
+          "text": "Constant: MAX_SPEED = 120; Variable: car_speed = 80"
+        },
+        {
+          "key": "B",
+          "text": "Constant: const maxSpeed = 120; Variable: let carSpeed = 80"
+        },
+        {
+          "key": "C",
+          "text": "Constant: MaxSpeed = 120; Variable: CARSPEED = 80"
+        },
+        {
+          "key": "D",
+          "text": "Constant: _MAXSPEED = 120; Variable: car-speed = 80"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "Under PEP-8, constants should be in UPPERCASE_SNAKE_CASE, and standard variables should be in lowercase_snake_case."
+    }
+  ],
+  "codeQuestions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "Write a program",
+      "title": "Interactive Greeting",
+      "question": "Write a program that queries the user for their first name and their country, then prints out a personalized greeting message in the format: 'Hello {first_name} from {country}, welcome to Python!'.",
+      "codeTemplate": "# Query user inputs\nfirst_name = \"Bob\" # Replace with input when real\ncountry = \"Canada\"   # Replace with input when real\n\n# Construct the greeting f-string and print it\n# YOUR CODE HERE",
+      "solutionCode": "first_name = \"Bob\"\ncountry = \"Canada\"\nprint(f\"Hello {first_name} from {country}, welcome to Python!\")",
+      "expectedOutput": "Hello Bob from Canada, welcome to Python!",
+      "hints": [
+        "Use Python's f-strings to format variables within a text literal directly.",
+        "An f-string starts with an f prefix: f\"My text {variable}\""
+      ],
+      "explanation": "We define our string variables and use an f-string literal. The curly braces {} act as insertion frames for variables which Python fills at execution."
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "Complete missing code",
+      "title": "Fahrenheit to Celsius Converter",
+      "question": "Complete the missing line of code to safely cast the temperature_f_str string into a float, and calculate the Celsius temperature. Formula: Celsius = (Fahrenheit - 32) * 5/9.",
+      "codeTemplate": "temperature_f_str = \"98.6\"\n\n# Cast temperature_f_str to float\ntemp_f = # YOUR CODE HERE\n\n# Formula\ntemp_c = (temp_f - 32) * 5 / 9\nprint(f\"Celsius: {temp_c:.1f}\")",
+      "solutionCode": "temperature_f_str = \"98.6\"\ntemp_f = float(temperature_f_str)\ntemp_c = (temp_f - 32) * 5 / 9\nprint(f\"Celsius: {temp_c:.1f}\")",
+      "expectedOutput": "Celsius: 37.0",
+      "hints": [
+        "Use the built-in float() function to convert string characters into floating-point numbers."
+      ],
+      "explanation": "By casting the string '98.6' into a float using float(), we can perform arithmetic. We print it with floating format specs :.1f to limit to one decimal place."
+    },
+    {
+      "id": "q3",
+      "difficulty": "Medium",
+      "type": "Debug existing code",
+      "title": "Fix the Math Crash",
+      "question": "The following program crashes with a TypeError. Locate and fix the bug so that it calculates and prints the doubled value of the user's score correctly.",
+      "buggyCode": "# The program captures a score, then doubles it\nscore_input = \"450\" # Simulated input\ndoubled_score = score_input * 2\nprint(\"Doubled Score:\", doubled_score)",
+      "solutionCode": "score_input = \"450\"\ndoubled_score = int(score_input) * 2\nprint(\"Doubled Score:\", doubled_score)",
+      "expectedOutput": "Doubled Score: 900",
+      "hints": [
+        "When multiplying a string by 2 in Python, it performs string repetition (e.g. '450450'), not multiplication.",
+        "You must explicitly cast the string input to an integer using int()."
+      ],
+      "explanation": "By converting the input string score_input to an integer using int(score_input), Python performs numerical multiplication instead of repeating the string."
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "Optimize code",
+      "title": "Efficient Custom print()",
+      "question": "Given three separate items, format and print them on a single line separated by a double-colon '::' and ending with a exclamation mark '!', without using string concatenation (+).",
+      "codeTemplate": "part1 = \"Core\"\npart2 = \"Node\"\npart3 = \"Online\"\n\n# Implement using print() parameters only\n# YOUR CODE HERE",
+      "solutionCode": "part1 = \"Core\"\npart2 = \"Node\"\npart3 = \"Online\"\nprint(part1, part2, part3, sep=\"::\", end=\"!\")",
+      "expectedOutput": "Core::Node::Online!",
+      "hints": [
+        "Look into the custom parameters of print(): 'sep' and 'end'."
+      ],
+      "explanation": "By specifying sep='::', we join the separate items. By overriding end='!', we prevent a final newline, saving memory and executing efficiently without making temporary string objects."
+    },
+    {
+      "id": "q5",
+      "difficulty": "Medium",
+      "type": "Debug existing code",
+      "title": "Identify the Case-Sensitivity Bug",
+      "question": "Find the typo/variable assignment crash in this snippet and repair it to print the correct circle description.",
+      "buggyCode": "Radius = 15\npi_value = 3.14159\narea = pi_value * (radius ** 2)\nprint(\"Area is:\", area)",
+      "solutionCode": "radius = 15\npi_value = 3.14159\narea = pi_value * (radius ** 2)\nprint(\"Area is:\", area)",
+      "expectedOutput": "Area is: 706.85775",
+      "hints": [
+        "Check the capital letter 'R' vs lowercase 'r' in the variable definitions."
+      ],
+      "explanation": "Python is case-sensitive. The variable is defined as 'Radius' with an uppercase 'R' but referenced as 'radius' in the calculation, raising a NameError. We align both to lowercase."
+    },
+    {
+      "id": "q6",
+      "difficulty": "Hard",
+      "type": "Predict output using code",
+      "title": "NoneType Arithmetic Behavior",
+      "question": "Write code to verify the return type of a function that does not return anything explicitly, and show what happens if you try to print it.",
+      "codeTemplate": "def empty_func():\n    pass\n\nresult = empty_func()\n# YOUR CODE HERE: Print result and print type(result)",
+      "solutionCode": "def empty_func():\n    pass\n\nresult = empty_func()\nprint(result)\nprint(type(result))",
+      "expectedOutput": "None\n<class 'NoneType'>",
+      "hints": [
+        "In Python, functions without an explicit return statement return None automatically."
+      ],
+      "explanation": "Because there is no return inside empty_func(), Python implicitly returns the None object, which is of type NoneType."
+    },
+    {
+      "id": "q7",
+      "difficulty": "Hard",
+      "type": "Modify existing code",
+      "title": "Safe Multi-Cast Converter",
+      "question": "Modify the provided snippet to handle safe casting. Convert value_input first to a float. If that float is a whole number (like 45.0), display it as a pure integer (45), otherwise keep it as a float.",
+      "codeTemplate": "value_input = \"45.0\"\n\n# Convert to float first, then check and print\n# YOUR CODE HERE",
+      "solutionCode": "value_input = \"45.0\"\nval_f = float(value_input)\nif val_f.is_integer():\n    print(int(val_f))\nelse:\n    print(val_f)",
+      "expectedOutput": "45",
+      "hints": [
+        "You can check if a float represents a whole number using the .is_integer() method on float values."
+      ],
+      "explanation": "We convert the string to a float first. Using .is_integer() helps us detect whole values and cast them down to integers using int(), making terminal displays clean."
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "Small implementation",
+      "title": "Interactive Bill Splitter",
+      "question": "Build a mini currency calculator. Given three string inputs representing a bill total, splitting people, and a tip percentage, compute each person's share as a rounded float. Output should be exact.",
+      "codeTemplate": "bill_str = \"120.0\"\npeople_str = \"4\"\ntip_pct_str = \"15\"\n\n# YOUR CODE HERE: Convert, calculate, and print person's share rounded to two decimals",
+      "solutionCode": "bill_str = \"120.0\"\npeople_str = \"4\"\ntip_pct_str = \"15\"\n\nbill = float(bill_str)\npeople = int(people_str)\ntip = float(tip_pct_str)\n\ntotal = bill * (1 + tip / 100)\nshare = total / people\nprint(f\"Share per person: {share:.2f}\")",
+      "expectedOutput": "Share per person: 34.50",
+      "hints": [
+        "Cast the bill and tip to float, and people to int.",
+        "Format the output using f-string specifiers :.2f to get exactly 2 decimal places."
+      ],
+      "explanation": "First, string tokens are cast to numeric floats and integers. The tip is evaluated to scale the bill, divided by split size, and formatted with .2f precision."
+    }
+  ]
 }

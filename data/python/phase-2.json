@@ -1,0 +1,512 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 2,
+    "phaseName": "Operators & Precedence",
+    "duration": "4 hours"
+  },
+  "learningObjectives": [
+    "Master arithmetic, comparison, and logical operators for decision making.",
+    "Implement assignment and bitwise operators in low-level data manipulation.",
+    "Understand operator precedence (PEMDAS/BODMAS) to prevent logic errors.",
+    "Utilize identity and membership operators for efficient object checking.",
+    "Analyze complex expressions for clarity and bug prevention."
+  ],
+  "prerequisites": [
+    "Variables and Data Types (int, float, str, bool)",
+    "Basic Python syntax and shell usage"
+  ],
+  "introduction": "Operators are the 'verbs' of the Python language. They define how data is manipulated, transformed, and compared. Understanding how Python evaluates these expressions is the difference between writing clean, predictable code and introducing subtle, hard-to-track logic bugs.",
+  "conceptExplanation": "In Python, an operator is a symbol that performs an operation on operands (data). Expressions are combinations of operators and operands. Because multiple operators can exist in a single line, Python uses a strict set of 'Precedence' rules—a hierarchy that determines which operation is performed first. Think of this as the grammar of mathematical and logical logic in software.",
+  "syntax": "result = (a + b) * (c >> 2) and (d is not e) or (f in list_obj)",
+  "syntaxBreakdown": [
+    "Arithmetic: +, -, *, /, // (floor), % (modulo), ** (exponent)",
+    "Comparison: ==, !=, >, <, >=, <=",
+    "Logical: and, or, not (short-circuiting behavior)",
+    "Identity: is, is not (checking if objects share the same memory address)",
+    "Membership: in, not in (checking presence in iterables)"
+  ],
+  "rulesAndKeyPoints": [
+    "Parentheses () always hold the highest precedence and override default order.",
+    "Exponentiation (**) has higher precedence than multiplication/division.",
+    "Multiplication, division, and modulo are grouped at the same level.",
+    "Addition and subtraction occur after multiplicative operators.",
+    "Comparison operators (==, <, >) have lower precedence than arithmetic.",
+    "Logical 'not' has the highest precedence among logical operators.",
+    "Logical 'and' is evaluated before 'or'.",
+    "Identity ('is') checks memory reference; do not use it for equality of values.",
+    "Short-circuit evaluation means 'and' stops if the first operand is False.",
+    "Bitwise operators (&, |, ^) operate on the binary representation of integers."
+  ],
+  "codeExample1": {
+    "title": "Basic Arithmetic and Precedence",
+    "code": "result = 10 + 5 * 2 ** 2 / 2\nprint(result)",
+    "explanation": "Demonstrates order: Exponentiation (2**2=4) -> Multiplication (5*4=20) -> Division (20/2=10.0) -> Addition (10+10.0=20.0).",
+    "output": "20.0"
+  },
+  "codeExample2": {
+    "title": "Practical Identity and Membership Check",
+    "code": "data_buffer = [10, 20, 30]\nstatus = 20\n\nif status in data_buffer and status is not None:\n    print('Valid processing status')",
+    "explanation": "Validates if a status exists within a buffer and is not None using identity and membership operators.",
+    "output": "Valid processing status"
+  },
+  "dryRunSteps": [
+    {
+      "stepNumber": 1,
+      "lineOfCode": "status = 20",
+      "lineNumber": 2,
+      "explanation": "Variable status is assigned the integer 20.",
+      "variablesState": {
+        "status": "20"
+      }
+    },
+    {
+      "stepNumber": 2,
+      "lineOfCode": "status in data_buffer",
+      "lineNumber": 4,
+      "explanation": "Python checks if 20 exists in the list [10, 20, 30]. Result is True.",
+      "variablesState": {
+        "status": "20"
+      }
+    },
+    {
+      "stepNumber": 3,
+      "lineOfCode": "status is not None",
+      "lineNumber": 4,
+      "explanation": "Checks if status is an object other than None. Result is True.",
+      "variablesState": {
+        "status": "20"
+      }
+    },
+    {
+      "stepNumber": 4,
+      "lineOfCode": "if True and True:",
+      "lineNumber": 4,
+      "explanation": "Both conditions met, executing the print statement block.",
+      "variablesState": {
+        "status": "20"
+      }
+    }
+  ],
+  "memoryVisualization": {
+    "description": "Visualizing identity operator 'is' comparing objects in memory.",
+    "elements": [
+      {
+        "id": "a",
+        "label": "a",
+        "type": "stack",
+        "value": "100"
+      },
+      {
+        "id": "b",
+        "label": "b",
+        "type": "stack",
+        "value": "100"
+      },
+      {
+        "id": "mem_100",
+        "label": "Integer 100",
+        "type": "heap",
+        "value": "100"
+      },
+      {
+        "id": "p1",
+        "label": "Pointer to heap",
+        "type": "pointer",
+        "pointsTo": "mem_100"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Input validation: Using 'in' to check user roles in a list of authorized IDs.",
+    "Transaction logs: Using arithmetic modulo (%) to process batching cycles.",
+    "Performance optimization: Using 'not' and short-circuit evaluation to skip heavy calculations.",
+    "State machines: Comparing current status constants using identity operators."
+  ],
+  "commonMistakes": [
+    "Using '==' instead of 'is' for None checks.",
+    "Confusing '=' (assignment) with '==' (equality).",
+    "Neglecting parentheses leading to unexpected order-of-operation results.",
+    "Assuming left-to-right evaluation for all operators (e.g., exponentiation is right-to-left)."
+  ],
+  "bestPractices": [
+    "Use parentheses even if precedence is clear to improve code readability.",
+    "Prefer 'is not None' over '!= None' for readability and PEP 8 standards.",
+    "Keep expressions short; break complex logical statements into readable variables.",
+    "Always use parentheses when mixing bitwise and arithmetic operators."
+  ],
+  "faqs": [
+    {
+      "question": "Why use 'is' instead of '=='?",
+      "answer": "'==' checks for value equality (do these have the same contents?), while 'is' checks for object identity (are these the exact same instance in memory?)."
+    },
+    {
+      "question": "Does Python use operator overloading?",
+      "answer": "Yes, Python allows objects to define their own behavior for operators via dunder methods like __add__ or __eq__."
+    }
+  ],
+  "summary": "Phase 2 established that operators are the foundation of logic. We covered the hierarchy of precedence, the distinct roles of identity vs equality, and the practical application of membership tests, ensuring you can write expressive and error-free code.",
+  "keyTakeaways": [
+    "Parentheses override default precedence.",
+    "Short-circuiting improves efficiency in 'and'/'or' chains.",
+    "Identity ('is') is for objects; Equality ('==') is for values.",
+    "Membership ('in') is highly optimized for collection searches."
+  ],
+  "previewOfNextTopic": "Phase 3 will cover String manipulation, where we will apply these operators to process and format text data efficiently.",
+  "mcqs": [
+    {
+      "id": "m1",
+      "type": "theory",
+      "question": "Which operator has the highest precedence in Python?",
+      "options": [
+        {
+          "key": "A",
+          "text": "and"
+        },
+        {
+          "key": "B",
+          "text": "not"
+        },
+        {
+          "key": "C",
+          "text": "or"
+        },
+        {
+          "key": "D",
+          "text": "is"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "The 'not' operator has higher precedence than 'and' and 'or'."
+    },
+    {
+      "id": "m2",
+      "type": "theory",
+      "question": "What is the result of 10 // 3?",
+      "options": [
+        {
+          "key": "A",
+          "text": "3"
+        },
+        {
+          "key": "B",
+          "text": "3.33"
+        },
+        {
+          "key": "C",
+          "text": "3.0"
+        },
+        {
+          "key": "D",
+          "text": "4"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "Floor division returns the integer portion of the division."
+    },
+    {
+      "id": "m3",
+      "type": "output_prediction",
+      "question": "What is the output of: print(3 * 1**3)?",
+      "options": [
+        {
+          "key": "A",
+          "text": "27"
+        },
+        {
+          "key": "B",
+          "text": "3"
+        },
+        {
+          "key": "C",
+          "text": "1"
+        },
+        {
+          "key": "D",
+          "text": "9"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Exponentiation (1**3 = 1) is evaluated before multiplication (3 * 1 = 3)."
+    },
+    {
+      "id": "m4",
+      "type": "output_prediction",
+      "question": "What is the output of: print(5 > 3 and 2 < 4)?",
+      "options": [
+        {
+          "key": "A",
+          "text": "True"
+        },
+        {
+          "key": "B",
+          "text": "False"
+        },
+        {
+          "key": "C",
+          "text": "None"
+        },
+        {
+          "key": "D",
+          "text": "Error"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "5 > 3 is True and 2 < 4 is True; True and True is True."
+    },
+    {
+      "id": "m5",
+      "type": "output_prediction",
+      "question": "What is the output of: print(True or False and False)?",
+      "options": [
+        {
+          "key": "A",
+          "text": "False"
+        },
+        {
+          "key": "B",
+          "text": "True"
+        },
+        {
+          "key": "C",
+          "text": "None"
+        },
+        {
+          "key": "D",
+          "text": "Error"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Logical 'and' has higher precedence than 'or'. (False and False) is evaluated first (False), then (True or False) is True."
+    },
+    {
+      "id": "m6",
+      "type": "find_the_bug",
+      "question": "Identify the logical error: x = 10; if x = 5: print('Yes')",
+      "options": [
+        {
+          "key": "A",
+          "text": "Syntax error: Cannot use '=' in if statement."
+        },
+        {
+          "key": "B",
+          "text": "Logical error: Comparison should be '=='."
+        },
+        {
+          "key": "C",
+          "text": "Indentation error."
+        },
+        {
+          "key": "D",
+          "text": "Name error."
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "The assignment operator '=' is used instead of the equality comparison operator '=='."
+    },
+    {
+      "id": "m7",
+      "type": "find_the_bug",
+      "question": "Which of these is the incorrect way to check for None?",
+      "options": [
+        {
+          "key": "A",
+          "text": "if x is None:"
+        },
+        {
+          "key": "B",
+          "text": "if x is not None:"
+        },
+        {
+          "key": "C",
+          "text": "if x == None:"
+        },
+        {
+          "key": "D",
+          "text": "if x = None:"
+        }
+      ],
+      "correctAnswer": "D",
+      "explanation": "Option D uses an assignment operator, which is invalid in an expression."
+    },
+    {
+      "id": "m8",
+      "type": "complete_the_code",
+      "question": "Complete: To check if 'a' exists in list 'my_list', use ____.",
+      "options": [
+        {
+          "key": "A",
+          "text": "'a' equals my_list"
+        },
+        {
+          "key": "B",
+          "text": "'a' in my_list"
+        },
+        {
+          "key": "C",
+          "text": "'a' exists my_list"
+        },
+        {
+          "key": "D",
+          "text": "my_list.contains('a')"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "The 'in' operator is the idiomatic way to check membership in Python."
+    },
+    {
+      "id": "m9",
+      "type": "complete_the_code",
+      "question": "What fills the blank? result = 10 ____ 2 # result is 100",
+      "options": [
+        {
+          "key": "A",
+          "text": "*"
+        },
+        {
+          "key": "B",
+          "text": "**"
+        },
+        {
+          "key": "C",
+          "text": "^"
+        },
+        {
+          "key": "D",
+          "text": "/"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "10 to the power of 2 is 100, represented by the exponentiation operator '**'."
+    },
+    {
+      "id": "m10",
+      "type": "best_approach",
+      "question": "Which is the most readable and Pythonic way to combine multiple logic checks?",
+      "options": [
+        {
+          "key": "A",
+          "text": "Use many nested if-else blocks."
+        },
+        {
+          "key": "B",
+          "text": "Use complex, unparenthesized expressions."
+        },
+        {
+          "key": "C",
+          "text": "Use parentheses to group logic explicitly."
+        },
+        {
+          "key": "D",
+          "text": "Avoid logical operators."
+        }
+      ],
+      "correctAnswer": "C",
+      "explanation": "Parentheses clarify intent and prevent precedence-related bugs, making the code maintainable."
+    }
+  ],
+  "codeQuestions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "Write a program",
+      "title": "Temperature Converter",
+      "question": "Write a program that takes an integer Celsius, calculates Fahrenheit using (C * 9/5) + 32, and prints the result.",
+      "solutionCode": "celsius = 25\nfahrenheit = (celsius * 9/5) + 32\nprint(fahrenheit)",
+      "hints": [
+        "Remember order of operations",
+        "Multiply before adding"
+      ],
+      "explanation": "Calculates Fahrenheit using standard formula with parentheses to ensure correct precedence."
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "Complete missing code",
+      "title": "Even Number Validator",
+      "question": "Fill the blank to print True if 'n' is even.",
+      "codeTemplate": "n = 10\nis_even = (n ____ 2 == 0)\nprint(is_even)",
+      "solutionCode": "n = 10\nis_even = (n % 2 == 0)\nprint(is_even)",
+      "hints": [
+        "Use modulo operator"
+      ],
+      "explanation": "The % operator returns the remainder; even numbers have a remainder of 0 when divided by 2."
+    },
+    {
+      "id": "q3",
+      "difficulty": "Easy-Medium",
+      "type": "Debug existing code",
+      "title": "Logical Fix",
+      "question": "This code is intended to check if x is between 10 and 20. Fix the syntax.",
+      "buggyCode": "x = 15\nif 10 < x < 20:\n    print('Correct')",
+      "solutionCode": "x = 15\nif x > 10 and x < 20:\n    print('Correct')",
+      "hints": [
+        "Python supports chaining, but show explicit logical 'and'"
+      ],
+      "explanation": "While chained comparisons work, explicitly using 'and' is standard practice in many languages and improves readability."
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "Predict output using code",
+      "title": "Precedence Challenge",
+      "question": "Predict the output of the following expression:",
+      "codeTemplate": "a = 5\nb = 2\nc = a ** b * 3 / 2\nprint(c)",
+      "solutionCode": "a = 5\nb = 2\nc = (25 * 3) / 2\nprint(float(c))",
+      "expectedOutput": "37.5",
+      "hints": [
+        "Exponentiation is higher than mult"
+      ],
+      "explanation": "5**2=25, 25*3=75, 75/2=37.5."
+    },
+    {
+      "id": "q5",
+      "difficulty": "Medium",
+      "type": "Write a program",
+      "title": "Access Level Check",
+      "question": "Check if a user has admin access. Admin list: ['admin', 'superuser']. User: 'manager'. Use membership operators.",
+      "solutionCode": "admin_list = ['admin', 'superuser']\nuser = 'manager'\nhas_access = user in admin_list\nprint(has_access)",
+      "expectedOutput": "False",
+      "hints": [
+        "Use the 'in' keyword"
+      ],
+      "explanation": "Checks if the string 'manager' exists inside the provided list."
+    },
+    {
+      "id": "q6",
+      "difficulty": "Medium-Hard",
+      "type": "Modify existing code",
+      "title": "Bitwise Status Flag",
+      "question": "Modify this to check if the 2nd bit (value 2) is set in flag variable 7 using bitwise AND.",
+      "solutionCode": "flag = 7\n# 7 is 111 in binary\nis_bit_set = (flag & 2) != 0\nprint(is_bit_set)",
+      "hints": [
+        "Use & and compare to 0"
+      ],
+      "explanation": "7 & 2 results in 2 (binary 010). Since 2 != 0, the bit is set."
+    },
+    {
+      "id": "q7",
+      "difficulty": "Hard",
+      "type": "Small implementation",
+      "title": "Leap Year Detector",
+      "question": "Write logic to check if year 2024 is a leap year (divisible by 4, not by 100 unless by 400).",
+      "solutionCode": "year = 2024\nis_leap = (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)\nprint(is_leap)",
+      "hints": [
+        "Use logical combinations of modulo"
+      ],
+      "explanation": "Standard leap year logic requires grouping arithmetic and logical operators."
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "Optimize code",
+      "title": "Lazy Evaluator",
+      "question": "Optimize this logical check to prevent unnecessary expensive_function() calls if the flag is False.",
+      "codeTemplate": "flag = False\nres = expensive_function() and flag",
+      "solutionCode": "flag = False\nres = flag and expensive_function()",
+      "hints": [
+        "Short-circuiting"
+      ],
+      "explanation": "By putting 'flag' first, if it is False, the 'and' operator short-circuits and never executes the expensive function."
+    }
+  ]
+}

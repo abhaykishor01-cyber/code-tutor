@@ -1,0 +1,322 @@
+{
+  "metadata": {
+    "phaseNumber": 10,
+    "title": "Dynamic Memory Allocation",
+    "duration": "4 Hours",
+    "difficulty": "Intermediate"
+  },
+  "learningObjectives": [
+    "Understand the detailed layout of process memory including Stack, Heap, Code, and Data segments",
+    "Master memory allocation using malloc(), calloc(), and realloc() with strict error checking",
+    "Understand manual memory management lifetime rules and the explicit use of free()",
+    "Identify, prevent, and debug memory leaks, double-frees, and use-after-free vulnerabilities"
+  ],
+  "prerequisites": [
+    "Pointers (Pointers to basic types, pointer arithmetic)",
+    "Sizeof Operator",
+    "Variable Scope and Lifetime"
+  ],
+  "introduction": "Up to this point, all variable sizes and arrays in your C programs have had their sizes determined at compile-time. This is known as static or automatic allocation on the Stack. However, real-world programs must process runtime inputs whose sizes are unknown beforehand (e.g., reading a text file of variable length, or handling an unpredictable number of network connections). Dynamic Memory Allocation allows a C program to request memory space dynamically from the system during program execution, utilizing a specialized memory pool called the Heap.",
+  "conceptExplanation": "To understand dynamic memory, we must first look at a running C program's Memory Layout. Memory is divided into segments: \n1. Code Segment: Stores the compiled machine instructions (read-only).\n2. Data Segment (Initialized/Uninitialized): Stores global and static variables.\n3. Stack: Stores local variables and function call frames. It grows downward and is automatically managed. When a function exits, its stack frame is popped, and its memory is lost.\n4. Heap: A large pool of memory used for dynamic allocation. It grows upward and must be explicitly managed by the programmer. Memory allocated on the Heap remains allocated until the programmer explicitly frees it or the program terminates.\n\nBecause the system cannot automatically reclaim Heap memory, C provides the standard library functions <stdlib.h>: malloc(), calloc(), realloc(), and free(). Unlike Stack allocations, which throw stack overflow errors on exhaustion, dynamic allocation functions will signal failure by returning a null pointer (NULL). It is the programmer's absolute responsibility to check this return value before dereferencing, and to release the memory when it is no longer needed.",
+  "syntax": "void* malloc(size_t size);\nvoid* calloc(size_t num, size_t size);\nvoid* realloc(void* ptr, size_t new_size);\nvoid free(void* ptr);",
+  "syntaxBreakdown": [
+    "void* : A generic pointer type that can be implicitly converted to any other pointer type (e.g., int*, char*) without an explicit cast in C.",
+    "size_t size : The absolute number of bytes of memory to allocate.",
+    "size_t num : The number of elements to allocate (used by calloc for array allocations).",
+    "void* ptr : A pointer to a previously allocated dynamic memory block on the heap.",
+    "free(ptr) : Releases the allocated block pointed to by ptr. Passing NULL to free is guaranteed to be a safe, no-operation."
+  ],
+  "rulesAndKeyPoints": [
+    "Always check for NULL: Dynamic allocation can fail if the system is out of memory. Never use a returned pointer without verifying it is not NULL.",
+    "Always match allocations with free: Every call to malloc/calloc/realloc must have a corresponding call to free to prevent memory leaks.",
+    "Avoid Dangling Pointers: After calling free(ptr), set ptr = NULL to ensure you do not inadvertently access or free the pointer again.",
+    "Do not cast the return of malloc: In standard C, casting 'void*' is unnecessary and can hide compiler warnings if <stdlib.h> is omitted.",
+    "Avoid realloc data loss: Always assign realloc's return value to a temporary pointer. If realloc fails, it returns NULL, and assigning it directly to your original pointer would orphan the existing memory."
+  ],
+  "codeExample1": {
+    "title": "Basic Dynamic Array Allocation with malloc() and free()",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main(void) {\n    int n = 5;\n    // Allocate memory on the heap for 5 integers\n    int *arr = malloc(n * sizeof(*arr));\n    \n    // Always check if the allocation succeeded\n    if (arr == NULL) {\n        fprintf(stderr, \"Memory allocation failed!\\n\");\n        return 1;\n    }\n    \n    // Safe to populate and use\n    for (int i = 0; i < n; i++) {\n        arr[i] = (i + 1) * 10;\n    }\n    \n    // Print the dynamic array\n    for (int i = 0; i < n; i++) {\n        printf(\"arr[%d] = %d\\n\", i, arr[i]);\n    }\n    \n    // Explicitly release the memory back to the operating system\n    free(arr);\n    \n    // Prevent dangling pointer use\n    arr = NULL;\n    \n    return 0;\n}",
+    "explanation": "This example shows the safe lifecycle of dynamically allocated memory. malloc() requests bytes matching 5 integers. We verify the return pointer is not NULL before reading/writing. After writing and printing values, we free the memory and explicitly assign NULL to prevent subsequent bugs."
+  },
+  "codeExample2": {
+    "title": "Resizing Dynamic Arrays with calloc() and realloc()",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nint main(void) {\n    int num_elements = 3;\n    \n    // calloc allocates AND zero-initializes elements\n    int *arr = calloc(num_elements, sizeof(*arr));\n    if (arr == NULL) {\n        return 1;\n    }\n    \n    printf(\"Initial zeros:\\n\");\n    for (int i = 0; i < num_elements; i++) {\n        printf(\"%d \", arr[i]);\n    }\n    printf(\"\\n\");\n    \n    // Resize dynamic array to hold 6 elements\n    int new_elements = 6;\n    int *temp = realloc(arr, new_elements * sizeof(*temp));\n    if (temp == NULL) {\n        // realloc failed, but arr is still valid and needs to be freed\n        free(arr);\n        return 1;\n    }\n    \n    // realloc was successful, safe to overwrite arr\n    arr = temp;\n    \n    // Initialize the newly added elements\n    for (int i = num_elements; i < new_elements; i++) {\n        arr[i] = (i + 1) * 100;\n    }\n    \n    printf(\"Resized array:\\n\");\n    for (int i = 0; i < new_elements; i++) {\n        printf(\"%d \", arr[i]);\n    }\n    printf(\"\\n\");\n    \n    free(arr);\n    return 0;\n}",
+    "explanation": "This demonstrates calloc() setting all bytes to zero automatically, and realloc() growing the block. Notice that the return value of realloc() is saved to a temporary variable 'temp' to ensure the original pointer 'arr' is not lost if the operating system runs out of heap memory during resizing.",
+    "expectedOutput": "Initial zeros:\n0 0 0 \nResized array:\n0 0 0 400 500 600 "
+  },
+  "stepByStepDryRun": [
+    "Step 1: Program starts execution, stack frame for main is created. Variables: num_elements = 3, and a local pointer 'arr' initialized to uninitialized garbage.",
+    "Step 2: calloc(3, sizeof(int)) is called. The OS allocates 12 continuous bytes of memory on the Heap and zeroes out every single bit.",
+    "Step 3: calloc returns the address of the allocated block (e.g., 0x5555555590a0). The program stores this address in 'arr'.",
+    "Step 4: The if check confirms that 'arr' is not NULL. Elements are printed showing '0 0 0' because of calloc's auto-zeroing feature.",
+    "Step 5: realloc(arr, 6 * sizeof(int)) is executed. The system attempts to expand the block at 0x5555555590a0. Since space is available directly adjacent, it expands it to 24 bytes in place, retaining original content, and returns the original address.",
+    "Step 6: The return address is caught in 'temp'. It is validated as not NULL, and 'arr' is updated to equal 'temp'.",
+    "Step 7: Indices 3, 4, 5 of the array are populated with 400, 500, and 600.",
+    "Step 8: The printed output shows all 6 elements accurately.",
+    "Step 9: free(arr) is called. The 24-byte block starting at 0x5555555590a0 is marked as free/usable by the heap manager. Main function returns 0 safely."
+  ],
+  "memoryVisualization": {
+    "type": "Stack and Heap Diagram",
+    "description": "Visualizing how pointer variables stored on the stack point to dynamic variables allocated on the heap.",
+    "nodes": [
+      {
+        "label": "Stack: ptr variable",
+        "value": "Address: 0x7ffd50 (points to 0x555a10)",
+        "address": "0x7ffd50",
+        "color": "sky"
+      },
+      {
+        "label": "Heap Element [0]",
+        "value": "Value: 42",
+        "address": "0x555a10",
+        "color": "emerald"
+      },
+      {
+        "label": "Heap Element [1]",
+        "value": "Value: 99",
+        "address": "0x555a14",
+        "color": "emerald"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Implementing dynamic collection structs (e.g., Vectors, Hashmaps, Linked Lists) that grow/shrink dynamically with items.",
+    "Processing large dataset records from databases where file structures vary and maximum capacities are unknown in advance.",
+    "Parsing dynamic JSON/XML payload trees in backend networking engines.",
+    "Loading dynamic image resolutions into memory frame buffers for real-time graphics rendering."
+  ],
+  "commonMistakes": [
+    "Forgetting to check if malloc() returned NULL before reading/writing.",
+    "Using uninitialized dynamic memory allocated with malloc() (unlike calloc, malloc does not clear storage).",
+    "Memory Leaks: Allocating memory repeatedly inside loops without calling free().",
+    "Double Freeing: Calling free() on the exact same pointer address twice.",
+    "Dangling Pointer use: Accessing memory that has already been returned via free().",
+    "Assigning the return of realloc() directly to the source pointer without a temp pointer check, leading to leaks on failure."
+  ],
+  "bestPractices": [
+    "Adopt 'Single Ownership' patterns: Design your modules so that whoever creates memory is also explicitly responsible for freeing it.",
+    "After freeing a pointer, always explicitly set it to NULL (e.g., free(ptr); ptr = NULL;) to mitigate Use-After-Free issues.",
+    "Use calloc instead of malloc if you intend to default-initialize numeric and pointer fields to clean, predictable zeros.",
+    "Always compile with diagnostic tools like AddressSanitizer (gcc -fsanitize=address) or use Valgrind to track down memory leaks immediately."
+  ],
+  "faqs": [
+    {
+      "question": "What happens if I try to access memory after calling free() on it?",
+      "answer": "This leads to Undefined Behavior. The operating system might not crash immediately because the memory block is simply returned to the allocator pool. However, that space may soon be reassigned, overwriting your data, corrupting program state, or causing unpredictable segmentation faults."
+    },
+    {
+      "question": "Does calling free() modify the pointer variable itself?",
+      "answer": "No. The free() function only tells the memory manager that the block at the specified address is no longer in use. The pointer variable on the stack still contains the exact same memory address, which now points to invalid data (creating a dangling pointer)."
+    },
+    {
+      "question": "Is it required to cast the return of malloc (e.g., char *c = (char*)malloc(10))?",
+      "answer": "No. In C, a void* implicitly converts to any type pointer. Casting malloc's return is actually considered bad practice because it can suppress compiler warnings if you forget to include <stdlib.h>, leading to bugs on 64-bit platforms."
+    }
+  ],
+  "summary": "Dynamic Memory Allocation provides the power to allocate and size memory dynamically on the Heap during program runtime. Programmers must manually handle the entire lifecycle of dynamically allocated blocks using malloc, calloc, realloc, and free, requiring clean error checks and discipline to prevent dangerous leaks and crashes.",
+  "keyTakeaways": [
+    "Stack is managed automatically but limited in size; Heap is manual but virtually unlimited.",
+    "All allocations must have a corresponding free() call to avoid resource exhaustion (memory leaks).",
+    "malloc() returns uninitialized memory, while calloc() initializes memory to binary zeros.",
+    "Always reallocate using temporary variables to avoid losing pointers on allocation failures."
+  ],
+  "nextTopicPreview": "Now that you can allocate complex, variable structures in memory dynamically, we will explore File I/O (Input/Output) to see how dynamic memory can be utilized to read and write arbitrary file sizes directly from disk.",
+  "questionsAndAnswers": [
+    {
+      "id": "q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "Explain the difference between Stack memory and Heap memory in terms of speed, size, and lifetime management.",
+      "answer": "Stack memory is extremely fast because allocation simply involves shifting the stack pointer. It has limited size limits (often 1MB-8MB depending on OS settings), and the lifetime of its allocations is managed automatically by the compiler via lexical scope (cleared on function exit). Heap memory is slower to allocate due to complex tracking mechanisms, but is limited only by physical/virtual RAM. Its lifetime must be managed manually by the programmer.",
+      "explanation": "Understanding this distinction helps programmers decide when to allocate on stack (short-lived, small variables) versus heap (large datasets, long-lived variables)."
+    },
+    {
+      "id": "q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Why is calloc preferred over malloc when setting up structures containing security flags or sensitive pointer fields?",
+      "answer": "malloc leaves whatever legacy data was previously sitting in the physical RAM segment intact (dirty memory). If your structure contains sensitive variables (like authentication flags or pointers), failure to manually initialize them could leave active configurations or pointers that point to unexpected addresses. calloc clears every single byte of allocated space to zero, guaranteeing predictable default states.",
+      "explanation": "Security bugs (such as information disclosure and use of uninitialized variables) are mitigated through calloc's explicit initialization guarantee."
+    },
+    {
+      "id": "q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a clean C code snippet to safely allocate a 2D integer array of dynamic dimensions 'rows' and 'cols' using pointers-to-pointers.",
+      "answer": "int **allocate_matrix(int rows, int cols) {\n    int **matrix = malloc(rows * sizeof(*matrix));\n    if (!matrix) return NULL;\n    for (int i = 0; i < rows; i++) {\n        matrix[i] = malloc(cols * sizeof(**matrix));\n        if (!matrix[i]) {\n            // Rollback already allocated rows to prevent leaks\n            for (int j = 0; j < i; j++) free(matrix[j]);\n            free(matrix);\n            return NULL;\n        }\n    }\n    return matrix;\n}",
+      "explanation": "This demonstrates deep nested dynamic allocations and the essential error handling required to avoid memory leaks if a partial sub-allocation fails midway."
+    },
+    {
+      "id": "q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Design a safe resizing wrapper function around realloc that takes an existing pointer and doubles its current capacity, handling failures without leaking current memory.",
+      "answer": "void *safe_double_capacity(void *ptr, size_t current_size) {\n    if (current_size == 0) return NULL;\n    size_t new_size = current_size * 2;\n    void *temp = realloc(ptr, new_size);\n    if (temp == NULL) {\n        // Original memory is intact! Log error but do not lose ptr.\n        fprintf(stderr, \"Critical: Resizing failed. Original memory preserved.\\n\");\n        return NULL;\n    }\n    return temp;\n}",
+      "explanation": "Using a temporary pointer inside realloc safeguards against memory leaks. Directly reassigning the target variable (ptr = realloc(ptr)) would wipe the original pointer on failure, leaving the original block orphaned on the heap."
+    },
+    {
+      "id": "q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Identify and fix the memory leak in the following function:\nvoid process_data(void) {\n    int *data = malloc(100 * sizeof(int));\n    if (data == NULL) return;\n    // processing logic...\n    if (error_condition) return;\n    free(data);\n}",
+      "answer": "The leak occurs on early returns inside the error handling branch. If 'error_condition' is true, the function returns immediately without invoking 'free(data)'. To fix it, you must free memory before returning, or restructure the exits:\nvoid process_data(void) {\n    int *data = malloc(100 * sizeof(int));\n    if (data == NULL) return;\n    // processing logic...\n    if (error_condition) {\n        free(data); // Fix: Free memory before escaping function\n        return;\n    }\n    free(data);\n}",
+      "explanation": "Leak checkers frequently discover allocations orphaned due to early exit patterns, which are highly common in error checking logic."
+    },
+    {
+      "id": "q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "What is wrong with freeing a pointer returned by a function that was originally allocated on the stack, and how do compilers react to this?",
+      "answer": "Attempting to pass a non-heap stack address to free() leads to a catastrophic runtime failure, typically a crash (e.g., 'free(): invalid pointer' or segmentation fault). The memory allocator keeps track of metadata (sizes, structures) inside headers placed immediately preceding allocated heap chunks. Since stack addresses lack this metadata, free() reads corrupt or missing metadata headers, causing severe runtime undefined behavior.",
+      "explanation": "Only pointers returned by malloc, calloc, or realloc can ever be passed to free."
+    },
+    {
+      "id": "q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Implement a C function 'create_string_clone' that dynamically allocates exactly enough memory to clone a source string, performs the copy, and returns the pointer.",
+      "answer": "char *create_string_clone(const char *src) {\n    if (src == NULL) return NULL;\n    size_t len = strlen(src);\n    // Allocate len + 1 bytes to make room for null-terminator\n    char *dest = malloc((len + 1) * sizeof(*dest));\n    if (dest == NULL) return NULL;\n    strcpy(dest, src);\n    return dest;\n}",
+      "explanation": "When working with dynamic strings, always remember to account for the termination character '\\0' in the dynamic byte computation (+ 1)."
+    },
+    {
+      "id": "q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Implement a miniature safe dynamic integer vector structure (Dynamic Array) in C featuring append, initialization, and clean teardown.",
+      "answer": "typedef struct {\n    int *data;\n    size_t size;\n    size_t capacity;\n} IntVector;\n\nIntVector* create_vector(size_t initial_cap) {\n    IntVector *vec = malloc(sizeof(*vec));\n    if (!vec) return NULL;\n    vec->data = malloc(initial_cap * sizeof(*(vec->data)));\n    if (!vec->data) {\n        free(vec);\n        return NULL;\n    }\n    vec->size = 0;\n    vec->capacity = initial_cap;\n    return vec;\n}\n\nint append_vector(IntVector *vec, int val) {\n    if (vec->size >= vec->capacity) {\n        size_t new_cap = vec->capacity * 2;\n        int *temp = realloc(vec->data, new_cap * sizeof(*temp));\n        if (!temp) return 0; // Failed to resize\n        vec->data = temp;\n        vec->capacity = new_cap;\n    }\n    vec->data[vec->size++] = val;\n    return 1; // Success\n}\n\nvoid destroy_vector(IntVector *vec) {\n    if (vec) {\n        free(vec->data);\n        free(vec);\n    }\n}",
+      "explanation": "This exhibits professional architecture in C, creating a reusable dynamic layout pattern combining struct allocation, sub-member allocation, safe dynamic realloc sizing, and multi-tier cleanup."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "category": "Theory",
+      "question": "Which of the following segments in memory is responsible for storing local variables created inside functions?",
+      "options": {
+        "A": "Code segment",
+        "B": "Heap segment",
+        "C": "Stack segment",
+        "D": "Data segment"
+      },
+      "correctOption": "C",
+      "explanation": "Stack memory handles compiler-managed automatic variable frames which are cleared dynamically when scopes exit."
+    },
+    {
+      "id": "m2",
+      "category": "Theory",
+      "question": "How do malloc() and calloc() differ in memory initialization?",
+      "options": {
+        "A": "malloc() clears allocated bytes to 0; calloc() leaves uninitialized garbage values.",
+        "B": "calloc() clears allocated bytes to 0; malloc() leaves uninitialized garbage values.",
+        "C": "malloc() runs at compile-time; calloc() runs at runtime.",
+        "D": "There is no difference between them except the syntax formatting."
+      },
+      "correctOption": "B",
+      "explanation": "calloc guarantees clean binary initialization (every bit set to 0), whereas malloc leaves previous physical content intact (garbage values)."
+    },
+    {
+      "id": "m3",
+      "category": "Output Prediction",
+      "question": "What is the outcome of executing this snippet?\nint *p = malloc(sizeof(int));\n*p = 100;\nfree(p);\nprintf(\"%d\\n\", *p);",
+      "options": {
+        "A": "Always prints 100",
+        "B": "Guaranteed compilation error",
+        "C": "Guaranteed immediate crash",
+        "D": "Undefined Behavior (may print garbage, 100, or crash)"
+      },
+      "correctOption": "D",
+      "explanation": "Accessing memory after it has been freed (*p) is a classic Use-After-Free bug. Because the operating system may or may not immediately unmap or reuse that page, the outcome is completely undefined."
+    },
+    {
+      "id": "m4",
+      "category": "Output Prediction",
+      "question": "What will happen if you attempt to resize a block with realloc using a size of 0? (e.g., realloc(ptr, 0))",
+      "options": {
+        "A": "It behaves like free(ptr) and returns NULL in standard environments.",
+        "B": "It doubles the current size.",
+        "C": "It creates a compiler warning and forces compilation abort.",
+        "D": "It throws a hardware interrupt."
+      },
+      "correctOption": "A",
+      "explanation": "Passing 0 to realloc as a target size releases the memory associated with ptr, behaving similarly to free()."
+    },
+    {
+      "id": "m5",
+      "category": "Output Prediction",
+      "question": "Analyze the execution of this code block:\nchar *p = malloc(10);\np = malloc(20);\nfree(p);",
+      "options": {
+        "A": "It compiles and successfully frees both blocks.",
+        "B": "It leaks the first allocation of 10 bytes.",
+        "C": "It leaks the second allocation of 20 bytes.",
+        "D": "It results in a double-free error at runtime."
+      },
+      "correctOption": "B",
+      "explanation": "By assigning the output of the second malloc to 'p' without freeing the first pointer, the reference to the first 10-byte block is permanently lost, causing a memory leak."
+    },
+    {
+      "id": "m6",
+      "category": "Find the Bug",
+      "question": "Identify the bug in this allocation statement:\nint *arr = malloc(10 * sizeof(int));\nfor (int i = 0; i <= 10; i++) {\n    arr[i] = i;\n}",
+      "options": {
+        "A": "The cast to (int*) is missing.",
+        "B": "malloc arguments should have been split with a comma.",
+        "C": "The loop bounds check (i <= 10) causes a buffer overflow on index 10.",
+        "D": "You cannot initialize dynamic memory inside a for loop."
+      },
+      "correctOption": "C",
+      "explanation": "An array of size 10 has valid indices from 0 to 9. The condition 'i <= 10' attempts to write to 'arr[10]', writing past the end of the dynamically allocated buffer."
+    },
+    {
+      "id": "m7",
+      "category": "Find the Bug",
+      "question": "Identify the critical flaw inside this function design:\nint* create_array() {\n    int temp[5] = {1, 2, 3, 4, 5};\n    return temp;\n}",
+      "options": {
+        "A": "You must use malloc() because temp is an array, not a pointer.",
+        "B": "It returns a pointer to dynamic memory that cannot be resized.",
+        "C": "It returns the address of a local stack variable, which is destroyed upon function return.",
+        "D": "It is syntactically invalid to initialize elements within functions."
+      },
+      "correctOption": "C",
+      "explanation": "The array 'temp' is declared on the stack frame of 'create_array()'. Once the function exits, its frame is popped and the returned address becomes completely invalid."
+    },
+    {
+      "id": "m8",
+      "category": "Complete the Code",
+      "question": "Choose the syntax parameters that correctly allocate memory for a dynamic array of 50 structures of type 'User' using calloc:\nUser *list = calloc(_____, _____);",
+      "options": {
+        "A": "50, sizeof(User)",
+        "B": "sizeof(User), 50",
+        "C": "50 * sizeof(User)",
+        "D": "User, 50"
+      },
+      "correctOption": "A",
+      "explanation": "calloc takes two parameters: first, the number of elements (50), and second, the byte size of each element (sizeof(User))."
+    },
+    {
+      "id": "m9",
+      "category": "Complete the Code",
+      "question": "Which option completes the check safely in a custom realloc operation?\nint *temp = realloc(old_ptr, size);\nif (_____)\n{\n    // handle failure\n}",
+      "options": {
+        "A": "temp == old_ptr",
+        "B": "temp == NULL",
+        "C": "old_ptr == NULL",
+        "D": "temp != NULL"
+      },
+      "correctOption": "B",
+      "explanation": "If realloc fails, it returns NULL. We check for 'temp == NULL' to cleanly handle errors without losing the address stored in 'old_ptr'."
+    },
+    {
+      "id": "m10",
+      "category": "Best Approach",
+      "question": "What is the best approach to mitigate dangling pointers throughout a complex system?",
+      "options": {
+        "A": "Avoid using free() and let the OS handle reclamation on program exit.",
+        "B": "Cast all malloc pointers to double-pointers.",
+        "C": "Wrap free() in a custom macro or function that resets the pointer to NULL immediately after freeing.",
+        "D": "Use realloc instead of malloc for every memory reservation."
+      },
+      "correctOption": "C",
+      "explanation": "Resetting pointers to NULL immediately after freeing ensures that subsequent checks (ptr != NULL) succeed in catching and skipping invalid references."
+    }
+  ]
+}

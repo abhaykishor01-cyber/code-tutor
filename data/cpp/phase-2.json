@@ -1,0 +1,404 @@
+{
+  "phase_metadata": {
+    "phase_number": 2,
+    "title": "OOP Basics",
+    "description": "Deep dive into Classes, Objects, Access Specifiers, Member Functions, and the magic of the 'this' pointer."
+  },
+  "learning_objectives": [
+    "Explain the transition from procedural programming to Object-Oriented Programming (OOP).",
+    "Define custom data types using C++ classes and instantiate them as objects.",
+    "Apply Encapsulation principles using public, private, and protected access specifiers.",
+    "Differentiate between data members and member functions in physical memory.",
+    "Leverage the implicit 'this' pointer for method chaining and resolving variable shadowing."
+  ],
+  "prerequisites": [
+    "Understanding of variables, basic types, and scope from Phase 1.",
+    "Familiarity with C++ references and pointers.",
+    "Basic knowledge of function definitions and stack frames."
+  ],
+  "introduction": "Welcome to Phase 2. Until now, you have been writing code procedurally: defining individual variables and writing functions that manipulate those variables. While this works for simple scripts, complex software architectures become messy when data is decoupled from the logic that modifies it. Object-Oriented Programming (OOP) changes this paradigm entirely. It allows you to bind data and the functions that manipulate that data together into a single, cohesive unit called an 'Object'. This phase will transition your mindset from step-by-step algorithms to designing clean, reusable, and self-contained types.",
+  "concept_explanation": "Let's demystify the core concepts step-by-step.\n\n1. What is a Class and an Object?\nA Class is a custom, programmer-defined blueprint. It tells the compiler what variables (Data Members) and functions (Member Functions) should exist inside a custom type. An Object is an actual physical instance of that blueprint created in memory. If 'Car' is the class (blueprint), then your specific red Tesla sitting in your garage is an object.\n\n2. C++ Keywords Introduced:\n- 'class': Used to declare a user-defined blueprint.\n- 'public': An access specifier. Any members declared under 'public' can be accessed from anywhere outside the class.\n- 'private': An access specifier. Any members declared under 'private' can only be accessed by functions belonging to this specific class. This is the cornerstone of Encapsulation.\n- 'protected': An access specifier. Members are private to the outside world, but can be accessed by derived (inherited) classes.\n- 'this': A keyword representing an implicit pointer to the current object instance calling the member function.\n\n3. Access Specifiers and Encapsulation:\nEncapsulation is the practice of hiding the internal state of an object and requiring all interaction to occur through a well-defined public interface. By default, C++ class members are 'private'. This prevents external code from putting our object into an invalid state (e.g., setting a 'bank_balance' to a negative number directly).\n\n4. Data Members vs. Member Functions in Memory:\nData members are stored inside the physical memory layout of each object instance. If you create three objects of a class with an integer member, you have three distinct integers in memory. However, member functions do not duplicate for each object! To save space, a single copy of the function code resides in the code segment. When a member function is called, the compiler secretly passes the address of the calling object as an argument. Inside the function, this secret address is exposed via the 'this' pointer.",
+  "syntax": "class ClassName {\nprivate:\n    // Data members (accessible only within this class)\n    DataType memberVariable_;\n\npublic:\n    // Member functions (accessible from anywhere)\n    void setMember(DataType value) {\n        this->memberVariable_ = value; // Resolved via implicit pointer\n    }\n\n    [[nodiscard]] DataType getMember() const {\n        return memberVariable_;\n    }\n}; // Note the critical trailing semicolon!",
+  "syntax_breakdown": [
+    {
+      "element": "class ClassName",
+      "explanation": "Declares a new user-defined type named ClassName. By default, all elements declared inside are private."
+    },
+    {
+      "element": "private:",
+      "explanation": "An access specifier indicating that all declarations following it can only be read or written to by member functions of this class."
+    },
+    {
+      "element": "public:",
+      "explanation": "An access specifier indicating that all variables and functions declared beneath it can be accessed directly from any scope outside the class."
+    },
+    {
+      "element": "this->",
+      "explanation": "A dereference pointer operation pointing to the calling object. It explicitly tells the compiler that the following identifier refers to a member variable of the current instance, which is incredibly useful for resolving parameter shadowing."
+    },
+    {
+      "element": "[[nodiscard]]",
+      "explanation": "A standard C++17 attribute that warns the developer if the return value of this getter function is discarded during a call."
+    },
+    {
+      "element": "const (at end of function)",
+      "explanation": "A qualifier on member functions promising that the function will not modify any data members of the class. It allows this function to be safely called on const objects."
+    },
+    {
+      "element": "};",
+      "explanation": "Every class declaration in C++ must terminate with a semicolon. Forgetting this is a notorious source of compiler errors."
+    }
+  ],
+  "rules_and_key_points": [
+    "Classes default to 'private' access. Structs default to 'public' access. That is their single structural difference in C++.",
+    "Data members should almost always be kept 'private' to preserve object invariants and enforce encapsulation.",
+    "The 'this' pointer is an implicit parameter passed to all non-static member functions. It is of type 'T* const' (a constant pointer to the class type).",
+    "In const member functions, the type of 'this' becomes 'const T* const' (a constant pointer to a constant object), preventing any modification of members.",
+    "Never access private members from outside class scope; doing so will trigger a hard compilation error.",
+    "Member initialization should prioritize in-class default values (C++11/17) to prevent undefined behavior from uninitialized variables."
+  ],
+  "code_example_1_basic": {
+    "title": "Basic Class Definition, Access Control, and 'this' Pointer Usage",
+    "code": "#include <iostream>\n\nclass SimpleCounter {\nprivate:\n    int count = 0; // Modern C++ in-class initialization\n\npublic:\n    // 'this->count' resolves ambiguity between parameter and member variable\n    void setCount(int count) {\n        this->count = count;\n    }\n\n    void increment() {\n        this->count++; // Implicitly same as count++\n    }\n\n    [[nodiscard]] int getCount() const {\n        return this->count;\n    }\n};\n\nint main() {\n    SimpleCounter counter;\n    counter.setCount(10);\n    counter.increment();\n    std::cout << \"Final count: \" << counter.getCount() << std::endl;\n    return 0;\n}",
+    "explanation": "This basic example demonstrates declaring a custom type 'SimpleCounter' with a private data member 'count' (shielded from direct external tampering). It exposes three public methods: 'setCount' (which uses 'this->' to resolve parameter shadowing, where the parameter 'count' has the same name as the member variable), 'increment' (modifying internal state), and a const-qualified getter 'getCount' (for safe read-only access).",
+    "expected_output": "Final count: 11",
+    "dry_run": [
+      {
+        "line": "SimpleCounter counter;",
+        "description": "Allocates space for 'counter' on the Stack frame of main(). The private member 'count' is initialized to 0 based on the in-class default initializer."
+      },
+      {
+        "line": "counter.setCount(10);",
+        "description": "Calls 'setCount' with argument 10. The compiler implicitly passes the address of 'counter' as the 'this' pointer. Inside, 'this->count' evaluates to 'counter.count', assigning it the value 10."
+      },
+      {
+        "line": "counter.increment();",
+        "description": "Calls 'increment'. The current object's count (10) is incremented to 11."
+      },
+      {
+        "line": "counter.getCount();",
+        "description": "Calls 'getCount' which reads the current state (11) safely and returns it."
+      },
+      {
+        "line": "std::cout << ... << std::endl;",
+        "description": "Outputs 'Final count: 11' to standard output."
+      }
+    ]
+  },
+  "code_example_2_practical": {
+    "title": "A Real-World Chained Builder for Network Packet Headers",
+    "code": "#include <iostream>\n#include <string_view>\n#include <cstdint>\n\nclass PacketHeader {\nprivate:\n    uint16_t sourcePort_ = 0;\n    uint16_t destPort_ = 0;\n    uint32_t sequenceNum_ = 0;\n    bool isSyn_ = false;\n\npublic:\n    // Setter returning a reference to the current object (*this) to enable chaining\n    PacketHeader& setSourcePort(uint16_t port) {\n        this->sourcePort_ = port;\n        return *this;\n    }\n\n    PacketHeader& setDestPort(uint16_t port) {\n        this->destPort_ = port;\n        return *this;\n    }\n\n    PacketHeader& setSequenceNum(uint32_t seq) {\n        this->sequenceNum_ = seq;\n        return *this;\n    }\n\n    PacketHeader& setSynFlag(bool syn) {\n        this->isSyn_ = syn;\n        return *this;\n    }\n\n    void print() const {\n        std::cout << \"Packet [Src: \" << sourcePort_ \n                  << \", Dst: \" << destPort_ \n                  << \", Seq: \" << sequenceNum_ \n                  << \", SYN: \" << (isSyn_ ? \"Yes\" : \"No\") << \"]\" << std::endl;\n    }\n};\n\nint main() {\n    PacketHeader tcpHeader;\n    \n    // Method Chaining made possible by returning reference to *this\n    tcpHeader.setSourcePort(443)\n             .setDestPort(51020)\n             .setSequenceNum(100502)\n             .setSynFlag(true);\n\n    tcpHeader.print();\n    return 0;\n}",
+    "explanation": "This practical code demonstrates how developers build configurations in systems programming using 'Method Chaining'. By returning a reference to '*this' (the dereferenced 'this' pointer) from each setter method, we return a reference to the modified instance itself. This allows us to link multiple configuration calls sequentially in a single clean expression.",
+    "expected_output": "Packet [Src: 443, Dst: 51020, Seq: 100502, SYN: Yes]",
+    "dry_run": [
+      {
+        "line": "PacketHeader tcpHeader;",
+        "description": "Initializes 'tcpHeader' on the main stack frame. Member variables are initialized to their default in-class values (0, 0, 0, false)."
+      },
+      {
+        "line": ".setSourcePort(443)",
+        "description": "Modifies 'sourcePort_' of 'tcpHeader' to 443. Returns a reference to 'tcpHeader' (via '*this')."
+      },
+      {
+        "line": ".setDestPort(51020)",
+        "description": "Calls on the returned reference. Modifies 'destPort_' of 'tcpHeader' to 51020. Returns reference to 'tcpHeader' again."
+      },
+      {
+        "line": ".setSequenceNum(100502)",
+        "description": "Calls on the returned reference. Modifies 'sequenceNum_' to 100502. Returns reference to 'tcpHeader' again."
+      },
+      {
+        "line": ".setSynFlag(true)",
+        "description": "Calls on the returned reference. Sets 'isSyn_' flag to true. Returns reference to 'tcpHeader' again, finalizing the statement."
+      },
+      {
+        "line": "tcpHeader.print();",
+        "description": "Invokes the 'print' method, reading current state variables from the 'tcpHeader' memory layout."
+      }
+    ]
+  },
+  "memory_visualization": {
+    "type": "Stack and Heap Diagram",
+    "description": "Memory visualization representing the layout of the 'SimpleCounter' object on the stack and the temporary 'this' pointer pushed during a member function execution.",
+    "entities": [
+      {
+        "name": "counter (SimpleCounter Object)",
+        "address": "0x7ffee3b4a2bc",
+        "value": "{ count: 11 }",
+        "segment": "Stack"
+      },
+      {
+        "name": "this (implicit parameter inside increment())",
+        "address": "0x7ffee3b4a2a0",
+        "value": "0x7ffee3b4a2bc",
+        "segment": "Stack Frame (increment)",
+        "points_to": "0x7ffee3b4a2bc"
+      }
+    ]
+  },
+  "real_world_use_cases": [
+    {
+      "scenario": "Network Protocol Buffers",
+      "description": "Encoding complex protocol headers (like TCP/IP, custom game server packets) where class encapsulation guarantees that checksums and size attributes remain valid when payload data is changed."
+    },
+    {
+      "scenario": "GUI Layout Controls",
+      "description": "Representing individual user interface components (buttons, text boxes) as classes, allowing states like 'isHovered' and methods like 'render()' to be self-contained."
+    },
+    {
+      "scenario": "Database Connection Pool Management",
+      "description": "Protecting internal handles and raw socket arrays from direct modification while providing developers with clean public API interfaces like 'acquireConnection()' or 'releaseConnection()'."
+    }
+  ],
+  "common_mistakes": [
+    {
+      "mistake": "Missing semicolon after the class declaration",
+      "explanation": "C++ requires a trailing semicolon at the closing brace of class declarations. If omitted, the compiler tries to interpret the next line (like main) as a return type or a syntax continuation, resulting in extremely confusing error reports.",
+      "fix": "Ensure every class layout terminates exactly with '};'."
+    },
+    {
+      "mistake": "Modifying class attributes within a const-qualified getter",
+      "explanation": "If you promise the compiler that a function is read-only using the 'const' keyword, but try to assign a value to an internal data member, compilation will fail.",
+      "fix": "Either remove the 'const' qualifier if the function must modify state, or leave the state alone and only return values."
+    },
+    {
+      "mistake": "Accessing private attributes from public scope",
+      "explanation": "Trying to run 'counter.count = 5;' directly in 'main' when 'count' is defined in the private scope of the class.",
+      "fix": "Write a public getter/setter method inside the class to safely manipulate and inspect the private variable."
+    }
+  ],
+  "best_practices": [
+    "Always make data members private (or occasionally protected) to ensure absolute control over external access points.",
+    "Add 'const' suffix to any member function that does not modify the object's logical state, allowing integration with other const contexts.",
+    "Use standard in-class default values (e.g., 'int count = 0;') to ensure members never hold garbage value memory.",
+    "Utilize modern '[[nodiscard]]' flags on getter functions whose return values must not be ignored by calling functions."
+  ],
+  "frequently_asked_questions": [
+    {
+      "question": "What is the structural difference between a C++ struct and a class?",
+      "answer": "In C++, the only difference is default access controls. Members of a 'struct' are public by default, while members of a 'class' are private by default. In practice, developers use 'struct' for plain old data (POD) and 'class' for behavioral components."
+    },
+    {
+      "question": "Can the 'this' pointer be null inside a valid member function?",
+      "answer": "No. In standard C++, member functions must be called on a valid instance. Although a programmer could theoretically invoke a method on a null pointer resulting in Undefined Behavior, modern standard rules assume 'this' is always valid and non-null."
+    },
+    {
+      "question": "Does each instance of a class have its own copy of member functions?",
+      "answer": "No. There is only one copy of each member function in the executable's code segment. This single function code is shared by all instances, with the compiler seamlessly passing the specific instance's address via the 'this' pointer behind the scenes."
+    }
+  ],
+  "summary": "This phase introduced the fundamental building blocks of Object-Oriented C++. By declaring classes, managing scope through access specifiers (public and private), and utilizing the implicit 'this' pointer, you have transitioned from isolated algorithms to structured, encapsulated architectural thinking. You are now prepared to build highly safe, secure, and intuitive custom data structures.",
+  "key_takeaways": [
+    "Classes serve as models/blueprints, whereas objects are actual localized in-memory instances.",
+    "Encapsulation isolates implementation details (private) from safe interfaces (public).",
+    "The 'this' pointer is passed implicitly under the hood, pointing to the calling object.",
+    "Const methods represent immutable operations and are necessary to interact with const objects."
+  ],
+  "preview_next_topic": "In the next phase, we will discover how objects are initialized and destroyed safely through the power of Constructors and Destructors.",
+  "questions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Classes vs. Objects",
+      "question": "In your own words, explain how a Class is different from an Object in C++ physical memory. What role does each play?",
+      "hint": "Think about blueprints versus physical buildings.",
+      "answer": "A Class is a conceptual template or blueprint which does not occupy physical memory space for variables during declaration (except static components). It merely maps out structure and rules. An Object is a concrete instantiation of that class, allocated on the Stack or Heap, occupying an actual addressable range of bytes corresponding to the sum of its non-static data members."
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Access Control Purpose",
+      "question": "Why is it critical to mark class data members as 'private' while providing public setter/getter methods? Provide a real-world engineering reason.",
+      "hint": "Think about maintaining control over what values are allowed inside a variable.",
+      "answer": "This is the core concept of Encapsulation. By restricting direct access, we protect the object's invariants. For example, if a 'Date' class had a public 'month' integer, any user could set it to 13 or -5. By keeping 'month' private and forcing updates through a public 'setMonth(int m)' method, we can validate that the input is strictly between 1 and 12, throwing an exception or rejecting invalid values."
+    },
+    {
+      "id": "q3",
+      "difficulty": "Easy-Medium",
+      "type": "Practical",
+      "title": "Basic Rectangle Class Definition",
+      "question": "Write a complete C++ class named 'Rectangle' with private float members 'width' and 'height'. Provide public getters, setters, and a const member function 'getArea()' that returns the calculated area of the rectangle.",
+      "hint": "Ensure getters and area calculator are marked 'const'.",
+      "answer": "class Rectangle {\nprivate:\n    float width = 0.0f;\n    float height = 0.0f;\npublic:\n    void setWidth(float w) { width = w; }\n    void setHeight(float h) { height = h; }\n    [[nodiscard]] float getWidth() const { return width; }\n    [[nodiscard]] float getHeight() const { return height; }\n    [[nodiscard]] float getArea() const { return width * height; }\n};"
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "Practical",
+      "title": "Method Chaining implementation",
+      "question": "Modify a class 'Speaker' with private integer 'volume'. Write fluent setter functions 'volumeUp()' and 'volumeDown()' that increment/decrement volume, and return a reference to the calling object to support continuous method chaining (e.g., 'mySpeaker.volumeUp().volumeUp().volumeDown();').",
+      "hint": "Return '*this' from methods that modify volume, returning 'Speaker&' as the type.",
+      "answer": "class Speaker {\nprivate:\n    int volume = 10;\npublic:\n    Speaker& volumeUp() {\n        volume++;\n        return *this;\n    }\n    Speaker& volumeDown() {\n        volume--;\n        return *this;\n    }\n    [[nodiscard]] int getVolume() const {\n        return volume;\n    }\n};"
+    },
+    {
+      "id": "q5",
+      "difficulty": "Medium",
+      "type": "Mistake Debugging",
+      "title": "Uncovering Basic Class Semicolon and Access Issues",
+      "question": "Identify and correct three fundamental compile-time errors in the following snippet:\n\nclass Dog {\n    std::string name;\n    void speak() {\n        std::cout << name << \" says woof!\";\n    }\n}\n\nint main() {\n    Dog myDog;\n    myDog.name = \"Rex\";\n    myDog.speak();\n}",
+      "hint": "Check the default class access, missing terminator punctuation, and variable manipulation scopes.",
+      "answer": "Fixes:\n1. Missing semicolon at the end of class declaration line 7 ('};').\n2. 'name' and 'speak' default to 'private' access since they are inside a 'class' without explicit public flags. They must be grouped under a 'public:' specifier to be accessed in 'main'.\n\nCorrected Code:\nclass Dog {\npublic:\n    std::string name;\n    void speak() {\n        std::cout << name << \" says woof!\\n\";\n    }\n};"
+    },
+    {
+      "id": "q6",
+      "difficulty": "Medium-Hard",
+      "type": "Mistake Debugging",
+      "title": "Debugging Const Violation and Shadowing",
+      "question": "A junior engineer wrote this code expecting it to update and print coordinates, but it fails compilation. Debug the code and explain why it failed:\n\nclass Point {\nprivate:\n    int x = 0;\n    int y = 0;\npublic:\n    void setX(int x) const {\n        x = x;\n    }\n    void print() const {\n        std::cout << \"(\" << x << \", \" << y << \")\\n\";\n    }\n};",
+      "hint": "Look at the 'const' qualifier on the setter and examine variable shadowing on 'x'.",
+      "answer": "Errors and Fixes:\n1. 'setX' is declared as a 'const' member function. A const member function guarantees it will not alter class member states. Mutating 'x' inside it triggers a compilation error.\n2. The expression 'x = x;' inside 'setX' is assigning the local parameter 'x' to itself due to parameter shadowing. It fails to touch the actual class member variable. This must be resolved by using 'this->x = x;' after removing the const qualifier.\n\nCorrected Code:\nvoid setX(int x) {\n    this->x = x;\n}"
+    },
+    {
+      "id": "q7",
+      "difficulty": "Hard",
+      "type": "Coding",
+      "title": "Encapsulating a Secure Transaction Ledger",
+      "question": "Design a class 'SecureWallet' that tracks double value 'balance'. Provide a public method 'deposit(double amount)' and 'withdraw(double amount)'. The wallet must enforce strict invariants: balance can never drop below zero, and deposit amounts must be strictly positive. Return true if transaction is successful, false otherwise.",
+      "hint": "Validate inputs before updating state, keeping balance hidden as private.",
+      "answer": "class SecureWallet {\nprivate:\n    double balance = 0.0;\npublic:\n    bool deposit(double amount) {\n        if (amount <= 0.0) return false;\n        balance += amount;\n        return true;\n    }\n    bool withdraw(double amount) {\n        if (amount <= 0.0 || (balance - amount < 0.0)) return false;\n        balance -= amount;\n        return true;\n    }\n    [[nodiscard]] double getBalance() const {\n        return balance;\n    }\n};"
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "Coding",
+      "title": "Self-Assignment Detection Class",
+      "question": "Write a modern class 'UniqueSystemHandle' representing a system resource. It stores an integer ID 'handleId'. Write a public function 'copyFrom(const UniqueSystemHandle& other)' that mimics copying data. It must use the 'this' pointer to detect self-copying (i.e. if a client mistakenly executes 'obj.copyFrom(obj);') and skip assignment if addresses match.",
+      "hint": "Compare the memory address of the current object ('this') against the address of the incoming reference ('&other').",
+      "answer": "class UniqueSystemHandle {\nprivate:\n    int handleId = 0;\npublic:\n    void setHandle(int id) { this->handleId = id; }\n    [[nodiscard]] int getHandle() const { return handleId; }\n    \n    bool copyFrom(const UniqueSystemHandle& other) {\n        // Compare pointer address of 'this' to the address of 'other'\n        if (this == &other) {\n            return false; // Prevent redundant self-assignment\n        }\n        this->handleId = other.handleId;\n        return true;\n    }\n};"
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "type": "Theory",
+      "question": "What is the primary difference in behavior between the keywords 'class' and 'struct' in C++?",
+      "options": {
+        "A": "A class can support member functions, whereas structs are only capable of storing plain structural data.",
+        "B": "In a class, members default to private access, whereas in a struct, members default to public access.",
+        "C": "Classes are dynamically allocated on the Heap by default, while structs reside only on the Stack.",
+        "D": "Structs do not support inheritance, whereas classes natively support all OOP properties."
+      },
+      "answer": "B",
+      "explanation": "In standard C++, there is only one difference: class members are private by default, while struct members are public by default. Both support complete OOP features, encapsulation, methods, and inheritance."
+    },
+    {
+      "id": "m2",
+      "type": "Theory",
+      "question": "What is the type of the implicit 'this' pointer within a const member function of a class 'Engine'?",
+      "options": {
+        "A": "Engine* const",
+        "B": "const Engine*",
+        "C": "const Engine* const",
+        "D": "Engine const*"
+      },
+      "answer": "C",
+      "explanation": "In a non-const member function of class Engine, 'this' is a constant pointer to Engine ('Engine* const'). In a const member function, the object pointed to also becomes const, leading to a constant pointer to a constant Engine object ('const Engine* const')."
+    },
+    {
+      "id": "m3",
+      "type": "Output",
+      "question": "Given the following code, what will be the printed output?\n\n#include <iostream>\nclass Trial {\n    int val = 5;\npublic:\n    void modify(int val) {\n        val = val + 10;\n    }\n    void print() { std::cout << val; }\n};\nint main() {\n    Trial t;\n    t.modify(100);\n    t.print();\n}",
+      "options": {
+        "A": "5",
+        "B": "15",
+        "C": "105",
+        "D": "110"
+      },
+      "answer": "A",
+      "explanation": "Because of parameter shadowing, the expression 'val = val + 10' inside 'modify()' modifies only the local parameter 'val', not the member variable. Since 'this->' was not used to resolve the conflict, the member variable remains untouched at 5."
+    },
+    {
+      "id": "m4",
+      "type": "Output",
+      "question": "Predict the output of the following C++ program:\n\n#include <iostream>\nclass Chain {\n    int value = 0;\npublic:\n    Chain setValue(int val) {\n        this->value = val;\n        return *this;\n    }\n    void print() { std::cout << value; }\n};\nint main() {\n    Chain c;\n    c.setValue(10).setValue(20);\n    c.print();\n}",
+      "options": {
+        "A": "0",
+        "B": "10",
+        "C": "20",
+        "D": "Compiler Error"
+      },
+      "answer": "B",
+      "explanation": "Notice the return type of 'setValue' is 'Chain' (return-by-value), not 'Chain&' (return-by-reference). When 'c.setValue(10)' runs, it returns a *copy* of 'c'. The subsequent '.setValue(20)' modifies the temporary copy, leaving the original object 'c' unmodified with a value of 10."
+    },
+    {
+      "id": "m5",
+      "type": "Output",
+      "question": "What is the output of the following code snippet?\n\n#include <iostream>\nclass Base {\n    int value = 42;\n};\nint main() {\n    Base b;\n    std::cout << b.value;\n}",
+      "options": {
+        "A": "42",
+        "B": "0",
+        "C": "Garbage Value",
+        "D": "Compilation Error"
+      },
+      "answer": "D",
+      "explanation": "Because class members are 'private' by default, trying to access 'b.value' directly from 'main()' (external scope) results in a compilation error: 'value is a private member of Base'."
+    },
+    {
+      "id": "m6",
+      "type": "Bug",
+      "question": "Identify the compiler error in the following code skeleton:\n\nclass Hardware\n{\n    int devId = 1;\n}\n\nint main() {\n    Hardware h;\n    return 0;\n}",
+      "options": {
+        "A": "The class member 'devId' must be initialized in a constructor, not in-line.",
+        "B": "The class definition is missing a terminating semicolon at its closing brace.",
+        "C": "The main function cannot construct object 'h' because class has no constructor.",
+        "D": "The compiler expects a 'public' keyword before declaring the class."
+      },
+      "answer": "B",
+      "explanation": "C++ requires a semicolon directly after the closing brace of a class declaration ('};'). Omitting this semicolon triggers syntax compilation errors."
+    },
+    {
+      "id": "m7",
+      "type": "Bug",
+      "question": "Identify the error and safety concern in the following class method implementation:\n\nclass Config {\n    int rate_ = 0;\npublic:\n    const Config& getSelf() const {\n        return *this;\n    }\n};",
+      "options": {
+        "A": "It is illegal to return '*this' from a const member function.",
+        "B": "Returning a reference to 'this' is a compiler error because 'this' points to the stack.",
+        "C": "There is no error; this is perfectly valid and safe code.",
+        "D": "The return type must be 'Config*' instead of returning a reference."
+      },
+      "answer": "C",
+      "explanation": "This code is completely valid and safe. Returning '*this' as a reference (either const or non-const) is a common pattern to avoid copying. It is safe as long as the object outlives the returned reference."
+    },
+    {
+      "id": "m8",
+      "type": "Code Completion",
+      "question": "What statement should be placed in the blank to successfully implement method chaining?\n\nclass Alert {\n    int level = 0;\npublic:\n    Alert& setLevel(int level) {\n        this->level = level;\n        ________;\n    }\n};",
+      "options": {
+        "A": "return this",
+        "B": "return &this",
+        "C": "return *this",
+        "D": "return Alert"
+      },
+      "answer": "C",
+      "explanation": "To return a reference to the current object, you must dereference the 'this' pointer using 'return *this;'. Since the function return type is 'Alert&', it will return a reference to the active instance."
+    },
+    {
+      "id": "m9",
+      "type": "Code Completion",
+      "question": "Complete the declaration of 'display' so that it can be invoked on constant instances of class 'Device':\n\nclass Device {\n    int id = 0;\npublic:\n    void display() ________ {\n        std::cout << id;\n    }\n};",
+      "options": {
+        "A": "const",
+        "B": "static",
+        "C": "mutable",
+        "D": "override"
+      },
+      "answer": "A",
+      "explanation": "Adding the 'const' keyword at the end of a member function's parameter list marks it as a const member function. This allows the function to be called on const objects of that class."
+    },
+    {
+      "id": "m10",
+      "type": "Best Approach",
+      "question": "Which of the following is considered the best software engineering practice regarding class data member layout?",
+      "options": {
+        "A": "Data members should be public to make debugging easier.",
+        "B": "Data members should be private, initialized inside the class by default, and modified only through validated public setters.",
+        "C": "Data members should be protected by default because it is always faster to compile.",
+        "D": "Always use 'struct' for everything in C++ to avoid dealing with private access specifiers."
+      },
+      "answer": "B",
+      "explanation": "Hiding data members inside private scopes (Encapsulation) ensures that external components cannot corrupt the object's state. Providing default in-class values prevents undefined behavior from uninitialized variables."
+    }
+  ]
+}

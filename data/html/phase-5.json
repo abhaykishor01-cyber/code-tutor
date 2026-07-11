@@ -1,0 +1,165 @@
+{ "phase_metadata": { "phase_number": 5, "title": "CSS Basics: Styling the Web",
+"description": "Introduction to Cascading Style Sheets (CSS), methods of adding
+styles to HTML, and basic property manipulation for text and colors.",
+"estimated_time": "3.5 Hours" }, "learning_objectives": [ "Understand the role
+of CSS in separating content from presentation", "Implement CSS using Inline,
+Internal, and External methods", "Master CSS syntax including selectors,
+properties, and values", "Apply colors using names, Hex, RGB, and HSL values",
+"Configure background properties for elements", "Manipulate text appearance
+using font and alignment properties" ], "prerequisites": [ "Solid understanding
+of HTML tags and attributes (Phases 1-4)", "Ability to create and link files in
+a code editor" ], "introduction": "HTML provides the structure (the skeleton),
+but CSS (Cascading Style Sheets) provides the beauty (the skin, clothes, and
+makeup). CSS allows you to control the color, font, size, and layout of your
+HTML elements. By learning CSS, you move from building plain documents to
+designing professional, visually engaging websites.", "concept_explanation": {
+"what_is_css": "CSS is a stylesheet language used to describe the presentation
+of a document written in HTML. It allows you to apply styles globally across
+your entire website from a single file.", "inclusion_methods": "There are three
+ways to add CSS: 1. Inline (inside the HTML tag), 2. Internal (inside a  tag in
+the ), and 3. External (in a separate .css file linked via ). External is the
+industry standard.", "css_syntax": "CSS works by selecting an HTML element and
+then declaring a property (what you want to change) and a value (how you want to
+change it).", "cascading": "The 'Cascading' in CSS means that styles follow a
+hierarchy. If multiple styles conflict, the browser decides which one to apply
+based on specificity and order.", "color_systems": "CSS supports multiple ways
+to define color: Names (red), Hexadecimal (#ff0000), RGB (rgb(255,0,0)), and HSL
+(hue, saturation, lightness)." }, "syntax": { "css_rule": "selector {\n
+property: value;\n}", "external_link": "<link rel="stylesheet"
+href="style.css">", "internal_style": "\n h1 { color: blue; }\n",
+"inline_style": "<p style="color: red;">Text" }, "breakdown_of_syntax": {
+"selector": "The HTML element you want to style (e.g., h1, p, div).",
+"property": "The feature you want to change (e.g., color, font-size,
+background-color).", "value": "The specific setting for that property (e.g.,
+blue, 20px, #000).", "declaration": "The combination of property and value
+(e.g., color: blue;).", "declaration_block": "Everything inside the curly braces
+{ }." }, "rules_and_key_points": { "rule_1": "Every CSS declaration must end
+with a semicolon (;).", "rule_2": "The property and value are separated by a
+colon (:).", "rule_3": "CSS property names and values are case-insensitive, but
+lowercase is the standard.", "rule_4": "External CSS files must not contain any
+HTML tags like .", "rule_5": "Inline styles have the highest priority but are
+hard to maintain; use them sparingly.", "rule_6": "Comments in CSS start with /*
+and end with /.", "rule_7": "Hex colors consist of 6 characters (0-9, A-F)
+preceded by a #.", "rule_8": "Font-family values with spaces (like 'Times New
+Roman') must be in quotes.", "rule_9": "The 'background' property is a shorthand
+for multiple background-related properties.", "rule_10": "Browsers read CSS from
+top to bottom; later rules can override earlier ones." }, "code_example_1": {
+"title": "Internal CSS and Text Styling", "description": "Applying colors and
+font properties within the HTML head.", "code": "\n\n\n \n / This is a CSS
+comment /\n body {\n background-color: #f0f0f0;\n font-family: Arial,
+sans-serif;\n }\n h1 {\n color: navy;\n text-align: center;\n text-decoration:
+underline;\n }\n p {\n font-size: 18px;\n color: rgb(50, 50, 50);\n
+line-height: 1.6;\n }\n \n\n\n Welcome to CSS\n CSS makes styling easy and
+fun!\n\n" }, "code_example_2": { "title": "External CSS (style.css)",
+"description": "The professional way to style: separating the CSS into its own
+file.", "code": "/ Contents of style.css /\n.main-header {\n background-image:
+url('pattern.png');\n background-repeat: no-repeat;\n background-size: cover;\n
+height: 200px;\n}\n\n.highlight-text {\n font-weight: bold;\n color:
+hsl(120, 100%, 25%); / Dark Green /\n background-color: yellow;\n}" }, "output":
+"Example 1 results in a light-gray page with a centered, underlined navy heading
+and readable gray text. Example 2 (if applied to HTML) creates a header with a
+background image and specific 'highlighted' text that is bold, dark green, and
+has a yellow background.", "step_by_step_dry_run": [ "Browser parses the HTML
+and finds the  tag or .", "The CSS engine identifies the 'body' selector and
+applies a light-gray background to the whole page.", "It finds the 'h1'
+selector, changes its text color to navy, and centers it.", "It hits the 'p'
+selector and adjusts the font size to 18px.", "If an inline style exists on a
+specific tag, it overrides the general rules for that specific tag only.", "The
+final rendered page reflects the combination of all applied styles." ],
+"memory_visualization": "Cascade Hierarchy (from weakest to strongest):\n[
+Browser Defaults ] --> [ External CSS ] --> [ Internal  ] --> [ Inline
+style="..." ]", "real_world_use_cases": [ "Changing the entire color scheme of a
+website by editing one line in an external CSS file.", "Creating consistent
+typography (fonts and spacing) across 100+ pages of a blog.", "Applying a 'Dark
+Mode' by switching the background-color and text-color properties.",
+"Highlighting error messages in red and success messages in green using CSS
+classes.", "Adjusting line-height and letter-spacing for better readability on
+long articles." ], "common_mistakes": [ "Forgetting the semicolon (;) at the end
+of a line, which breaks the following line.", "Writing CSS code inside the HTML
+body without a  tag.", "Using '#' for RGB values or forgetting '#' for Hex
+values.", "Misspelling properties (e.g., 'font-colour' instead of 'color').",
+"Not linking the external CSS file correctly (wrong path in href)." ],
+"best_practices": [ "Use External CSS files for better organization and
+performance.", "Use meaningful property values (e.g., use 'rem' or 'px'
+consistently).", "Organize your CSS by grouping related styles (e.g., all header
+styles together).", "Avoid inline styles as they make HTML messy and hard to
+update.", "Always provide a fallback font (e.g., font-family: Arial,
+sans-serif;)." ], "faqs": [ { "question": "Which CSS method is the fastest for
+the browser?", "answer": "External CSS is generally best because the browser
+caches the file, meaning it only downloads it once even if the user visits
+multiple pages." }, { "question": "What is the difference between 'color' and
+'background-color'?", "answer": "'color' changes the color of the text itself,
+while 'background-color' changes the color of the box/area behind the text." }
+], "summary": "Phase 5 introduced the power of CSS. We learned the syntax
+(selector/property/value), the three ways to link CSS to HTML, and how to
+control basic visual elements like colors, fonts, and backgrounds. This is the
+starting point for all web design.", "key_takeaways": [ "CSS controls the look
+and feel of a website.", "External CSS is the preferred method for professional
+sites.", "CSS syntax consists of a selector and a declaration block.", "Every
+declaration needs a colon and a semicolon.", "Hex, RGB, and HSL are common ways
+to define colors.", "The 'font-family' property sets the typeface.", "The
+'text-align' property handles horizontal positioning.", "CSS comments use the /
+... */ syntax.", "Inline styles override internal and external styles.", "Proper
+indentation makes CSS readable for developers." ], "preview_next_topic": "In
+Phase 6, we will learn the 'CSS Box Model'—the most important concept in web
+layout, which defines how margins, borders, and padding work together.",
+"questions_and_answers": [ { "question": "What are the three ways to add CSS to
+an HTML document?", "answer": "The three ways are: 1. Inline (using the style
+attribute), 2. Internal (using the  tag in the ), and 3. External (using a  tag
+to point to a .css file).", "difficulty": "Easy Concept" }, { "question":
+"Explain the structure of a CSS rule.", "answer": "A CSS rule consists of a
+selector (the element to style) and a declaration block. Inside the block, you
+have properties and values separated by colons, with each declaration ending in
+a semicolon.", "difficulty": "Moderate Concept" }, { "question": "Write the CSS
+code to make all level-2 headings blue, centered, and using the 'Verdana'
+font.", "answer": "h2 {\n color: blue;\n text-align: center;\n font-family:
+Verdana, sans-serif;\n}", "difficulty": "Moderate Practical" }, { "question":
+"Create a CSS rule for a class named 'info-box' that has a light-yellow
+background, a font size of 14px, and dark-gray text using an RGB value.",
+"answer": ".info-box {\n background-color: lightyellow;\n font-size: 14px;\n
+color: rgb(64, 64, 64);\n}", "difficulty": "Hard Practical" }, { "question":
+"Identify the bug:  p { color: red font-size: 12px } ", "answer": "There is a
+missing semicolon after 'red'. It should be 'color: red;' otherwise the browser
+cannot distinguish where the first property ends and the next begins.",
+"difficulty": "Moderate Mistake" }, { "question": "A student linked their CSS
+using . Why might the styles not appear?", "answer": "The  tag is missing the
+'rel' attribute. Browsers need 'rel="stylesheet"' to understand that the linked
+file is intended to style the page.", "difficulty": "Hard Mistake" }, {
+"question": "Apply styles to a paragraph so that it has a background image
+'bg.jpg', the text is bold, and the text is white.", "answer": "p {\n
+background-image: url('bg.jpg');\n font-weight: bold;\n color: white;\n}",
+"difficulty": "Moderate Coding" }, { "question": "Write a complete HTML document
+that uses internal CSS to change the entire body background to a Hex color #222
+and all text inside to HSL(0, 0%, 90%).", "answer": "\n\n\n \n body {\n
+background-color: #222;\n color: hsl(0, 0%, 90%);\n }\n \n\n\n Dark mode
+styling!\n\n", "difficulty": "Hard Coding" } ], "multiple_choice_questions": [ {
+"question": "Which HTML tag is used to define internal CSS?", "options": { "A":
+"", "B": "", "C": "", "D": "" }, "answer": "C", "type": "Theory" }, {
+"question": "In CSS, what character is used to separate the property from the
+value?", "options": { "A": "Semicolon (;)", "B": "Colon (:)", "C": "Comma (,)",
+"D": "Dot (.)" }, "answer": "B", "type": "Theory" }, { "question": "Predict the
+output: Text (with an external CSS saying p { color: blue; })", "options": {
+"A": "Text will be blue", "B": "Text will be red", "C": "Text will be purple",
+"D": "Text will be black (default)" }, "answer": "B", "type": "Output
+Prediction" }, { "question": "What is the result of 'font-weight: bold;'?",
+"options": { "A": "Text becomes slanted", "B": "Text becomes thicker", "C":
+"Text becomes underlined", "D": "Text becomes capitalized" }, "answer": "B",
+"type": "Output Prediction" }, { "question": "What color is
+rgb(255, 255, 255)?", "options": { "A": "Black", "B": "Red", "C": "White", "D":
+"Transparent" }, "answer": "C", "type": "Output Prediction" }, { "question":
+"Find the bug: h1 { color = green; }", "options": { "A": "Should use a colon
+instead of '='", "B": "Missing curly braces", "C": "h1 is not a valid selector",
+"D": "Green must be in quotes" }, "answer": "A", "type": "Find the Bug" }, {
+"question": "Find the bug: ", "options": { "A": "The rel should be 'style'",
+"B": "It should use 'href' instead of 'src'", "C": "Link tags must be closed
+with ", "D": "CSS files cannot be linked this way" }, "answer": "B", "type":
+"Find the Bug" }, { "question": "Complete the code for a gray color: color:
+#______;", "options": { "A": "GGGGGG", "B": "888888", "C": "RGBGRAY", "D":
+"000000" }, "answer": "B", "type": "Complete the Code" }, { "question":
+"Complete the code for centering text: text-align: ______;", "options": { "A":
+"middle", "B": "center", "C": "centered", "D": "inline" }, "answer": "B",
+"type": "Complete the Code" }, { "question": "Which is the best approach for
+professional web projects?", "options": { "A": "Use Inline styles for
+everything", "B": "Write all CSS in the  of every page", "C": "Use one external
+.css file linked to all pages", "D": "Style elements using only HTML attributes"
+}, "answer": "C", "type": "Best Approach" } ] }

@@ -1,0 +1,189 @@
+{ "phase_metadata": { "phase_number": 8, "phase_name": "Encapsulation and
+Packages", "description": "Learn to protect data integrity through Encapsulation
+and organize code effectively using Java Packages.", "java_version": "21 LTS" },
+"learning_objectives": [ "Implement data hiding using private fields and public
+methods", "Master the four access modifiers: public, private, protected, and
+default", "Organize Java classes into logical package structures", "Understand
+the 'import' statement and naming conventions", "Learn the basics of JAR files
+for code distribution" ], "prerequisites": [ "Phase 5: OOP Basics (Classes and
+Objects)", "Phase 6: Inheritance (for protected modifier context)" ],
+"introduction": "Encapsulation is the process of wrapping data (variables) and
+code (methods) together as a single unit. It acts as a protective shield that
+prevents data from being accessed by code outside this shield. Packages, on the
+other hand, provide a mechanism to group related classes, acting like folders on
+a computer to keep our project organized and avoid naming conflicts.",
+"concept_explanation": { "what_is_it": "Encapsulation is the technique of making
+class fields private and providing access via public getter and setter methods.
+Packages are namespaces that organize classes and interfaces.",
+"why_do_we_need_it": "Encapsulation ensures data integrity by validating input
+before changing a variable. Packages prevent 'namespace collisions' (two classes
+with the same name) and make large projects manageable.", "how_it_works": "By
+using the 'private' keyword, we hide the internal state of an object. To allow
+controlled access, we provide 'getter' (read) and 'setter' (write) methods.
+Packages use the file system directory structure to map class names.",
+"access_modifiers": "1. private: Accessible only within the same class. 2.
+default (no keyword): Accessible only within the same package. 3. protected:
+Accessible in the same package and by subclasses in different packages. 4.
+public: Accessible from anywhere.", "syntax_explanation": "Packages must be
+declared at the very top of a Java file. Imports follow the package
+declaration." }, "syntax": { "package_declaration": "package
+com.company.project;", "import_statement": "import java.util.ArrayList;",
+"encapsulation": "private String data;\npublic String getData() { return data;
+}\npublic void setData(String data) { this.data = data; }" },
+"syntax_breakdown": { "package": "A keyword used to group related classes. It
+must be the first line of code.", "import": "A keyword used to make classes from
+other packages available in the current file.", "private": "An access modifier
+that restricts visibility to the containing class only.", "public": "An access
+modifier that allows visibility to all other classes.", "protected": "An access
+modifier that allows visibility to the package and subclasses.", "this_keyword":
+"Used inside setters to distinguish between class fields and method parameters."
+}, "rules_and_key_points": [ "A class can only have one package declaration.",
+"Package names should be lowercase and follow reverse domain naming (e.g.,
+com.google.search).", "Fields should almost always be private to maintain
+encapsulation.", "Getters and setters must be public to be useful.", "The
+default access modifier has no keyword.", "Standard Java classes (like String)
+are in java.lang, which is imported automatically.", "Static imports allow
+accessing static members without the class name.", "A JAR (Java ARchive) file is
+a compressed collection of compiled .class files.", "Subclasses can access
+protected members of the parent even if in a different package.", "Encapsulation
+is also known as 'Data Hiding'." ], "code_example_1": { "title": "Standard
+Encapsulation", "description": "A BankAccount class where the balance is
+protected from direct modification and validated via a setter.", "code": "class
+BankAccount {\n // Private field - Data Hiding\n private double balance;\n\n //
+Constructor\n public BankAccount(double initialBalance) {\n if (initialBalance
+>= 0) {\n this.balance = initialBalance;\n }\n }\n\n // Getter method\n public
+double getBalance() {\n return balance;\n }\n\n // Setter method with
+validation\n public void deposit(double amount) {\n if (amount > 0) {\n balance
++= amount;\n System.out.println("Deposited: $" + amount);\n } else {\n
+System.out.println("Invalid deposit amount");\n }\n }\n}\n\npublic class Main
+{\n public static void main(String[] args) {\n BankAccount account = new
+BankAccount(1000.0);\n account.deposit(500.0);\n System.out.println("Current
+Balance: $" + account.getBalance());\n // account.balance = 5000000; // This
+would cause a Compilation Error\n }\n}" }, "code_example_2": { "title":
+"Packages and Access Modifiers", "description": "Demonstrating how different
+access levels work across classes.", "code": "// File: Person.java\n// package
+com.learn.people;\n\nclass Person {\n public String name = "John"; // Visible
+everywhere\n private int age = 25; // Only in Person class\n protected String
+hobby = "Coding"; // Package + Subclasses\n int packagePoints = 100; // Only
+this package (Default)\n\n public void showAge() {\n // Private is accessible
+here\n System.out.println("Age is: " + age);\n }\n}\n\npublic class AccessDemo
+{\n public static void main(String[] args) {\n Person p = new Person();\n
+System.out.println("Name: " + p.name);\n System.out.println("Hobby: " +
+p.hobby);\n System.out.println("Points: " + p.packagePoints);\n p.showAge();\n
+// System.out.println(p.age); // Error: age has private access\n }\n}" },
+"output": "Deposited: $500.0\nCurrent Balance: $1500.0\nName: John\nHobby:
+Coding\nPoints: 100\nAge is: 25", "step_by_step_dry_run": "1. The program starts
+in main. \n2. A BankAccount object is created on the Heap with
+balance 1000.0.\n3. The 'deposit' method is called. It checks if amount (500)
+> 0.\n4. Condition is true, so the private balance is updated (1000 + 500).\n5.
+The 'getBalance' method is called to safely retrieve the value.\n6. The
+AccessDemo class shows that public, protected, and default members are
+accessible because AccessDemo and Person are in the same scope/package, but
+'age' remains hidden.", "memory_visualization": "Heap Memory: Contains the
+BankAccount object. Inside that object, the field 'balance' exists. \nStack
+Memory: Contains the 'account' reference variable. \nControl Flow: Even though
+'account' is on the stack, it cannot reach 'balance' directly. It must pass
+through the 'deposit()' method frame on the stack, which acts as a gatekeeper to
+the Heap data.", "real_world_use_cases": [ "Financial Systems: Preventing
+unauthorized balance updates.", "API Libraries: Hiding complex internal logic
+while exposing only simple methods to users.", "Project Structure: Organizing a
+'User Management' package vs an 'Inventory Management' package in an ERP
+system.", "Security: Protecting sensitive user data like password hashes within
+a User object." ], "common_mistakes": [ "Making fields 'public' just to avoid
+writing getters and setters.", "Forgetting that 'default' access (no keyword)
+does not allow access in different packages, even for subclasses.", "Trying to
+put the package declaration after the import statements.", "Using '.' imports
+excessively, which can lead to naming conflicts between different packages.",
+"Not using 'this' keyword in setters, leading to shadowed variables (setting the
+parameter to itself instead of the field)." ], "best_practices": [ "Always use
+the 'private' modifier for class variables.", "Provide getters and setters only
+when necessary (Read-only objects only need getters).", "Use meaningful package
+names (e.g., com.yourname.projectname.module).", "Avoid using the default
+package; always define a package name.", "Keep one public class per file and
+name the file after that class." ], "faq": [ { "question": "What is the
+difference between Encapsulation and Data Hiding?", "answer": "Data hiding
+(using private) is a part of encapsulation. Encapsulation is the broader concept
+of grouping data and methods together and controlling access to that unit." }, {
+"question": "Can a class be private?", "answer": "Top-level classes cannot be
+private; they can only be public or default. However, inner classes (classes
+inside other classes) can be private." }, { "question": "What is a JAR file?",
+"answer": "A JAR (Java ARchive) file is a package file format used to aggregate
+many Java class files and associated metadata and resources into one file for
+distribution." } ], "summary": "Phase 8 covered the crucial concepts of
+Encapsulation and Packages. We learned how to protect object data using access
+modifiers and how to provide controlled access through getters and setters. We
+also explored how packages help in organizing code and managing visibility
+across different parts of a Java application.", "key_takeaways": [ "Private
+fields + Public methods = Encapsulation.", "Public is for everyone, Private is
+for the class only.", "Protected is for family (subclasses) and neighbors
+(package).", "Default is for neighbors (package) only.", "Packages prevent
+naming conflicts and organize code like folders." ],
+"preview_of_the_next_topic": "In Phase 9, we will learn about Exception
+Handling, which allows our programs to handle errors gracefully without
+crashing.", "questions": [ { "difficulty": "Easy", "topic": "Concept",
+"question": "Which access modifier provides the highest level of data
+protection?", "answer": "The 'private' access modifier provides the highest
+protection as it restricts access to only the class where the member is
+defined." }, { "difficulty": "Moderate", "topic": "Concept", "question":
+"Explain the difference between 'default' and 'protected' access modifiers.",
+"answer": "'Default' (no keyword) allows access only within the same package.
+'Protected' allows access within the same package AND by subclasses even if they
+are in different packages." }, { "difficulty": "Moderate", "topic": "Practical
+Usage", "question": "How do you create a 'Read-Only' class in Java using
+encapsulation?", "answer": "Make all fields 'private' and 'final', and provide
+only 'getter' methods. Do not provide any 'setter' methods so the object's state
+cannot be changed after creation." }, { "difficulty": "Hard", "topic":
+"Practical Usage", "question": "If class A is in package 'p1' and class B
+(subclass of A) is in package 'p2', can B access a 'default' method of A? Why?",
+"answer": "No. Class B cannot access a default method of A because default
+access is strictly limited to the same package. Even though B is a subclass,
+'default' is more restrictive than 'protected'." }, { "difficulty": "Moderate",
+"topic": "Common Mistake", "question": "Correct the following setter: public
+void setName(String name) { name = name; }", "answer": "The issue is variable
+shadowing. Use the 'this' keyword to refer to the class field: 'public void
+setName(String name) { this.name = name; }'." }, { "difficulty": "Hard",
+"topic": "Common Mistake", "question": "What is the error in a Java file that
+starts with an 'import' statement followed by a 'package' statement?", "answer":
+"The 'package' statement must be the very first non-comment line in a Java file.
+If an 'import' appears before 'package', the code will not compile." }, {
+"difficulty": "Moderate", "topic": "Coding", "question": "Write a class
+'Student' with encapsulated fields 'name' and 'grade'. Ensure 'grade' can only
+be set if it is between 0 and 100.", "answer": "class Student { private String
+name; private int grade; public void setGrade(int g) { if(g >= 0 && g <= 100)
+this.grade = g; } public int getGrade() { return grade; } }" }, { "difficulty":
+"Hard", "topic": "Coding", "question": "Demonstrate the use of a 'static import'
+to use 'Math.sqrt' and 'Math.PI' without the 'Math.' prefix.", "answer": "import
+static java.lang.Math.; public class Test { void calc() { double r = sqrt(PI); }
+}" } ], "mcqs": [ { "question": "Which keyword is used to import a specific
+class into a file?", "options": { "A": "package", "B": "include", "C": "import",
+"D": "using" }, "answer": "C" }, { "question": "What is the primary benefit of
+encapsulation?", "options": { "A": "Faster execution speed", "B": "Data security
+and control over how data is modified", "C": "Automatic memory management", "D":
+"Reduction in the number of classes needed" }, "answer": "B" }, { "question":
+"Predict Output: Class A { private int x = 5; } Class B { main { A obj = new
+A(); System.out.print(obj.x); } }", "options": { "A": "5", "B": "0", "C":
+"Compilation Error", "D": "Runtime Error" }, "answer": "C" }, { "question": "If
+no access modifier is specified, what is the default visibility?", "options": {
+"A": "Public", "B": "Private", "C": "Package-private", "D": "Protected" },
+"answer": "C" }, { "question": "Which of these is a valid package declaration?",
+"options": { "A": "package 123.com.test;", "B": "package
+com.my_company.project;", "C": "import package com.test;", "D": "package
+java.util.Scanner;" }, "answer": "B" }, { "question": "Find the bug: \nimport
+java.util.;\npackage com.app;\nclass MyClass { }", "options": { "A": "Missing
+semicolon after class", "B": "The package statement must come before the import
+statement", "C": "util. is not allowed", "D": "Class name should be in
+lowercase" }, "answer": "B" }, { "question": "Which modifier allows a member to
+be accessed by a subclass in a different package?", "options": { "A": "private",
+"B": "default", "C": "protected", "D": "None of the above" }, "answer": "C" }, {
+"question": "Complete the code for a getter:\nprivate String val;\npublic String
+getVal() { ________ }", "options": { "A": "return val;", "B": "return
+this.val();", "C": "this.val = val;", "D": "System.out.println(val);" },
+"answer": "A" }, { "question": "Predict Output: \nclass Test { \n private Test()
+{ System.out.print("Private "); } \n public static void main(String[] args) {
+Test t = new Test(); } \n}", "options": { "A": "Private", "B": "Compilation
+Error", "C": "Runtime Error", "D": "No Output" }, "answer": "A" }, { "question":
+"Best Approach: How should you design a class that represents a User's sensitive
+profile?", "options": { "A": "Make all fields public for easy access", "B":
+"Make fields private and provide getters and setters with validation", "C":
+"Make fields protected and put all other classes in the same package", "D": "Use
+no modifiers (default)" }, "answer": "B" } ] }

@@ -1,0 +1,186 @@
+{ "phase_metadata": { "phase_number": 15, "phase_name": "Mini Projects: Building
+Real-World Systems", "learning_objectives": [ "Apply Object-Oriented Programming
+(OOP) principles to solve real-world problems", "Understand how to architect a
+multi-class system in C++", "Manage data collections using STL containers like
+std::vector", "Implement business logic such as banking transactions and library
+inventory tracking", "Practice clean code habits and modular design" ],
+"prerequisites": [ "Classes and Objects (Phase 2)", "Constructors and
+Destructors (Phase 3)", "Encapsulation and Getters/Setters (Phase 6)", "STL
+Containers like std::vector (Phase 10)" ] }, "introduction": "Phase 15 is where
+your theoretical knowledge transforms into practical skill. Instead of writing
+isolated functions, you will build complete, interactive systems. We will focus
+on designing software using classes that interact with each other, simulating
+real-world scenarios like banking, education, and inventory management. This
+phase emphasizes 'thinking in objects'—identifying the entities, their
+properties, and their behaviors.", "concept_explanation": { "what_is_it":
+"Project-based learning involves integrating multiple C++ concepts (OOP, STL,
+File Handling) into a single cohesive application.", "why_do_we_need_it": "In
+the professional world, software isn't just one class; it's a network of
+interacting components. Projects teach you how to manage complexity, handle user
+input effectively, and maintain data integrity.", "how_does_it_work": "We
+identify 'Entities' (like a BankAccount or a Book), define their data (balance,
+title), and implement 'Services' (deposit, borrow) that modify that data while
+keeping it safe via encapsulation.", "when_to_use": "Whenever you transition
+from learning syntax to building actual tools or applications." },
+"syntax_explanation": { "syntax": "class SystemName {\nprivate:\n std::vector
+data;\npublic:\n void addItem(const Entity& item);\n void processLogic();\n};",
+"breakdown_of_syntax": [ { "keyword": "class SystemName", "explanation": "The
+'Manager' or 'Controller' class that orchestrates the entire application logic."
+}, { "keyword": "std::vector data", "explanation": "A dynamic collection used to
+store multiple objects (like many books in a library) in memory." }, {
+"keyword": "const Entity& item", "explanation": "Passing an object by
+reference-to-const to avoid expensive copying while ensuring the original object
+isn't modified." } ] }, "rules_and_key_points": { "rules": [ "Keep data members
+private and use public methods for interaction.", "Use descriptive names for
+classes (e.g., 'Library' instead of 'LManager').", "Always validate user input
+(e.g., don't allow a negative bank deposit).", "Separate display logic (cout)
+from business logic (calculation) where possible.", "Use modern C++ features
+like range-based for loops for cleaner code." ], "key_points": [ "Projects turn
+concepts into experience.", "OOP helps in mapping code to real-world objects.",
+"Encapsulation protects the internal state of your project data.", "Vectors are
+the most common way to store multiple objects in a mini-project.", "A 'Manager'
+class helps centralize control of the system.", "Code reusability is a primary
+goal of modular project design.", "Error handling ensures the program doesn't
+crash on invalid user input.", "Dry running logic is essential before writing
+the code.", "The 'this' pointer can be used to distinguish between member
+variables and parameters.", "Building a simple UI via the console is the first
+step in project development." ] }, "code_examples": [ { "title": "Simple
+Calculator (OOP Style)", "description": "A basic calculator demonstrating how to
+wrap functionality inside a class for better organization.", "code": "#include
+\n\nclass Calculator {\npublic:\n double add(double a, double b) { return a + b;
+}\n double subtract(double a, double b) { return a - b; }\n double
+multiply(double a, double b) { return a * b; }\n double divide(double a, double
+b) {\n if (b == 0) {\n std::cout << "Error: Division by zero!" << std::endl;\n
+return 0;\n }\n return a / b;\n }\n};\n\nint main() {\n Calculator calc;\n
+std::cout << "Addition (10+5): " << calc.add(10, 5) << std::endl;\n std::cout <<
+"Division (10/2): " << calc.divide(10, 2) << std::endl;\n return 0;\n}",
+"output": "Addition (10+5): 15\nDivision (10/2): 5" }, { "title": "Practical:
+Bank Account System", "description": "A simplified banking system showing class
+interaction, private data, and a vector of accounts.", "code": "#include
+\n#include \n#include \n\nclass BankAccount {\nprivate:\n std::string owner;\n
+double balance;\n\npublic:\n BankAccount(std::string name, double
+initialDeposit) \n : owner(name), balance(initialDeposit) {}\n\n void
+deposit(double amount) {\n if (amount > 0) balance += amount;\n }\n\n void
+withdraw(double amount) {\n if (amount > 0 && amount <= balance) {\n balance -=
+amount;\n } else {\n std::cout << "Insufficient funds for " << owner <<
+std::endl;\n }\n }\n\n void display() const {\n std::cout << "Account: " <<
+owner << " | Balance: $" << balance << std::endl;\n }\n};\n\nint main() {\n
+std::vector accounts;\n \n // Creating accounts\n
+accounts.push_back(BankAccount("Alice", 1000.0));\n
+accounts.push_back(BankAccount("Bob", 500.0));\n\n // Performing operations\n
+accounts[0].deposit(500);\n accounts[1].withdraw(600);\n\n // Displaying all
+accounts\n for (const auto& acc : accounts) {\n acc.display();\n }\n\n
+return 0;\n}", "output": "Insufficient funds for Bob\nAccount: Alice | Balance:
+$1500\nAccount: Bob | Balance: $500", "dry_run": "1. Main creates a vector to
+store BankAccount objects. 2. Two objects (Alice and Bob) are constructed and
+added to the vector. 3. Alice's account calls deposit(500), updating its
+internal balance from 1000 to 1500. 4. Bob's account calls withdraw(600). The
+condition (600 <= 500) is false, so it prints an error message. 5. A range-based
+for loop iterates through the vector and prints the current state of every
+account." } ], "memory_visualization": { "concept": "Objects in a Vector",
+"description": "In the Bank Account project, when we push BankAccount objects
+into a vector, they are stored contiguously in memory on the Heap (since
+std::vector manages dynamic memory). Each BankAccount object contains its own
+'owner' string and 'balance' double.", "visualization_steps": [ "Vector Header:
+Points to memory address 0x100.", "Address 0x100: [ Alice | 1500.0 ]
+(BankAccount Object 1)", "Address 0x120: [ Bob | 500.0 ] (BankAccount
+Object 2)", "Each object is a distinct instance with its own memory footprint."
+] }, "real_world_use_cases": [ "Banking Software: Managing millions of user
+accounts with secure transactions.", "E-commerce Inventory: Keeping track of
+product stock, prices, and categories.", "Student Information Systems: Handling
+grades, attendance, and registration in universities.", "Task Management Apps:
+Storing and sorting user 'Todo' items." ], "common_mistakes": [ "Directly
+accessing private members (e.g., acc.balance = 100) instead of using methods.",
+"Forgetting to validate user input, leading to negative money or empty names.",
+"Creating logic that relies on hard-coded array sizes instead of using
+std::vector.", "Writing all code in main() instead of splitting it into
+classes." ], "best_practices": [ "Always mark getter methods as 'const' (e.g.,
+double getBalance() const).", "Use a switch statement for a clean console-based
+menu system.", "Initialize member variables using Constructor Initialization
+Lists for better performance.", "Pass large objects by constant reference to
+avoid unnecessary memory overhead." ], "faq": [ { "question": "Why use
+std::vector instead of a standard array for projects?", "answer": "A vector is
+dynamic. You don't know how many books or accounts a user will add, so a vector
+grows automatically as needed." }, { "question": "What is the purpose of a
+'Manager' class?", "answer": "It serves as a controller that handles the logic
+of adding, deleting, and searching through the data objects." } ], "summary": {
+"key_takeaways": [ "Mini projects bridge the gap between syntax and software
+engineering.", "Class interactions are the heart of professional C++
+development.", "Encapsulation ensures that data can only be modified through
+controlled logic.", "STL vectors are powerful tools for managing object
+collections." ], "preview_of_next_topic": "In Phase 16, we will look into
+Advanced STL Containers and how to optimize our projects using Maps and Sets."
+}, "questions": [ { "id": 1, "difficulty": "Easy", "type": "Concept",
+"question": "In a Library Management System, why should the 'bookStatus'
+(Available/Borrowed) be private?", "answer": "To prevent external code from
+changing the status without following proper logic (like checking if the user is
+authorized), ensuring data integrity." }, { "id": 2, "difficulty": "Moderate",
+"type": "Concept", "question": "What is the benefit of having a separate class
+for 'Transaction' in a Bank System rather than just a function?", "answer": "A
+Transaction class can store history (date, time, amount, type) for every action,
+allowing for audit logs and undo operations, which is better for organization
+and scalability." }, { "id": 3, "difficulty": "Moderate", "type": "Practical
+Usage", "question": "Write a method for a 'Book' class that checks if a specific
+title matches the book's title (case-sensitive).", "answer": "bool
+isTitleMatch(std::string searchTitle) const { return this->title == searchTitle;
+}" }, { "id": 4, "difficulty": "Hard", "type": "Practical Usage", "question":
+"How would you implement a search functionality in a 'Library' class that
+returns a pointer to a 'Book' object from a vector of books if found?",
+"answer": "Book* findBook(std::string title) { for(auto& b : books) {
+if(b.getTitle() == title) return &b; } return nullptr; }" }, { "id": 5,
+"difficulty": "Moderate", "type": "Common Mistake", "question": "What is wrong
+with this logic in a Bank System? 'void withdraw(double amt) { balance -= amt;
+}'", "answer": "It fails to check if 'amt' is positive and if 'balance' is
+greater than or equal to 'amt', potentially leading to negative balances." }, {
+"id": 6, "difficulty": "Hard", "type": "Common Mistake", "question": "If you
+store pointers in a vector (std::vector<Book*>) in your project, what critical
+step must you perform in the destructor of the Manager class?", "answer": "You
+must iterate through the vector and manually 'delete' every pointer to prevent
+memory leaks, as the vector only deletes the pointer address, not the allocated
+memory." }, { "id": 7, "difficulty": "Moderate", "type": "Coding", "question":
+"Complete the logic for a Todo App to mark a task as completed based on its
+index.", "answer": "void markDone(int index) { if(index >= 0 && index <
+tasks.size()) { tasks[index].isCompleted = true; } }" }, { "id": 8,
+"difficulty": "Hard", "type": "Coding", "question": "Create a function signature
+and logic for 'Transfer' between two BankAccount objects.", "answer": "void
+transfer(BankAccount& from, BankAccount& to, double amount) {
+if(from.getBalance() >= amount) { from.withdraw(amount); to.deposit(amount); }
+}" } ], "mcqs": [ { "id": 1, "type": "Theory", "question": "Which OOP principle
+is primarily used when we group attributes like 'title' and 'author' into a
+'Book' class?", "options": { "A": "Inheritance", "B": "Encapsulation", "C":
+"Polymorphism", "D": "Abstraction" }, "answer": "B" }, { "id": 2, "type":
+"Theory", "question": "In a menu-driven program, which structure is best for
+handling different user choices (1, 2, 3...)?", "options": { "A": "if-else if",
+"B": "while loop", "C": "switch-case", "D": "for loop" }, "answer": "C" }, {
+"id": 3, "type": "Output Prediction", "question": "What happens if you use
+'std::vector::push_back()' with a class that has no default constructor but has
+a parameterized one?", "options": { "A": "It works normally", "B": "Compiler
+error unless you provide arguments", "C": "It crashes at runtime", "D": "The
+vector fills with null values" }, "answer": "B" }, { "id": 4, "type": "Output
+Prediction", "question": "Given: std::vector v = {10, 20}; v.push_back(30); cout
+<< v.size(); What is the output?", "options": { "A": "2", "B": "3", "C": "10",
+"D": "30" }, "answer": "B" }, { "id": 5, "type": "Output Prediction",
+"question": "If a class member is 'const double pi = 3.14;', can a method in the
+class change its value?", "options": { "A": "Yes, if the method is public", "B":
+"Yes, if the method is not const", "C": "No, const values are immutable", "D":
+"Yes, using the 'this' pointer" }, "answer": "C" }, { "id": 6, "type": "Find the
+Bug", "question": "Find the bug: 'class Todo { string task; public: Todo(string
+t) { task = t; } }; vector list; list.push_back("Clean");'", "options": { "A":
+"Vector cannot hold objects", "B": "The constructor must be private", "C":
+"Everything is correct (string converts to Todo via constructor)", "D":
+"Push_back only accepts integers" }, "answer": "C" }, { "id": 7, "type": "Find
+the Bug", "question": "What is wrong here: 'void addGrade(int g) {
+grades.push_back(g); }' if grades is defined as 'int grades[10];'?", "options":
+{ "A": "push_back is a vector method, not for arrays", "B": "The grade must be a
+float", "C": "The array is too small", "D": "None of the above" }, "answer": "A"
+}, { "id": 8, "type": "Complete the Code", "question": "Complete the code to
+iterate through a vector of objects 'accounts': 'for (_____ acc : accounts) {
+acc.display(); }'", "options": { "A": "int", "B": "auto&", "C": "std::vector",
+"D": "void" }, "answer": "B" }, { "id": 9, "type": "Complete the Code",
+"question": "To allow a BankAccount to start with zero balance if not specified:
+'BankAccount(double b = ____) : balance(b) {}'", "options": { "A": "null", "B":
+"0.0", "C": "void", "D": "default" }, "answer": "B" }, { "id": 10, "type": "Best
+Approach", "question": "What is the best way to handle a 'Delete User' operation
+in a project with a vector?", "options": { "A": "Set the user object to null",
+"B": "Clear the entire vector and start over", "C": "Use vector::erase() with an
+iterator", "D": "Move the user to the end of the vector" }, "answer": "C" } ] }

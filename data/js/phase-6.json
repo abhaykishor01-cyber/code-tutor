@@ -1,0 +1,257 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 6,
+    "phaseTitle": "Object Architecture & Advanced Patterns",
+    "description": "Master JavaScript Objects: from memory management and property descriptors to advanced functional patterns like destructuring and cloning.",
+    "estimatedTime": "180 minutes"
+  },
+  "learningObjectives": [
+    "Master the distinction between Stack and Heap memory for Object references.",
+    "Efficiently manipulate properties using Dot vs. Bracket notation and Computed keys.",
+    "Leverage 'this' context and understand the lexical binding of Arrow functions.",
+    "Utilize static methods: Object.keys, values, entries, and the modern Object.hasOwn().",
+    "Implement immutable data patterns using Spread, Object.assign, and structuredClone.",
+    "Solve real-world problems with Object Destructuring and Alias assignment."
+  ],
+  "prerequisites": [
+    "Phase 1 - Primitive Data Types",
+    "Phase 4 - Function Scope and Callbacks",
+    "Phase 5 - Array Iteration (for processing entries)"
+  ],
+  "introduction": "In JavaScript, Objects are the foundation of everything. While primitives (strings, numbers) hold single values, Objects hold 'State' and 'Behavior'. Understanding Objects is the bridge between writing scripts and building professional software architecture. This phase covers how objects occupy memory, how to manipulate them without causing side effects, and how to use modern ES2023+ syntax to manage complex data entities.",
+  "conceptExplanation": "### 1. The Core Architecture\nAn Object is a collection of Key-Value pairs. Keys are strings (or Symbols), and Values can be anything. \n\n### 2. Access Strategies\n- **Dot Notation (`obj.key`):** The standard. Fast and readable. Requires the key to be a valid identifier.\n- **Bracket Notation (`obj['key']`):** The power tool. Allows keys with spaces, special characters, or keys stored in variables.\n\n### 3. The 'this' Mechanism\nIn a method, `this` points to the object currently executing the code. However, **Arrow Functions** do not have their own `this`. They inherit it from where the object was created (lexical scope), which is a common source of bugs in object-oriented JS.\n\n### 4. Memory Pointers\nWhen you assign an object to a new variable, you aren't copying the data; you are copying the 'address' to that data in the Heap. This is why changing `objB` often accidentally changes `objA`.",
+  "syntax": "const keyName = 'status';\nconst user = {\n  id: 101,\n  ['active_' + keyName]: true, // Computed Property\n  login() { console.log(this.id + ' logged in'); } // Method Shorthand\n};\n\n// Destructuring with Aliasing and Defaults\nconst { id: userId, role = 'guest' } = user;",
+  "breakdownOfSyntax": {
+    "Object Literal {}": "The container for the key-value pairs.",
+    "Computed Property []": "Allows using an expression or variable as a key name at creation time.",
+    "Method Shorthand": "Writing `login() {}` instead of `login: function() {}`.",
+    "Destructuring": "A syntax to 'unpack' properties into distinct variables.",
+    "Aliasing (id: userId)": "Renaming a property while destructuring.",
+    "Default Values": "Providing a fallback value if the property is undefined."
+  },
+  "rulesAndKeyPoints": [
+    "Objects are stored in the Heap; variables store a Reference (pointer).",
+    "O(1) Complexity: Accessing a property by key is extremely fast regardless of object size.",
+    "Keys are always converted to Strings (except Symbols).",
+    "Object.freeze() makes an object immutable (top-level only).",
+    "Object.seal() prevents adding/removing properties but allows changing existing ones.",
+    "Arrow functions should generally NOT be used as object methods.",
+    "The Spread operator `...` performs a Shallow Copy.",
+    "Use structuredClone() for deep copies of nested objects (Modern JS).",
+    "Object.entries() turns an object into an array of [key, value] pairs for iteration.",
+    "Always check for property existence using Object.hasOwn(obj, 'key') instead of obj.key !== undefined."
+  ],
+  "codeExample1": {
+    "title": "Reference vs. Value (The Memory Trap)",
+    "description": "Understanding why modifying a 'copy' affects the original.",
+    "code": "const original = { name: 'Dev', stats: { hp: 100 } };\n\n// Shallow copy via Spread\nconst copy = { ...original };\n\ncopy.name = 'Admin'; // Only changes copy\ncopy.stats.hp = 50;  // CHANGES BOTH (Nested object is still a shared reference)\n\nconsole.log(original.name);    // 'Dev'\nconsole.log(original.stats.hp); // 50 (Surprise!)\n\n// Deep copy (The Fix)\nconst deepCopy = structuredClone(original);\ndeepCopy.stats.hp = 0; // Only changes deepCopy"
+  },
+  "codeExample2": {
+    "title": "Real-World: Product Configuration System",
+    "description": "Using computed properties, methods, and static Object tools.",
+    "code": "const discountType = 'BLACK_FRIDAY';\n\nconst product = {\n  id: 'SKU-01',\n  price: 500,\n  [discountType]: 0.20, // Computed key\n  \n  calculatePrice() {\n    const discount = this[discountType] || 0;\n    return this.price * (1 - discount);\n  }\n};\n\n// Extracting data dynamically\nconst metadata = Object.entries(product);\nmetadata.forEach(([key, value]) => {\n  if (typeof value !== 'function') {\n    console.log(`${key}: ${value}`);\n  }\n});\n\nconsole.log('Final Price:', product.calculatePrice());"
+  },
+  "output": "Example 1 Output:\nDev\n50\n\nExample 2 Output:\nid: SKU-01\nprice: 500\nBLACK_FRIDAY: 0.2\nFinal Price: 400",
+  "stepByStepDryRun": {
+    "method": "Property Access via Variable",
+    "code": "const key = 'score'; const obj = { score: 10 }; console.log(obj[key]);",
+    "steps": [
+      "Step 1: The variable 'key' is evaluated. Its value is the string 'score'.",
+      "Step 2: The engine looks at 'obj' in memory.",
+      "Step 3: Because brackets [] are used, it looks for the property named by the value of 'key' ('score').",
+      "Step 4: It finds the value 10 and returns it.",
+      "Crucial Note: If obj.key was used, it would look for a literal property named 'key' and return undefined."
+    ]
+  },
+  "memoryVisualization": "STACK vs HEAP VISUALIZATION:\n1. [Stack] userVar -> [Heap Address: 0x001]\n2. [Heap Address: 0x001] -> { name: 'Alice', data: 0x002 }\n3. [Heap Address: 0x002] -> { bio: 'Dev' }\n\nWhen you do `const user2 = userVar`, you create a new entry in the STACK pointing to the same 0x001 address in the HEAP. This is 'Reference Sharing'.",
+  "realWorldUseCases": [
+    "State Objects: Managing complex UI states in React or Vue.",
+    "Data Modeling: Representing users, products, or transactions from a database.",
+    "Configuration: Passing options to third-party libraries (e.g., Chart.js or Leaflet).",
+    "Grouping Logic: Bundling utility functions into a single 'Service' object.",
+    "JSON Interaction: Processing data fetched from REST APIs."
+  ],
+  "commonMistakes": [
+    "Using Dot notation with variables (obj.myVar instead of obj[myVar]).",
+    "Forgetting that Object.keys() returns strings, even if the keys were numbers.",
+    "Attempting to use 'this' in arrow function methods.",
+    "Deeply nesting objects, making code hard to read and fragile.",
+    "Not checking for property existence before access, leading to 'Cannot read property of undefined' errors."
+  ],
+  "bestPractices": [
+    "Use Object Shorthand `{ name }` when possible for cleaner code.",
+    "Prefer Optional Chaining `user?.profile?.name` for safe nested access.",
+    "Use `Object.freeze()` for configuration/constant objects.",
+    "Keep objects 'flat' (minimize nesting) for easier maintenance.",
+    "Always use the Spread operator for updates in state-driven environments (Immutability).",
+    "Use `Object.hasOwn()` over `.hasOwnProperty()` as it is safer for objects created without prototypes."
+  ],
+  "frequentlyAskedQuestions": [
+    {
+      "difficulty": "Easy Concept",
+      "question": "What is the difference between an object and an array?",
+      "answer": "Arrays are ordered lists used for sequences of data, indexed by numbers. Objects are unordered collections used to represent entities, indexed by string keys."
+    },
+    {
+      "difficulty": "Moderate Concept",
+      "question": "How do Arrow functions behave as object methods?",
+      "answer": "Arrow functions do not have their own 'this'. If used as a method, 'this' will refer to the global scope (or the parent scope), usually resulting in 'undefined' when trying to access object properties."
+    },
+    {
+      "difficulty": "Moderate Practical",
+      "question": "How can I merge two objects, ensuring the second one overwrites the first?",
+      "answer": "Use the spread operator: `const final = { ...obj1, ...obj2 };`. If both have the same key, obj2's value wins."
+    },
+    {
+      "difficulty": "Hard Practical",
+      "question": "How do you check if an object is truly empty?",
+      "answer": "Use `Object.keys(obj).length === 0`. Note that `obj === {}` will always be false because of reference comparison."
+    },
+    {
+      "difficulty": "Moderate Mistake",
+      "question": "Why is 'typeof null' equal to 'object'?",
+      "answer": "This is a historical bug in JavaScript from its first version. It remains this way to avoid breaking older websites, but 'null' is technically a primitive, not an object."
+    },
+    {
+      "difficulty": "Hard Mistake",
+      "question": "What is a 'shallow copy' vs a 'deep copy'?",
+      "answer": "A shallow copy (Spread/Object.assign) copies top-level values. If the values are other objects, it only copies the reference. A deep copy (structuredClone) recursively copies every single level, creating a completely independent object."
+    },
+    {
+      "difficulty": "Moderate Coding",
+      "question": "Write code to prevent any further changes to an object called 'config'.",
+      "answer": "Object.freeze(config);"
+    },
+    {
+      "difficulty": "Hard Coding",
+      "question": "Write a function that swaps the keys and values of an object.",
+      "answer": "const swap = (obj) => Object.fromEntries(Object.entries(obj).map(([k, v]) => [v, k]));"
+    }
+  ],
+  "summary": "Phase 6 established the mastery of Objects, the primary structure for data modeling in JS. We covered property access, the nuances of the 'this' keyword, reference-based memory, and modern tools for immutable data management.",
+  "keyTakeaways": [
+    "Objects store data in the Heap and are accessed via Stack references.",
+    "Use Bracket notation for dynamic keys.",
+    "Regular functions bind 'this' to the object; Arrow functions do not.",
+    "Spread and Object.assign only perform shallow copies.",
+    "structuredClone is the modern way to deep clone objects.",
+    "Object.entries and Object.fromEntries allow seamless conversion between objects and arrays.",
+    "Optional chaining is mandatory for professional, crash-proof code.",
+    "Object.keys(obj).length is the reliable way to check for emptiness.",
+    "Computed properties allow dynamic key names during object creation.",
+    "Immutability is key in modern frameworks like React."
+  ],
+  "previewOfNextTopic": "In Phase 7, we step into the browser and learn DOM Manipulation—how to use JavaScript to interact with HTML elements and create dynamic user interfaces.",
+  "mcqs": [
+    {
+      "type": "Theory",
+      "question": "Which keyword refers to the object that is executing the current function?",
+      "options": {
+        "A": "self",
+        "B": "parent",
+        "C": "this",
+        "D": "context"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Theory",
+      "question": "What happens if you use an arrow function as a method in an object?",
+      "options": {
+        "A": "It works normally.",
+        "B": "'this' will be undefined or point to the global scope.",
+        "C": "It throws a SyntaxError.",
+        "D": "It makes the object immutable."
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "const a = { x: 1 }; const b = a; b.x = 2; console.log(a.x);",
+      "options": {
+        "A": "1",
+        "B": "2",
+        "C": "undefined",
+        "D": "ReferenceError"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "const user = { name: 'Lee' }; const { name: userName } = user; console.log(name);",
+      "options": {
+        "A": "'Lee'",
+        "B": "undefined or Error (ReferenceError)",
+        "C": "userName",
+        "D": "null"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "console.log(typeof {});",
+      "options": {
+        "A": "'array'",
+        "B": "'null'",
+        "C": "'object'",
+        "D": "'structure'"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "const obj = { val: 10 }; const key = 'val'; console.log(obj.key);",
+      "options": {
+        "A": "It should be obj[key]",
+        "B": "It should be obj.val()",
+        "C": "obj.key is a reserved word",
+        "D": "obj must be an array"
+      },
+      "answer": "A"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "const person = { name: 'Joe' }; Object.freeze(person); person.name = 'Bob'; console.log(person.name);",
+      "options": {
+        "A": "'Bob'",
+        "B": "'Joe'",
+        "C": "undefined",
+        "D": "TypeError"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "To get all keys of an object: const keys = ______.keys(myObj);",
+      "options": {
+        "A": "myObj",
+        "B": "Array",
+        "C": "Object",
+        "D": "JSON"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "To merge objects: const merged = { ___obj1, ___obj2 };",
+      "options": {
+        "A": "..",
+        "B": "...",
+        "C": "&&",
+        "D": "||"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Best Approach",
+      "question": "How should you safely access a deeply nested property 'user.address.zip'?",
+      "options": {
+        "A": "user.address.zip",
+        "B": "user && user.address && user.address.zip",
+        "C": "user?.address?.zip",
+        "D": "try { user.address.zip } catch {}"
+      },
+      "answer": "C"
+    }
+  ]
+}

@@ -1,0 +1,507 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 8,
+    "phaseName": "Object-Oriented Programming (OOP)",
+    "duration": "12 hours"
+  },
+  "learningObjectives": [
+    "Design robust software systems using Classes and Objects",
+    "Implement core OOP pillars: Encapsulation, Inheritance, and Polymorphism",
+    "Master the __init__ constructor and Dunder (magic) methods for operator overloading",
+    "Distinguish between Class attributes and Instance attributes",
+    "Manage object lifecycle and state safely"
+  ],
+  "prerequisites": [
+    "Phase 6: Comprehensive data structures knowledge",
+    "Phase 5: Functional decomposition and scope management"
+  ],
+  "introduction": "Object-Oriented Programming (OOP) transforms how we structure code by bundling data and the behaviors that operate on that data into discrete units called Objects. This approach enables developers to model real-world business entities—like BankAccounts, UserProfiles, or GameEntities—making codebases modular, testable, and infinitely easier to maintain.",
+  "conceptExplanation": "At the heart of OOP is the Class—a blueprint defining the structure. An Object is a specific instance of that blueprint. We define 'state' via instance variables and 'behavior' via methods. Inheritance allows us to create specialized versions of a base class (child) without rewriting code, while Encapsulation protects sensitive internal state from external interference.",
+  "syntax": "class ClassName:\n    class_variable = 0\n    def __init__(self, attribute):\n        self.attribute = attribute\n    def method(self):\n        pass",
+  "syntaxBreakdown": [
+    "class Keyword: Initiates the definition of a new object type.",
+    "self: A reference to the specific object instance allowing access to its attributes.",
+    "__init__: The constructor method triggered automatically upon object creation.",
+    "__str__: A magic method for controlling string representation of an object."
+  ],
+  "rulesAndKeyPoints": [
+    "Always use self to reference instance-specific data.",
+    "Class variables are shared across all instances; instance variables are unique.",
+    "Inheritance is implemented using class Child(Parent): syntax.",
+    "Use super().__init__() to invoke parent constructors during initialization.",
+    "Dunder methods like __len__ and __repr__ provide Pythonic interfaces for your custom objects.",
+    "Private attributes are denoted by a double underscore prefix (e.g., __balance).",
+    "Static methods (@staticmethod) do not require self and are used for logic related to the class but not its state.",
+    "Class methods (@classmethod) receive the class itself as the first argument (cls).",
+    "Encapsulation is enforced by conventions (single underscore) or name-mangling (double underscore).",
+    "Polymorphism allows different classes to implement the same method signature."
+  ],
+  "codeExample1": {
+    "title": "Basic Class Structure",
+    "code": "class Product:\n    def __init__(self, name, price):\n        self.name = name\n        self.price = price\n    def get_info(self):\n        return f'{self.name}: ${self.price:.2f}'\n\nlaptop = Product('Laptop', 999.99)\nprint(laptop.get_info())",
+    "explanation": "Demonstrates the simplest form of a class defining state (attributes) and behavior (method).",
+    "output": "Laptop: $999.99"
+  },
+  "codeExample2": {
+    "title": "Inheritance and Encapsulation",
+    "code": "class BankAccount:\n    def __init__(self, balance):\n        self.__balance = balance\n    def deposit(self, amount):\n        self.__balance += amount\n    def get_balance(self):\n        return self.__balance\n\nclass SavingsAccount(BankAccount):\n    def add_interest(self, rate):\n        self.deposit(self.get_balance() * rate)",
+    "explanation": "BankAccount uses __balance to prevent direct modification, while SavingsAccount inherits functionality.",
+    "output": "N/A"
+  },
+  "dryRunSteps": [
+    {
+      "stepNumber": 1,
+      "lineOfCode": "acc = SavingsAccount(100)",
+      "lineNumber": 1,
+      "explanation": "Instantiates SavingsAccount, triggers parent __init__.",
+      "variablesState": {
+        "__balance": "100"
+      }
+    },
+    {
+      "stepNumber": 2,
+      "lineOfCode": "acc.deposit(50)",
+      "lineNumber": 2,
+      "explanation": "Executes inherited method to modify protected state.",
+      "variablesState": {
+        "__balance": "150"
+      }
+    },
+    {
+      "stepNumber": 3,
+      "lineOfCode": "acc.add_interest(0.1)",
+      "lineNumber": 3,
+      "explanation": "Calculates 10% interest on current state.",
+      "variablesState": {
+        "__balance": "165"
+      }
+    },
+    {
+      "stepNumber": 4,
+      "lineOfCode": "print(acc.get_balance())",
+      "lineNumber": 4,
+      "explanation": "Returns current protected state safely.",
+      "variablesState": {
+        "__balance": "165"
+      }
+    }
+  ],
+  "memoryVisualization": {
+    "description": "Object memory structure in Python",
+    "elements": [
+      {
+        "id": "o1",
+        "label": "Instance Object",
+        "type": "heap"
+      },
+      {
+        "id": "v1",
+        "label": "__balance",
+        "type": "heap",
+        "value": "165"
+      },
+      {
+        "id": "p1",
+        "label": "acc_pointer",
+        "type": "stack",
+        "pointsTo": "o1"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Gaming Engines: Modeling players, items, and NPCs as unique objects.",
+    "Financial Systems: Enforcing strict transaction rules for account objects.",
+    "GUI Frameworks: Each button or window is an object instance inheriting from a base widget class.",
+    "Web Frameworks: Representing database records as Python model objects (ORMs)."
+  ],
+  "commonMistakes": [
+    "Forgetting the self parameter in instance method definitions.",
+    "Modifying mutable class variables directly instead of instance variables.",
+    "Over-using inheritance when composition might be cleaner.",
+    "Treating double-underscore attributes as absolute security (it's name mangling, not encryption)."
+  ],
+  "bestPractices": [
+    "Follow PEP 8 naming conventions: PascalCase for classes, snake_case for methods/vars.",
+    "Keep class methods focused on a single responsibility.",
+    "Use property decorators (@property) for clean getters and setters.",
+    "Always provide a meaningful __repr__ for easier debugging."
+  ],
+  "faqs": [
+    {
+      "question": "Why use 'self'?",
+      "answer": "It allows an instance to refer to its own attributes and methods, ensuring data integrity across different object instances."
+    },
+    {
+      "question": "What is name mangling?",
+      "answer": "Python changes the name of attributes prefixed with __ to _ClassName__attr to make accidental override difficult."
+    }
+  ],
+  "summary": "Phase 8 covers the fundamental shift from procedural scripts to object-oriented architectures. We explored how classes package state and behavior, how inheritance promotes code reuse, and how magic methods allow objects to feel like native Python types.",
+  "keyTakeaways": [
+    "Classes are blueprints; objects are entities.",
+    "Encapsulation hides complexity.",
+    "Inheritance enables specialized versions of generalized logic.",
+    "Dunder methods enable operator overloading."
+  ],
+  "previewOfNextTopic": "Phase 9: Modules and Packages - Organizing your classes into professional, importable libraries.",
+  "mcqs": [
+    {
+      "id": "m1",
+      "type": "theory",
+      "question": "Which keyword is used to access the parent class functionality?",
+      "options": [
+        {
+          "key": "A",
+          "text": "parent"
+        },
+        {
+          "key": "B",
+          "text": "super"
+        },
+        {
+          "key": "C",
+          "text": "base"
+        },
+        {
+          "key": "D",
+          "text": "self"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "super() is the standard way to call methods from a parent class."
+    },
+    {
+      "id": "m2",
+      "type": "output_prediction",
+      "question": "What happens if you omit 'self' in an instance method?",
+      "options": [
+        {
+          "key": "A",
+          "text": "Works perfectly"
+        },
+        {
+          "key": "B",
+          "text": "TypeError on call"
+        },
+        {
+          "key": "C",
+          "text": "AttributeError"
+        },
+        {
+          "key": "D",
+          "text": "SyntaxError"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Python automatically passes the instance to the method; if it's not defined as a parameter, you get an argument mismatch error."
+    },
+    {
+      "id": "m3",
+      "type": "output_prediction",
+      "question": "class A: x=1\na1=A()\na2=A()\na1.x=2\nprint(a2.x)?",
+      "options": [
+        {
+          "key": "A",
+          "text": "1"
+        },
+        {
+          "key": "B",
+          "text": "2"
+        },
+        {
+          "key": "C",
+          "text": "None"
+        },
+        {
+          "key": "D",
+          "text": "Error"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "Class variables are shared, but assigning to an instance creates an instance-specific attribute (shadowing)."
+    },
+    {
+      "id": "m4",
+      "type": "output_prediction",
+      "question": "What is the return type of a method with no return statement?",
+      "options": [
+        {
+          "key": "A",
+          "text": "Empty String"
+        },
+        {
+          "key": "B",
+          "text": "Zero"
+        },
+        {
+          "key": "C",
+          "text": "None"
+        },
+        {
+          "key": "D",
+          "text": "False"
+        }
+      ],
+      "correctAnswer": "C",
+      "explanation": "Python methods implicitly return None if no return statement is reached."
+    },
+    {
+      "id": "m5",
+      "type": "find_the_bug",
+      "question": "Identify bug: class X: def __init__(self): x=1",
+      "options": [
+        {
+          "key": "A",
+          "text": "Missing self in init"
+        },
+        {
+          "key": "B",
+          "text": "Missing self.x"
+        },
+        {
+          "key": "C",
+          "text": "Wrong init name"
+        },
+        {
+          "key": "D",
+          "text": "No bug"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "x is a local variable; it needs to be self.x to be stored on the instance."
+    },
+    {
+      "id": "m6",
+      "type": "find_the_bug",
+      "question": "Which is required for a class method?",
+      "options": [
+        {
+          "key": "A",
+          "text": "@static"
+        },
+        {
+          "key": "B",
+          "text": "@classmethod"
+        },
+        {
+          "key": "C",
+          "text": "cls parameter"
+        },
+        {
+          "key": "D",
+          "text": "Both B and C"
+        }
+      ],
+      "correctAnswer": "D",
+      "explanation": "Class methods need the decorator and the 'cls' parameter."
+    },
+    {
+      "id": "m7",
+      "type": "complete_the_code",
+      "question": "How to make a string representation?",
+      "options": [
+        {
+          "key": "A",
+          "text": "__str__"
+        },
+        {
+          "key": "B",
+          "text": "__repr__"
+        },
+        {
+          "key": "C",
+          "text": "__init__"
+        },
+        {
+          "key": "D",
+          "text": "Both A and B"
+        }
+      ],
+      "correctAnswer": "D",
+      "explanation": "Both magic methods control how an object is converted to a string."
+    },
+    {
+      "id": "m8",
+      "type": "complete_the_code",
+      "question": "Fill in: class Child(____):",
+      "options": [
+        {
+          "key": "A",
+          "text": "Parent"
+        },
+        {
+          "key": "B",
+          "text": "self"
+        },
+        {
+          "key": "C",
+          "text": "object"
+        },
+        {
+          "key": "D",
+          "text": "class"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "Syntax for inheritance requires the parent class name in parentheses."
+    },
+    {
+      "id": "m9",
+      "type": "best_approach",
+      "question": "How to protect internal object data?",
+      "options": [
+        {
+          "key": "A",
+          "text": "Use uppercase"
+        },
+        {
+          "key": "B",
+          "text": "Double underscore"
+        },
+        {
+          "key": "C",
+          "text": "Single underscore"
+        },
+        {
+          "key": "D",
+          "text": "Comments"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Double underscore triggers name mangling, which is the standard way to suggest private data."
+    },
+    {
+      "id": "m10",
+      "type": "theory",
+      "question": "What is an Object?",
+      "options": [
+        {
+          "key": "A",
+          "text": "A blueprint"
+        },
+        {
+          "key": "B",
+          "text": "A class method"
+        },
+        {
+          "key": "C",
+          "text": "An instance of a class"
+        },
+        {
+          "key": "D",
+          "text": "A function"
+        }
+      ],
+      "correctAnswer": "C",
+      "explanation": "An object is the realization/instance of a class definition."
+    }
+  ],
+  "codeQuestions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "Write a program",
+      "title": "Dog Class",
+      "question": "Create a class 'Dog' with attributes 'name' and 'breed'. Add a method 'bark' that returns 'Woof!'",
+      "solutionCode": "class Dog:\n    def __init__(self, name, breed):\n        self.name = name\n        self.breed = breed\n    def bark(self):\n        return 'Woof!'",
+      "hints": [
+        "Remember the init method",
+        "Ensure self is used"
+      ],
+      "explanation": "Basic class definition syntax practice."
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "Modify existing code",
+      "title": "Add String Dunder",
+      "question": "Add a __str__ method to the Dog class that returns 'Dog(name: X, breed: Y)'",
+      "codeTemplate": "class Dog:\n    def __init__(self, name, breed):\n        self.name = name\n        self.breed = breed",
+      "solutionCode": "class Dog:\n    def __init__(self, name, breed):\n        self.name = name\n        self.breed = breed\n    def __str__(self):\n        return f'Dog(name: {self.name}, breed: {self.breed})'",
+      "hints": [
+        "__str__ must return a string",
+        "Use an f-string"
+      ],
+      "explanation": "Demonstrates customizing object representation."
+    },
+    {
+      "id": "q3",
+      "difficulty": "Easy-Medium",
+      "type": "Complete missing code",
+      "title": "Inheritance",
+      "question": "Create a class 'Poodle' that inherits from 'Dog' and overrides 'bark' to return 'Yip!'",
+      "codeTemplate": "class Poodle(____):\n    def ____(self):\n        return 'Yip!'",
+      "solutionCode": "class Poodle(Dog):\n    def bark(self):\n        return 'Yip!'",
+      "hints": [
+        "Pass Dog to the class definition",
+        "Redefine bark method"
+      ],
+      "explanation": "Testing inheritance and method overriding."
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "Write a program",
+      "title": "Employee Data",
+      "question": "Create an Employee class. Use a class variable to track the number of employees created.",
+      "solutionCode": "class Employee:\n    count = 0\n    def __init__(self, name):\n        self.name = name\n        Employee.count += 1",
+      "hints": [
+        "Use Employee.count",
+        "Increment inside __init__"
+      ],
+      "explanation": "Shows the difference between instance and class scope."
+    },
+    {
+      "id": "q5",
+      "difficulty": "Medium",
+      "type": "Debug existing code",
+      "title": "Fix the Encapsulation",
+      "buggyCode": "class Wallet:\n    def __init__(self, money):\n        self.money = money\n    def get_money(self):\n        return self.money",
+      "solutionCode": "class Wallet:\n    def __init__(self, money):\n        self.__money = money\n    def get_money(self):\n        return self.__money",
+      "hints": [
+        "Use double underscores",
+        "Change both init and method"
+      ],
+      "explanation": "Fixing privacy by using name mangling."
+    },
+    {
+      "id": "q6",
+      "difficulty": "Medium-Hard",
+      "type": "Small implementation",
+      "title": "Custom Operator",
+      "question": "Implement the __add__ method in a class 'Vector' to add two vectors together.",
+      "solutionCode": "class Vector:\n    def __init__(self, x, y):\n        self.x, self.y = x, y\n    def __add__(self, other):\n        return Vector(self.x + other.x, self.y + other.y)",
+      "hints": [
+        "__add__ takes 'other' object",
+        "Return a new instance"
+      ],
+      "explanation": "Introduces operator overloading via magic methods."
+    },
+    {
+      "id": "q7",
+      "difficulty": "Hard",
+      "type": "Optimize code",
+      "title": "Property Decorator",
+      "question": "Rewrite the Wallet class to use @property for the money attribute instead of a getter method.",
+      "solutionCode": "class Wallet:\n    def __init__(self, money):\n        self.__money = money\n    @property\n    def money(self):\n        return self.__money",
+      "hints": [
+        "Use @property decorator",
+        "Access via instance.money"
+      ],
+      "explanation": "Professional way to handle attributes in Python."
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "Write a program",
+      "title": "Library System",
+      "question": "Build a simple library system: Book class, Library class. Library has a list of books. Implement methods to add books and list books by author.",
+      "solutionCode": "class Book:\n    def __init__(self, title, author):\n        self.title, self.author = title, author\n\nclass Library:\n    def __init__(self):\n        self.books = []\n    def add(self, book):\n        self.books.append(book)\n    def find_by_author(self, author):\n        return [b.title for b in self.books if b.author == author]",
+      "hints": [
+        "List comprehension is useful here",
+        "Library stores list of objects"
+      ],
+      "explanation": "System design challenge integrating classes and data structures."
+    }
+  ]
+}

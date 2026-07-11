@@ -1,0 +1,326 @@
+{
+  "metadata": {
+    "phaseNumber": 17,
+    "title": "Data Structures in C",
+    "duration": "12 Hours",
+    "difficulty": "Advanced"
+  },
+  "learningObjectives": [
+    "Master advanced dynamic memory manipulation using self-referential structures.",
+    "Implement and compare Singly, Doubly, and Circular Linked Lists.",
+    "Build LIFO (Stack) and FIFO (Queue, Circular Queue) structures using both static arrays and dynamic pointers.",
+    "Understand priority scheduling mechanisms utilizing Priority Queues and Binary Heaps.",
+    "Construct hierarchical models like Binary Trees, Binary Search Trees, and analyze self-balancing BST systems.",
+    "Implement key-value pairing maps using Hash Tables with collision resolution strategies.",
+    "Model non-linear relationship topologies using Graph representation models (Adjacency Matrix/List)."
+  ],
+  "prerequisites": [
+    "Phase 12: Dynamic Memory Allocation (malloc, calloc, realloc, free)",
+    "Phase 10: Structures and Unions",
+    "Phase 9: Pointers and Memory Management"
+  ],
+  "introduction": "In C, data structures are the foundational architects of memory and application logic. Unlike higher-level languages that provide built-in libraries for lists, trees, or graphs, C requires you to build these constructs from the ground up using raw byte allocations, pointers, and custom structs. Mastering data structures in C means understanding the exact layout of every byte on the heap, the routing of every reference pointer, and the performance characteristics of algorithms. This phase bridges the gap between raw hardware memory limits and high-level software architectures.",
+  "conceptExplanation": "Data structures in C are divided into Linear and Non-Linear structures.\n\n1. Linked Lists:\nUnlike contiguous arrays, linked lists are collections of nodes allocated dynamically on the heap. Each node contains data and one or more pointers to other nodes. \n- Singly Linked Lists point forward only.\n- Doubly Linked Lists point both forward and backward, allowing bidirectional traversal at the expense of an extra pointer per node.\n- Circular Linked Lists loop the last node's next pointer back to the head node, making them highly effective for round-robin scheduling.\n\n2. Stacks and Queues:\n- Stacks follow Last-In, First-Out (LIFO). Standard operations are push, pop, and peek. In C, you can implement a stack via a fixed-size array (fast, stack-allocated, risk of overflow) or a dynamic singly linked list (grows on demand, high pointer overhead).\n- Queues follow First-In, First-Out (FIFO) using enqueue and dequeue operations. A standard linear array queue suffers from the 'creeping index' problem, where empty spaces at the front are wasted. Circular Queues solve this by wrapping the rear and front pointers back to index 0 using modulo arithmetic: (rear + 1) % size.\n- Priority Queues assign each element a priority score. Elements with higher priorities are dequeued first. A Binary Heap is the most efficient way to back a priority queue.\n\n3. Trees & Binary Trees:\nTrees are non-linear, hierarchical data structures. A Binary Tree restricts each node to a maximum of two children (left and right). A Binary Search Tree (BST) enforces an ordering property: for any node, all values in its left subtree are strictly less than its value, and all values in its right subtree are strictly greater. This provides O(log N) search, insertion, and deletion times on balanced trees. However, if keys are inserted in sorted order, the tree degenerates into a linear list (O(N)). AVL Trees solve this by automatically self-balancing through rotations whenever the balance factor (height diff of left/right subtrees) of any node falls outside the range [-1, 1].\n\n4. Heaps:\nA Binary Heap is a complete binary tree that maintains the Heap Property. In a Max-Heap, every parent node is greater than or equal to its children; in a Min-Heap, every parent is less than or equal to its children. Because it is a complete tree, it can be efficiently represented sequentially as an array, where a node at index i has children at (2i + 1) and (2i + 2).\n\n5. Hash Tables:\nHash Tables provide fast key-value lookups by mapping keys to array indices via a Hash Function. Because different keys can hash to the same index (a collision), resolution strategies are required. Chaining handles this by maintaining a linked list at each index, while Open Addressing probes alternative indices within the array.\n\n6. Graphs:\nGraphs model network topologies of Vertices (nodes) connected by Edges. They are represented either as an Adjacency Matrix (a 2D array where matrix[i][j] = 1 indicates an edge; fast lookup but space-inefficient at O(V^2)) or an Adjacency List (an array of linked lists; space-efficient at O(V + E) but slower lookup).",
+  "syntax": "/* 1. Singly Linked List Node */\nstruct Node {\n    int data;\n    struct Node* next;\n};\n\n/* 2. Doubly Linked List Node */\nstruct DLLNode {\n    int data;\n    struct DLLNode* next;\n    struct DLLNode* prev;\n};\n\n/* 3. Binary Search Tree Node */\nstruct BSTNode {\n    int data;\n    struct BSTNode* left;\n    struct BSTNode* right;\n};\n\n/* 4. Hash Table Bucket (Chaining) */\nstruct HashNode {\n    int key;\n    int value;\n    struct HashNode* next;\n};",
+  "syntaxBreakdown": [
+    "struct Node: Defines a custom user-defined type containing a payload field (data) and a link field pointing to another instance of the same structure, creating a self-referential structure.",
+    "struct DLLNode: Contains two distinct self-referential pointers ('next' and 'prev') facilitating bidirectional movement across the memory pool.",
+    "struct BSTNode: Declares left and right sub-tree pointers enabling branching bifurcations from a single root point.",
+    "struct HashNode: Represents the nodes of a linked list used in bucket chaining to handle collisions within an array-based hash map."
+  ],
+  "rulesAndKeyPoints": [
+    "Always check for NULL allocations when executing malloc/calloc to avoid undefined behavior.",
+    "When altering a Linked List's head pointer within a function, pass a double pointer (Node** head) or return the new head pointer.",
+    "Every node allocated dynamically on the Heap must be manually deallocated (free) to avoid memory leaks. Order of operations matters: do not free a node before accessing its 'next' pointer.",
+    "Circular structures must avoid terminal-condition checks like 'while (current != NULL)' to prevent infinite loops. Use 'while (current != head)' after handling the initial state.",
+    "In a BST, always preserve the balance characteristics. An unbalanced BST degrades search performance to linear O(N)."
+  ],
+  "codeExample1": {
+    "title": "Complete Singly Linked List Implementation with Edge-Case Safeguards",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nstruct Node {\n    int data;\n    struct Node* next;\n};\n\n/* Insert a new node at the beginning of the list */\nvoid insertAtHead(struct Node** headRef, int val) {\n    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));\n    if (newNode == NULL) {\n        fprintf(stderr, \"Memory allocation failed\\n\");\n        exit(EXIT_FAILURE);\n    }\n    newNode->data = val;\n    newNode->next = *headRef;\n    *headRef = newNode;\n}\n\n/* Delete the first node with the specified key value */\nvoid deleteNode(struct Node** headRef, int key) {\n    struct Node* temp = *headRef;\n    struct Node* prev = NULL;\n\n    /* Handle case where head itself holds the key */\n    if (temp != NULL && temp->data == key) {\n        *headRef = temp->next;\n        free(temp);\n        return;\n    }\n\n    /* Search for key while keeping track of previous node */\n    while (temp != NULL && temp->data != key) {\n        prev = temp;\n        temp = temp->next;\n    }\n\n    /* If key is not present in the list */\n    if (temp == NULL) {\n        printf(\"Key %d not found in list.\\n\", key);\n        return;\n    }\n\n    /* Unlink the node from the linked list */\n    prev->next = temp->next;\n    free(temp);\n}\n\n/* Print the complete list sequential values */\nvoid printList(struct Node* node) {\n    while (node != NULL) {\n        printf(\"%d -> \", node->data);\n        node = node->next;\n    }\n    printf(\"NULL\\n\");\n}\n\n/* Deallocate all list nodes to prevent memory leak */\nvoid freeList(struct Node* head) {\n    struct Node* temp;\n    while (head != NULL) {\n        temp = head;\n        head = head->next;\n        free(temp);\n    }\n}\n\nint main() {\n    struct Node* head = NULL;\n    \n    insertAtHead(&head, 30);\n    insertAtHead(&head, 20);\n    insertAtHead(&head, 10);\n    \n    printf(\"Initial List: \");\n    printList(head);\n\n    printf(\"Deleting 20...\\n\");\n    deleteNode(&head, 20);\n    printList(head);\n\n    freeList(head);\n    return 0;\n}",
+    "explanation": "This code demonstrates safe Singly Linked List mechanics. Memory is allocated dynamically on the heap. We pass 'headRef' as a double pointer (struct Node**) so that modifications to the head of the list persist in the caller's stack frame. The delete function handles three critical scenarios: list being empty, target key at the head node, and target key deeper in the list. Finally, a complete deallocation step runs through the list to free every node, preventing memory leaks."
+  },
+  "codeExample2": {
+    "title": "Complete Binary Search Tree Implementation (BST)",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n\nstruct BSTNode {\n    int data;\n    struct BSTNode* left;\n    struct BSTNode* right;\n};\n\n/* Function to create a new BST node */\nstruct BSTNode* createNode(int value) {\n    struct BSTNode* newNode = (struct BSTNode*)malloc(sizeof(struct BSTNode));\n    if (newNode == NULL) {\n        fprintf(stderr, \"Out of memory!\\n\");\n        exit(EXIT_FAILURE);\n    }\n    newNode->data = value;\n    newNode->left = NULL;\n    newNode->right = NULL;\n    return newNode;\n}\n\n/* Recursive function to insert a key in the BST */\nstruct BSTNode* insert(struct BSTNode* root, int value) {\n    if (root == NULL) {\n        return createNode(value);\n    }\n    \n    if (value < root->data) {\n        root->left = insert(root->left, value);\n    } else if (value > root->data) {\n        root->right = insert(root->right, value);\n    }\n    /* Duplicate values are ignored in this implementation */\n    return root;\n}\n\n/* Recursive In-order Traversal (Left, Root, Right) */\nvoid inorderTraversal(struct BSTNode* root) {\n    if (root != NULL) {\n        inorderTraversal(root->left);\n        printf(\"%d \", root->data);\n        inorderTraversal(root->right);\n    }\n}\n\n/* Search for a value in the BST */\nstruct BSTNode* search(struct BSTNode* root, int key) {\n    if (root == NULL || root->data == key) {\n        return root;\n    }\n    if (key < root->data) {\n        return search(root->left, key);\n    }\n    return search(root->right, key);\n}\n\n/* Helper to deallocate tree memory */\nvoid freeTree(struct BSTNode* root) {\n    if (root != NULL) {\n        freeTree(root->left);\n        freeTree(root->right);\n        free(root);\n    }\n}\n\nint main() {\n    struct BSTNode* root = NULL;\n    \n    /* Insert elements to form a BST */\n    root = insert(root, 50);\n    insert(root, 30);\n    insert(root, 70);\n    insert(root, 20);\n    insert(root, 40);\n    \n    printf(\"In-order traversal: \");\n    inorderTraversal(root);\n    printf(\"\\n\");\n    \n    int key = 30;\n    struct BSTNode* result = search(root, key);\n    if (result != NULL) {\n        printf(\"Element %d found in BST.\\n\", key);\n    } else {\n        printf(\"Element %d not found in BST.\\n\", key);\n    }\n    \n    freeTree(root);\n    return 0;\n}",
+    "explanation": "This program constructs a Binary Search Tree (BST) recursively. Elements smaller than the root are stored in the left subtree, and larger values are stored in the right subtree. When in-order traversal is executed recursively, the output is printed in sorted ascending order. Finally, dynamic memory allocated for the tree nodes is fully cleaned up recursively via 'freeTree' in post-order order.",
+    "expectedOutput": "In-order traversal: 20 30 40 50 70 \nElement 30 found in BST."
+  },
+  "stepByStepDryRun": [
+    "Step 1: 'root' begins as NULL.",
+    "Step 2: insert(root, 50) is called. Because 'root == NULL', a new node containing 50 is created, allocated at heap address 0x1000, and returns as the new root.",
+    "Step 3: insert(root, 30) is executed. 30 < 50, so we recurse left. 'root->left' is NULL, so we create a new node at address 0x1020 containing 30, and assign it to 'root->left'.",
+    "Step 4: insert(root, 70) is executed. 70 > 50, so we recurse right. 'root->right' is NULL, so we create a new node at address 0x1040 containing 70, and assign it to 'root->right'.",
+    "Step 5: inorderTraversal(root) is executed. It recursively visits left (30), prints it, visits the root (50), prints it, and then recursively visits right (70), printing it."
+  ],
+  "memoryVisualization": {
+    "type": "heap-graph",
+    "description": "Heap diagram of a Singly Linked List with three values (10, 20, 30). The head pointer variable on the stack points to the first node in the Heap.",
+    "nodes": [
+      {
+        "label": "Stack Frame (head)",
+        "value": "Pointer pointing to 0x2008",
+        "address": "0x7FFF0040",
+        "color": "sky"
+      },
+      {
+        "label": "Node 1 (Head)",
+        "value": "Data: 10, Next: 0x2400",
+        "address": "0x2008",
+        "color": "emerald"
+      },
+      {
+        "label": "Node 2",
+        "value": "Data: 20, Next: 0x2910",
+        "address": "0x2400",
+        "color": "amber"
+      },
+      {
+        "label": "Node 3 (Tail)",
+        "value": "Data: 30, Next: NULL",
+        "address": "0x2910",
+        "color": "violet"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Operating System Schedulers: Utilize circular queues for scheduling round-robin CPU slice slices.",
+    "Web Browser History Navigation: Employs a doubly linked list or dual-stack mechanism to support forward and backward routing.",
+    "Compiler Syntax Parsers: Use stacks to match nesting parentheses, brackets, and arithmetic expression orders.",
+    "Network Routing Tables: Use Trie and Hash structures to handle IP routing table matches at hardware line speed.",
+    "Virtual Memory Allocators: Free lists (lists of unallocated memory chunks) are managed as doubly linked lists inside standard allocator runtimes."
+  ],
+  "commonMistakes": [
+    "Using a deleted node's memory space after freeing it (Use-After-Free).",
+    "Losing the reference to the head of a linked list, resulting in a permanent memory leak on the Heap.",
+    "Dereferencing a pointer that is NULL, which leads to immediate execution crashes (Segmentation Faults).",
+    "Assigning pointers in the wrong order during insertions, which can isolate the rest of the list.",
+    "Forgetting to update both pointers (prev and next) when performing insertions or deletions in Doubly Linked Lists."
+  ],
+  "bestPractices": [
+    "Always set your pointers to NULL immediately after freeing them to prevent accidental dereferencing.",
+    "Use auxiliary boundary checks ('if (head == NULL)') as defensive programming blocks inside all API procedures.",
+    "Avoid redundant traversals. Track both a 'head' and a 'tail' pointer inside a wrapper struct for instant O(1) list appends.",
+    "Ensure all dynamic memory allocations are systematically deallocated through modular cleanup functions.",
+    "Check for overflows on stack push operations, and underflows on pop operations."
+  ],
+  "faqs": [
+    {
+      "question": "Why use a linked list instead of an array?",
+      "answer": "Linked lists allow O(1) time insertions and deletions at any known location without shifting elements, and they grow dynamically without requiring contiguous memory blocks. Arrays require contiguous memory and have O(N) insertion/deletion costs because elements must be shifted."
+    },
+    {
+      "question": "What is the key difference between a tree and a graph?",
+      "answer": "A tree is a restricted type of graph. Specifically, a tree is an undirected, connected, and acyclic graph. In contrast, a graph can contain cycles, disjoint subgraphs, and directed edges."
+    },
+    {
+      "question": "How do you detect memory leaks in C data structures?",
+      "answer": "You should use memory profiling tools like Valgrind or AddressSanitizer. These tools monitor allocations and report any unfreed memory blocks when the program exits."
+    }
+  ],
+  "summary": "This phase explored data structures in C, focusing on pointers, nodes, dynamic memory, and algorithms. We built custom versions of linear structures (linked lists, stacks, queues) and hierarchical structures (trees, heaps, hash tables, and graphs). Creating these structures from scratch shows how raw hardware memory is organized to build complex, reliable software.",
+  "keyTakeaways": [
+    "In C, data structures must be manually constructed using self-referential structures and raw pointers.",
+    "Dynamic heap operations require a manual balance of allocation (malloc) and deallocation (free) to avoid memory leaks.",
+    "Choosing the right data structure directly impacts complexity, changing search times from O(N) to O(log N) or O(1)."
+  ],
+  "nextTopicPreview": "Phase 18 will cover Advanced File Handling in C, focusing on binary I/O operations, random file access using fseek and ftell, and managing structured file data streams.",
+  "questionsAndAnswers": [
+    {
+      "id": "Q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "How does a singly linked list differ from a doubly linked list in terms of memory and pointer mechanics?",
+      "answer": "A singly linked list node contains a single pointer ('next') pointing forward to the succeeding node, which uses 8 bytes of overhead on 64-bit systems. A doubly linked list node contains two pointers ('next' and 'prev') to allow both forward and backward traversal. This increases pointer overhead to 16 bytes per node and requires updating twice as many links during insertions and deletions.",
+      "explanation": "This question tests fundamental pointer mechanics. It highlights the trade-off between the flexibility of bidirectional traversal in a doubly linked list and the higher memory overhead it requires."
+    },
+    {
+      "id": "Q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Why is a circular queue more space-efficient than a simple array-based linear queue?",
+      "answer": "In a simple array-based linear queue, when elements are dequeued, the front pointer moves forward. This leaves unused memory at the beginning of the array. Even if the array has empty spaces, new elements cannot be enqueued if the rear pointer has reached the end of the array. A circular queue solves this by wrapping the rear index back to the beginning of the array using modulo arithmetic: (rear + 1) % capacity. This reuse of empty slots prevents memory waste.",
+      "explanation": "This question explains why circular queues are used in resource-constrained environments like OS kernels, where memory cannot be wasted."
+    },
+    {
+      "id": "Q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Implement a function to reverse a singly linked list in-place.",
+      "answer": "void reverseList(struct Node** headRef) {\n    struct Node* prev = NULL;\n    struct Node* current = *headRef;\n    struct Node* next = NULL;\n    while (current != NULL) {\n        next = current->next;  /* Save next node */\n        current->next = prev;  /* Reverse current node's pointer */\n        prev = current;        /* Move prev one step forward */\n        current = next;        /* Move current one step forward */\n    }\n    *headRef = prev;           /* Update the head pointer */\n}",
+      "explanation": "This is a classic coding interview problem that tests your understanding of pointer manipulation. Reversing a list in-place requires changing the next pointers of each node without losing the rest of the list."
+    },
+    {
+      "id": "Q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Write a dynamic memory-safe stack implementation using a linked list.",
+      "answer": "#include <stdio.h>\n#include <stdlib.h>\n\nstruct StackNode {\n    int data;\n    struct StackNode* next;\n};\n\nvoid push(struct StackNode** top, int val) {\n    struct StackNode* newNode = (struct StackNode*)malloc(sizeof(struct StackNode));\n    if (!newNode) return;\n    newNode->data = val;\n    newNode->next = *top;\n    *top = newNode;\n}\n\nint pop(struct StackNode** top) {\n    if (*top == NULL) return -1; /* Stack underflow sentinel */\n    struct StackNode* temp = *top;\n    int popped = temp->data;\n    *top = temp->next;\n    free(temp);\n    return popped;\n}",
+      "explanation": "This code demonstrates a dynamic stack implementation. It avoids array capacity limits by allocating new memory for each pushed element, and uses proper heap cleanup during pop operations."
+    },
+    {
+      "id": "Q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Explain why checking 'if (head == NULL)' is critical during deletion and how failing to do so causes a segmentation fault.",
+      "answer": "If a linked list is empty, its head pointer is NULL. If you try to delete a node without checking for NULL first, you will attempt to dereference a NULL pointer (e.g., 'head->next'). In C, dereferencing NULL attempts to read from protected system memory addresses. This triggers a hardware fault, and the operating system terminates the process with a segmentation fault.",
+      "explanation": "This highlight illustrates the dangers of dereferencing uninitialized or NULL pointers in C, and why defensive pointer checks are necessary."
+    },
+    {
+      "id": "Q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "How does a dangling pointer occur during a node deletion in a Doubly Linked List, and how do you prevent it?",
+      "answer": "A dangling pointer occurs if a node is deleted and freed, but the neighboring nodes (the previous node's 'next' pointer or the next node's 'prev' pointer) still point to the freed memory address. If the program tries to follow those pointers later, it will access invalid heap memory. To prevent this, you must update the neighboring pointers to point to each other before freeing the deleted node. For example: node->prev->next = node->next; and node->next->prev = node->prev;.",
+      "explanation": "This shows how errors can occur in doubly linked lists when pointer relationships are not fully updated before memory is freed."
+    },
+    {
+      "id": "Q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write a function to detect a cycle in a singly linked list using Floyd's Cycle-Finding Algorithm.",
+      "answer": "int hasCycle(struct Node* head) {\n    struct Node* slow = head;\n    struct Node* fast = head;\n    while (fast != NULL && fast->next != NULL) {\n        slow = slow->next;          /* Move slow pointer by 1 */\n        fast = fast->next->next;    /* Move fast pointer by 2 */\n        if (slow == fast) {\n            return 1;               /* Cycle detected */\n        }\n    }\n    return 0;                       /* No cycle found */\n}",
+      "explanation": "This algorithm uses two pointers moving at different speeds to detect cycles in a linked list. If there is a cycle, the faster pointer will eventually catch up to and meet the slower pointer."
+    },
+    {
+      "id": "Q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Write a function to find the lowest common ancestor (LCA) of two nodes in a Binary Search Tree.",
+      "answer": "struct BSTNode* findLCA(struct BSTNode* root, int n1, int n2) {\n    while (root != NULL) {\n        /* If both n1 and n2 are smaller than root, LCA is in left subtree */\n        if (root->data > n1 && root->data > n2) {\n            root = root->left;\n        }\n        /* If both n1 and n2 are greater than root, LCA is in right subtree */\n        else if (root->data < n1 && root->data < n2) {\n            root = root->right;\n        }\n        /* If one is smaller and the other is larger, this node is the LCA */\n        else {\n            break;\n        }\n    }\n    return root;\n}",
+      "explanation": "This function takes advantage of the ordering property of a BST. If two target values are on opposite sides of a node, that node is their lowest common ancestor."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "M1",
+      "category": "Theory",
+      "question": "What is the worst-case search time complexity of a standard, unbalanced Binary Search Tree (BST) with N nodes?",
+      "options": {
+        "A": "O(log N)",
+        "B": "O(1)",
+        "C": "O(N)",
+        "D": "O(N log N)"
+      },
+      "correctOption": "C",
+      "explanation": "In the worst-case scenario, keys are inserted in sorted order (e.g., 10, 20, 30, 40). This causes the BST to degenerate into a linear singly linked list, which has a linear search time of O(N)."
+    },
+    {
+      "id": "M2",
+      "category": "Theory",
+      "question": "Which data structure is best suited for implementing Breadth-First Search (BFS) on a graph?",
+      "options": {
+        "A": "Stack",
+        "B": "Queue",
+        "C": "Binary Search Tree",
+        "D": "Heap"
+      },
+      "correctOption": "B",
+      "explanation": "BFS explores nodes level by level, radiating outward from a starting node. A FIFO queue is ideal for this, as it processes nodes in the order they are discovered."
+    },
+    {
+      "id": "M3",
+      "category": "Output Prediction",
+      "question": "What is the printed output of the following stack push and pop sequence?\n\npush(10); push(20); pop(); push(30); pop(); pop();",
+      "options": {
+        "A": "20, 30, 10",
+        "B": "10, 20, 30",
+        "C": "20, 10, 30",
+        "D": "30, 20, 10"
+      },
+      "correctOption": "A",
+      "explanation": "Let's trace the operations: push(10) -> Stack is [10]. push(20) -> Stack is [10, 20]. pop() -> Pops 20. push(30) -> Stack is [10, 30]. pop() -> Pops 30. pop() -> Pops 10. The values popped are 20, 30, 10."
+    },
+    {
+      "id": "M4",
+      "category": "Output Prediction",
+      "question": "Given a Binary Search Tree with a root node of 15, a left child of 10, and a right child of 20, what is the output of an in-order traversal?",
+      "options": {
+        "A": "15 10 20",
+        "B": "10 15 20",
+        "C": "20 15 10",
+        "D": "10 20 15"
+      },
+      "correctOption": "B",
+      "explanation": "An in-order traversal visits nodes in the order: Left Subtree -> Root -> Right Subtree. In this case, that path is 10, then 15, then 20."
+    },
+    {
+      "id": "M5",
+      "category": "Output Prediction",
+      "question": "If a circular queue has a capacity of 5, front = 2, and rear = 4. What index will rear point to after a new element is enqueued?",
+      "options": {
+        "A": "5",
+        "B": "0",
+        "C": "2",
+        "D": "1"
+      },
+      "correctOption": "B",
+      "explanation": "The formula for the next rear pointer position in a circular queue is: (rear + 1) % capacity. Applying the numbers: (4 + 1) % 5 = 0. The rear pointer wraps back to index 0."
+    },
+    {
+      "id": "M6",
+      "category": "Find the Bug",
+      "question": "What is the primary bug in this function designed to append a node to the end of a singly linked list?\n\nvoid append(struct Node* head, int val) {\n    struct Node* temp = (struct Node*)malloc(sizeof(struct Node));\n    temp->data = val;\n    temp->next = NULL;\n    while (head->next != NULL) {\n        head = head->next;\n    }\n    head->next = temp;\n}",
+      "options": {
+        "A": "It fails to allocate memory correctly for the node.",
+        "B": "It will crash with a segmentation fault if the list is empty (head is NULL).",
+        "C": "It creates an infinite loop during traversal.",
+        "D": "It uses head as a traversal pointer."
+      },
+      "correctOption": "B",
+      "explanation": "If the list is empty (head is NULL), accessing 'head->next' in the while loop condition attempts to dereference a NULL pointer, causing a segmentation fault. You must check for an empty list first."
+    },
+    {
+      "id": "M7",
+      "category": "Find the Bug",
+      "question": "Identify the bug in this function that attempts to delete the head node of a singly linked list:\n\nvoid deleteHead(struct Node* head) {\n    if (head == NULL) return;\n    struct Node* temp = head;\n    head = head->next;\n    free(temp);\n}",
+      "options": {
+        "A": "The variable head is passed by value, so the caller's head pointer is not updated.",
+        "B": "It attempts to free unallocated memory.",
+        "C": "The call to free(temp) is invalid.",
+        "D": "The function will cause an infinite loop."
+      },
+      "correctOption": "A",
+      "explanation": "Because 'head' is passed by value, changes to it (like head = head->next) are local to the function. The caller's head pointer still points to the old head node, which has now been freed. This creates a dangling pointer. To fix this, you must pass a double pointer (struct Node** head)."
+    },
+    {
+      "id": "M8",
+      "category": "Complete the Code",
+      "question": "Which code snippet correctly completes the following statement to calculate the balance factor of an AVL tree node?\n\nint balanceFactor(struct Node* n) {\n    if (n == NULL) return 0;\n    return _________;\n}",
+      "options": {
+        "A": "height(n->left) + height(n->right)",
+        "B": "height(n->left) - height(n->right)",
+        "C": "height(n->left) * height(n->right)",
+        "D": "n->left->height - n->right->height"
+      },
+      "correctOption": "B",
+      "explanation": "The balance factor of an AVL tree node is defined as the height of its left subtree minus the height of its right subtree. A node is balanced if this factor is -1, 0, or 1."
+    },
+    {
+      "id": "M9",
+      "category": "Complete the Code",
+      "question": "Which code snippet correctly inserts a new node at the head of a collision chain list in a hash table using chaining?\n\nvoid insert(struct HashNode** table, int index, struct HashNode* newNode) {\n    _________\n    table[index] = newNode;\n}",
+      "options": {
+        "A": "newNode->next = NULL;",
+        "B": "newNode->next = table[index];",
+        "C": "table[index]->next = newNode;",
+        "D": "newNode = table[index];"
+      },
+      "correctOption": "B",
+      "explanation": "To insert a node at the head of the chain without losing existing nodes, the new node's next pointer must point to the current head of the chain (table[index]). Once that link is established, the head of the chain can be updated to point to the new node."
+    },
+    {
+      "id": "M10",
+      "category": "Best Approach",
+      "question": "Which data structure is most efficient for implementing a priority queue in a system where both insertions and deletions must happen in O(log N) time?",
+      "options": {
+        "A": "An unsorted array",
+        "B": "A sorted linked list",
+        "C": "A Binary Heap",
+        "D": "A hash table"
+      },
+      "correctOption": "C",
+      "explanation": "A Binary Heap (Max-Heap or Min-Heap) is the best choice here. It supports both insertions and deletions in O(log N) time, while keeping track of the minimum or maximum element in O(1) time."
+    }
+  ]
+}

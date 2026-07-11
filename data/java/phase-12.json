@@ -1,0 +1,207 @@
+{ "phase_metadata": { "phase_number": 12, "phase_name": "Java 8+ Features
+(Functional Programming)", "description": "Transition from imperative to
+functional programming style using Lambda Expressions, the Stream API, and
+Optional class to write concise, readable, and robust code.", "java_version":
+"21 LTS" }, "learning_objectives": [ "Understand the core concepts of Functional
+Programming in Java", "Master Lambda Expressions and Functional Interfaces",
+"Perform complex data processing using the Stream API (Filter, Map, Reduce)",
+"Use Method References to write cleaner code", "Eliminate NullPointerExceptions
+using the Optional class", "Understand Default and Static methods in interfaces"
+], "prerequisites": [ "Phase 7: Polymorphism (Interfaces)", "Phase 10:
+Collections Framework", "Phase 11: Generics" ], "introduction": "Java 8 marked a
+revolutionary shift in the language by introducing Functional Programming
+capabilities. Before this, Java was strictly imperative (telling the computer
+'how' to do things step-by-step). With Lambdas and Streams, we can program
+declaratively (telling the computer 'what' we want to achieve). This results in
+code that is more concise, easier to parallelize, and significantly more
+readable.", "concept_explanation": { "what_is_it": "Functional programming in
+Java revolves around treating code as data. A 'Lambda Expression' is an
+anonymous method (no name, no return type) that provides an implementation for a
+Functional Interface. The 'Stream API' is a pipeline of operations used to
+process collections of objects.", "functional_interfaces": "A Functional
+Interface is an interface that has exactly one abstract method (SAM - Single
+Abstract Method). Examples include Runnable, Comparator, and the built-in ones
+in java.util.function like Predicate (returns boolean) and Consumer (takes
+input, returns nothing).", "stream_api": "A Stream is not a data structure (it
+doesn't store data). It is a sequence of elements from a source (like a List)
+that supports aggregate operations. Operations are either Intermediate
+(transform the stream, e.g., filter, map) or Terminal (produce a result, e.g.,
+collect, forEach).", "optional_class": "Optional is a container object which may
+or may not contain a non-null value. It forces the developer to handle the case
+where a value might be missing, reducing the risk of NullPointerExceptions.",
+"method_references": "A shorthand notation for a lambda expression that only
+calls an existing method. Syntax: ClassName::methodName." }, "syntax": {
+"lambda_expression": "(parameters) -> { body }",
+"functional_interface_annotation": "@FunctionalInterface", "stream_pipeline":
+"collection.stream().filter(predicate).map(function).collect(collector);",
+"method_reference": "System.out::println", "optional":
+"Optional.ofNullable(variable).orElse("Default");" }, "syntax_breakdown": {
+"arrow_operator": "Separates the parameter list from the lambda body.",
+"predicate": "A functional interface method that takes one argument and returns
+a boolean (used in .filter()).", "function": "A functional interface method that
+takes one argument and returns a result (used in .map()).",
+"terminal_operation": "An operation that triggers the processing of the stream.
+Once called, the stream is consumed and cannot be reused.", "lazy_evaluation":
+"Intermediate stream operations are not performed until a terminal operation is
+invoked." }, "rules_and_key_points": [ "A lambda can only be used with
+Functional Interfaces.", "Variables used inside a lambda must be 'effectively
+final' (their value doesn't change after initialization).", "Streams do not
+modify the original source; they produce a new result.", "Intermediate
+operations are 'lazy'; they don't execute until a terminal operation is
+called.", "A Stream can be traversed only once.", "Parallel streams can be used
+for performance gains on large data sets (stream().parallel()).",
+"Optional.get() should be avoided; use orElse() or ifPresent() instead.",
+"Default methods in interfaces allow adding new functionality without breaking
+existing implementations.", "The :: syntax (Method Reference) is preferred over
+lambdas for simplicity when calling existing methods.", "Collectors.toList() or
+the newer .toList() (Java 16+) converts streams back to lists." ],
+"code_example_1": { "title": "Lambda and Method Reference Basics",
+"description": "Implementing a custom functional interface and using method
+references with forEach.", "code": "import
+java.util.;\n\n@FunctionalInterface\ninterface Greeting {\n void sayHello(String
+name);\n}\n\npublic class LambdaBasic {\n public static void main(String[] args)
+{\n // Using Lambda Expression\n Greeting g = (name) ->
+System.out.println("Hello, " + name);\n g.sayHello("Java Student");\n\n List
+fruits = Arrays.asList("Apple", "Banana", "Cherry");\n\n // Traditional
+for-each\n for(String f : fruits) { System.out.print(f + " "); }\n\n // Lambda
+forEach\n fruits.forEach(f -> System.out.print(f + " "));\n\n // Method
+Reference forEach\n fruits.forEach(System.out::println);\n }\n}" },
+"code_example_2": { "title": "Stream API and Optional in Action", "description":
+"Filtering, transforming, and collecting data from a list of objects.", "code":
+"import java.util.;\nimport java.util.stream.*;\n\nrecord Product(String name,
+double price) {}\n\npublic class StreamPractical {\n public static void
+main(String[] args) {\n List products = List.of(\n new
+Product("Laptop", 1200.0),\n new Product("Phone", 800.0),\n new
+Product("Mouse", 25.0),\n new Product("Keyboard", 45.0)\n );\n\n // Stream
+Pipeline: Filter products > 50, get names, sort them, collect to list\n List
+expensiveItems = products.stream()\n .filter(p -> p.price() > 50)\n
+.map(Product::name)\n .sorted()\n .collect(Collectors.toList());\n\n
+System.out.println("Expensive Items: " + expensiveItems);\n\n // Using Optional
+to find a specific product\n Optional found = products.stream()\n .filter(p ->
+p.name().equals("Webcam"))\n .findFirst();\n\n // Safe handling with Optional\n
+String result = found.map(Product::name).orElse("Product Not Found");\n
+System.out.println("Search Result: " + result);\n }\n}" }, "expected_output":
+"Hello, Java Student\nApple Banana Cherry Apple Banana Cherry
+Apple\nBanana\nCherry\nExpensive Items: [Laptop, Phone]\nSearch Result: Product
+Not Found", "step_by_step_dry_run": "1. In StreamPractical, a list of 4 products
+is created.\n2. .stream() starts the pipeline.\n3. .filter() checks each
+product. 'Mouse' and 'Keyboard' are excluded (price <= 50).\n4.
+.map(Product::name) extracts just the Strings 'Laptop' and 'Phone'.\n5.
+.sorted() puts them in alphabetical order ('Laptop' then 'Phone').\n6.
+.collect() bundles them into a new List.\n7. For the Optional search, the filter
+looks for 'Webcam'. No product matches.\n8. findFirst() returns an empty
+Optional.\n9. .orElse("Product Not Found") triggers because the Optional is
+empty.", "memory_visualization": "A Stream operation creates a chain of objects
+on the Heap. Each 'Intermediate' operation creates a new Stream object that
+'points' to the previous one. When the 'Terminal' operation is called, a single
+pass is made over the data. The data itself stays in the original List; the
+stream only holds logic for how to process it.", "real_world_use_cases": [
+"E-commerce: Filtering products by category, price range, and rating.", "Data
+Analysis: Calculating averages or sums of large datasets from CSV files.", "API
+Development: Transforming Database Entities into DTOs (Data Transfer Objects).",
+"Security: Filtering a list of permissions based on user roles.", "Logging:
+Processing log files to find specific error patterns." ], "common_mistakes": [
+"Calling more than one terminal operation on the same stream (causes
+IllegalStateException).", "Using streams for simple loops where a traditional
+for-loop is faster and clearer.", "Modifying the underlying collection inside a
+stream operation (causes Side Effects).", "Using Optional.get() without checking
+ifPresent() (leads back to NullPointerException).", "Forgetting the terminal
+operation (the stream pipeline won't execute at all)." ], "best_practices": [
+"Prefer method references (String::toUpperCase) over lambdas (s ->
+s.toUpperCase()) where possible.", "Keep lambdas short. If a lambda is more
+than 3 lines, move it to a separate method.", "Always use the
+@FunctionalInterface annotation to clarify intent and prevent errors.", "Use
+Optional for return types, not as method parameters or class fields.", "Use
+primitive streams (IntStream, DoubleStream) to avoid the overhead of
+boxing/unboxing." ], "faq": [ { "question": "Can I use a lambda with an abstract
+class that has one method?", "answer": "No. Lambdas only work with interfaces.
+Abstract classes, even with one method, are not functional interfaces." }, {
+"question": "What is the difference between map() and flatMap()?", "answer":
+"map() transforms each element into another element. flatMap() transforms each
+element into a stream and then flattens all those streams into a single stream
+(useful for nested collections)." }, { "question": "Why is the variable in a
+lambda required to be effectively final?", "answer": "Lambdas may be executed in
+different threads. To avoid concurrency issues and ensure consistency, Java
+prevents lambdas from modifying local variables from the enclosing scope." } ],
+"summary": "Phase 12 introduced the power of Functional Programming in Java. We
+learned how Lambda Expressions simplify code, how the Stream API allows for
+powerful data processing pipelines, and how the Optional class helps us write
+safer, null-free code.", "key_takeaways": [ "Functional Interfaces have exactly
+one abstract method.", "Lambdas replace bulky anonymous inner classes.",
+"Streams provide a declarative way to process collections.", "Intermediate
+operations are lazy; Terminal operations trigger execution.", "Optional is a
+container to safely handle missing values.", "Method references make code
+cleaner by reusing existing methods.", "Streams do not change the source data.",
+"Filter is for selection; Map is for transformation.", "Collectors transform
+streams back into collections.", "Functional code is often easier to read and
+maintain." ], "preview_of_the_next_topic": "In Phase 13, we will dive into
+Multithreading, learning how to make our Java programs perform multiple tasks
+simultaneously.", "questions": [ { "difficulty": "Easy", "topic": "Concept",
+"question": "What is a Functional Interface in Java?", "answer": "A Functional
+Interface is an interface that contains exactly one abstract method. It can
+contain multiple default or static methods, but only one 'unimplemented' method.
+This allows it to be the target for a lambda expression." }, { "difficulty":
+"Moderate", "topic": "Concept", "question": "Explain 'Lazy Evaluation' in the
+context of Java Streams.", "answer": "Lazy Evaluation means that intermediate
+operations (like filter or map) are not executed as soon as they are defined.
+Instead, they are recorded as a pipeline of tasks. The actual execution happens
+only when a terminal operation (like collect or count) is called, allowing the
+JVM to optimize the processing." }, { "difficulty": "Moderate", "topic":
+"Practical Usage", "question": "Write a stream pipeline that takes a list of
+integers, squares each number, and finds the sum of the squared values.",
+"answer": "int sum = list.stream().map(n -> n * n).reduce(0, Integer::sum);" },
+{ "difficulty": "Hard", "topic": "Practical Usage", "question": "Given a List of
+Strings, write a stream to find the first string that starts with 'J' and has a
+length greater than 5. Return it as an Optional.", "answer": "Optional result =
+list.stream().filter(s -> s.startsWith("J")).filter(s -> s.length()
+> 5).findFirst();" }, { "difficulty": "Moderate", "topic": "Common Mistake",
+"question": "What is the bug here? \nList list = Arrays.asList(1, 2, 3);\nStream
+s = list.stream();\ns.forEach(System.out::println);\nlong count = s.count();",
+"answer": "The bug is that the stream 's' is used twice. Streams cannot be
+reused after a terminal operation (forEach) has been called. The call to
+s.count() will throw an IllegalStateException." }, { "difficulty": "Hard",
+"topic": "Common Mistake", "question": "Why won't this compile? \nint total
+= 0;\nlist.forEach(n -> total += n);", "answer": "Variables used in a lambda
+must be 'final' or 'effectively final'. Here, 'total' is a local variable being
+modified inside the lambda, which is not allowed. To fix this, use a Stream
+reduce or a specialized primitive stream (IntStream)." }, { "difficulty":
+"Moderate", "topic": "Coding", "question": "Write a lambda expression for the
+Comparator interface to sort a List of Strings by their length.", "answer":
+"list.sort((s1, s2) -> Integer.compare(s1.length(), s2.length())); or
+list.sort(Comparator.comparingInt(String::length));" }, { "difficulty": "Hard",
+"topic": "Coding", "question": "Implement a custom Functional Interface 'MathOp'
+that takes two integers and returns an integer. Use it to perform a
+multiplication using a lambda.", "answer": "@FunctionalInterface interface
+MathOp { int operate(int a, int b); } ... MathOp mul = (a, b) -> a * b; int
+result = mul.operate(5, 4);" } ], "mcqs": [ { "question": "Which annotation is
+used to ensure an interface stays functional?", "options": { "A": "@Lambda",
+"B": "@FunctionalInterface", "C": "@SAM", "D": "@Functional" }, "answer": "B" },
+{ "question": "Which of these is a Terminal operation in Stream API?",
+"options": { "A": "filter", "B": "map", "C": "collect", "D": "sorted" },
+"answer": "C" }, { "question": "What is the output?
+List.of(1, 2, 3).stream().map(n -> n + 1).filter(n -> n > 2).count();",
+"options": { "A": "1", "B": "2", "C": "3", "D": "0" }, "answer": "B" }, {
+"question": "What does Optional.ofNullable(null) return?", "options": { "A": "A
+NullPointerException", "B": "null", "C": "An empty Optional object", "D": "An
+Optional containing the string 'null'" }, "answer": "C" }, { "question":
+"Predict output: Stream.of("a", "b", "c").filter(s -> { System.out.print(s);
+return true; });", "options": { "A": "abc", "B": "a", "C": "No output", "D":
+"Compilation Error" }, "answer": "C" }, { "question": "Find the bug: \ninterface
+Test { void run(); void stop(); }\nTest t = () ->
+System.out.println("Running");", "options": { "A": "Lambda body missing braces",
+"B": "Test is not a functional interface because it has two abstract methods",
+"C": "System.out.println cannot be in a lambda", "D": "Missing
+@FunctionalInterface annotation" }, "answer": "B" }, { "question": "Find the
+bug: \nOptional name = Optional.of("Java");\nString upper =
+name.toUpperCase();", "options": { "A": "Optional does not have a toUpperCase
+method", "B": "Optional must be instantiated with 'new'", "C": "name is null",
+"D": "toUpperCase is a static method" }, "answer": "A" }, { "question":
+"Complete the code: List list =
+names.stream().(String::toUpperCase).collect(Collectors.toList());", "options":
+{ "A": "filter", "B": "transform", "C": "map", "D": "convert" }, "answer": "C"
+}, { "question": "Complete the code to prevent NPE: String result = opt.(
+"Default" );", "options": { "A": "ifEmpty", "B": "orElse", "C": "get", "D":
+"fallback" }, "answer": "B" }, { "question": "Best Approach: You need to
+process 10 million records and filter them. Which should you use for better
+performance on a multi-core CPU?", "options": { "A": "Standard for-loop", "B":
+"stream()", "C": "parallelStream()", "D": "while loop" }, "answer": "C" } ] }

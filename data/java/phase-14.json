@@ -1,0 +1,216 @@
+{ "phase_metadata": { "phase_number": 14, "phase_name": "File I/O and
+Serialization", "description": "Learn to interact with the file system, handle
+persistent data storage, and convert objects into byte streams for storage or
+transmission.", "java_version": "21 LTS" }, "learning_objectives": [
+"Distinguish between Byte Streams and Character Streams", "Perform efficient
+file operations using BufferedReader and BufferedWriter", "Master automatic
+resource management with try-with-resources", "Understand Object Serialization
+and Deserialization using the Serializable interface", "Explore modern Java NIO
+(New I/O) using Path and Files classes", "Manage file metadata and directory
+structures" ], "prerequisites": [ "Phase 9: Exception Handling (crucial for I/O
+errors)", "Phase 12: Java 8+ Features (useful for Files.lines() stream
+processing)" ], "introduction": "Up until now, all data handled by our programs
+lived in the computer's volatile RAM and vanished once the program stopped. File
+I/O (Input/Output) allows us to save data permanently on a disk. Java provides
+two sets of tools: the classic 'java.io' package for stream-based I/O and the
+modern 'java.nio' (New I/O) package for high-performance, path-based
+operations.", "concept_explanation": { "what_is_it": "File I/O is the mechanism
+of reading data from a source (Input) and writing data to a destination
+(Output). Serialization is a specific type of I/O where a Java object's state is
+converted into a byte stream.", "why_do_we_need_it": "We need I/O for
+persistence (saving user settings, high scores, logs) and communication (sending
+data over a network). Buffering is used to reduce the number of expensive disk
+access operations by grouping data in memory.", "how_it_works": "Java uses
+'Streams' to handle I/O. Think of a stream as a continuous flow of data. Byte
+Streams (InputStream/OutputStream) handle raw binary data like images. Character
+Streams (Reader/Writer) handle text data using Unicode.",
+"serialization_basics": "To make an object 'Serializable', its class must
+implement the java.io.Serializable marker interface. This allows the
+ObjectOutputStream to save the object's instance variables to a file.",
+"nio_path_files": "The NIO.2 API (introduced in Java 7) uses 'Path' objects to
+represent file locations and the 'Files' utility class for powerful, one-line
+operations like reading all lines or copying files." }, "syntax": {
+"file_writer": "try (BufferedWriter writer = new BufferedWriter(new
+FileWriter("test.txt"))) {\n writer.write("Hello World");\n}", "nio_read": "List
+lines = Files.readAllLines(Path.of("data.txt"));", "serialization": "try
+(ObjectOutputStream oos = new ObjectOutputStream(new
+FileOutputStream("obj.ser"))) {\n oos.writeObject(myObject);\n}" },
+"syntax_breakdown": { "BufferedWriter": "A wrapper that provides a buffer for
+efficient writing. Without it, every write() call would hit the disk
+immediately.", "try_with_resources": "Ensures that the file stream is closed
+automatically at the end of the block, even if an error occurs.",
+"transient_keyword": "Used in serialization to mark fields that should NOT be
+saved (e.g., passwords or sensitive data).", "serialVersionUID": "A unique
+identifier for a serializable class to ensure that a saved object and the
+current class version are compatible.", "Path_of": "A modern static factory
+method to create a Path object representing a file or directory." },
+"rules_and_key_points": [ "Always close I/O streams to prevent memory leaks and
+file locking.", "Use Character Streams (Reader/Writer) for text files to handle
+encoding correctly.", "Use Byte Streams (InputStream/OutputStream) for binary
+files like images and audio.", "The 'transient' keyword prevents specific fields
+from being serialized.", "Static variables cannot be serialized because they
+belong to the class, not the instance.", "The Serializable interface is a
+'Marker Interface' (it has no methods).", "Files.exists(path) is the modern way
+to check for a file's existence.", "Buffered streams are significantly faster
+than unbuffered streams for large files.", "Serialization requires all nested
+objects within the class to also be Serializable.", "I/O operations almost
+always throw IOException, which must be handled or declared." ],
+"code_example_1": { "title": "Text File Writing and Reading", "description":
+"Using modern NIO.2 to write text and classic BufferedReader to read it back.",
+"code": "import java.io.;\nimport java.nio.file.;\nimport
+java.util.List;\n\npublic class FileBasics {\n public static void main(String[]
+args) {\n Path path = Path.of("example.txt");\n\n // Writing using NIO.2
+(Simplified)\n try {\n Files.writeString(path, "Java 21 File I/O is
+powerful!\nSecond Line.");\n System.out.println("File written successfully.");\n
+} catch (IOException e) {\n e.printStackTrace();\n }\n\n // Reading using
+BufferedReader\n try (BufferedReader reader = new BufferedReader(new
+FileReader(path.toFile()))) {\n String line;\n while ((line = reader.readLine())
+!= null) {\n System.out.println("Read: " + line);\n }\n } catch (IOException e)
+{\n System.out.println("Error reading file: " + e.getMessage());\n }\n }\n}" },
+"code_example_2": { "title": "Object Serialization", "description": "Saving and
+loading a User object to a file, demonstrating the transient keyword.", "code":
+"import java.io.*;\n\nclass User implements Serializable {\n private static
+final long serialVersionUID = 1L;\n String username;\n transient String
+password; // Won't be saved\n\n User(String u, String p) {\n this.username =
+u;\n this.password = p;\n }\n\n @Override\n public String toString() { return
+"User: " + username + ", Pwd: " + password; }\n}\n\npublic class
+SerializationDemo {\n public static void main(String[] args) {\n User user = new
+User("James_Gosling", "secret123");\n String filename = "user.ser";\n\n //
+Serialize\n try (ObjectOutputStream out = new ObjectOutputStream(new
+FileOutputStream(filename))) {\n out.writeObject(user);\n
+System.out.println("Object Serialized: " + user);\n } catch (IOException e) {
+e.printStackTrace(); }\n\n // Deserialize\n try (ObjectInputStream in = new
+ObjectInputStream(new FileInputStream(filename))) {\n User savedUser = (User)
+in.readObject();\n System.out.println("Object Deserialized: " + savedUser);\n //
+Note: password will be null because it was transient\n } catch (IOException |
+ClassNotFoundException e) { e.printStackTrace(); }\n }\n}" }, "output": "File
+written successfully.\nRead: Java 21 File I/O is powerful!\nRead: Second
+Line.\nObject Serialized: User: James_Gosling, Pwd: secret123\nObject
+Deserialized: User: James_Gosling, Pwd: null", "step_by_step_dry_run": "1.
+SerializationDemo: A 'User' object is created in memory with a password.\n2.
+ObjectOutputStream opens 'user.ser'. It writes the object's metadata and the
+'username' field.\n3. The 'password' field is skipped because of the 'transient'
+keyword.\n4. When reading back via ObjectInputStream, a NEW object is created on
+the heap.\n5. The field 'username' is populated from the file.\n6. The
+'password' field gets the default value for a String (null) since it wasn't in
+the file.\n7. The final printout shows the username intact but the password
+lost.", "memory_visualization": "When using BufferedReader, Java creates a 8KB
+buffer (by default) in the Heap. Instead of reading 1 character from the disk,
+the OS fills the 8KB buffer. The application then reads from this fast memory
+buffer. This 'Decorator Pattern' wraps a simple FileReader to add
+memory-efficiency layers.", "real_world_use_cases": [ "Log Files: Writing
+application events to a .log file for later debugging.", "Configurations: Saving
+app settings in a .properties or .json file.", "Game Saves: Serializing a
+'GameState' object to allow players to resume later.", "Data Export: Generating
+CSV reports from a database.", "Caching: Storing expensive calculation results
+on disk to avoid re-computation." ], "common_mistakes": [ "Not handling
+IOException, which causes compilation errors.", "Forgetting to flush or close
+the stream, leading to data not being written to the disk.", "Using relative
+paths like 'data.txt' and getting confused about the 'current working
+directory'.", "Attempting to serialize a class that doesn't implement
+Serializable.", "Mixing up Byte Streams and Character Streams (e.g., reading an
+image with a FileReader)." ], "best_practices": [ "Always use try-with-resources
+to ensure streams are closed.", "Prefer the java.nio.file.Files class for simple
+reading/writing tasks.", "Use buffering for all file operations to improve
+performance.", "Define a serialVersionUID for all Serializable classes to avoid
+versioning issues.", "Handle specific exceptions (FileNotFoundException)
+separately from generic IOExceptions if specialized logic is needed." ], "faq":
+[ { "question": "What is the difference between File and Path?", "answer": "File
+is the older class from java.io. Path is the modern interface from java.nio.
+Path is more flexible, supports different file systems, and works better with
+the Files utility class." }, { "question": "Why is the transient keyword
+useful?", "answer": "It provides security by preventing sensitive data like
+passwords from being saved to disk and reduces file size by skipping unnecessary
+or derived fields." }, { "question": "Does serialization save static
+variables?", "answer": "No. Static variables belong to the class, not the
+object. Serialization only captures the instance state." } ], "summary":
+"Phase 14 introduced the concepts of data persistence. We learned how to read
+and write text using both classic IO and modern NIO, managed resources safely
+using try-with-resources, and used Serialization to save entire object states to
+disk while protecting sensitive data with the transient keyword.",
+"key_takeaways": [ "IO = Data transfer; NIO = Modern, high-performance IO.",
+"Character streams are for text; Byte streams are for binary.", "Buffering is
+essential for performance.", "Try-with-resources is the standard for closing
+files.", "Serializable is required for object storage.", "Transient fields are
+ignored by serialization.", "IOException is a checked exception.",
+"Files.writeString and Files.readString are the easiest ways to handle text in
+Java 11+.", "SerialVersionUID helps maintain class compatibility.", "Always
+check if a file exists before reading to avoid exceptions." ],
+"preview_of_the_next_topic": "In Phase 15, we will put everything we've learned
+together to build real-world Mini Projects like a Student Management System and
+a Banking Application.", "questions": [ { "difficulty": "Easy", "topic":
+"Concept", "question": "What is the difference between a Reader and an
+InputStream?", "answer": "An InputStream reads raw bytes (8-bit), while a Reader
+reads characters (16-bit). Readers are specifically designed to handle text and
+perform character encoding conversion automatically." }, { "difficulty":
+"Moderate", "topic": "Concept", "question": "Explain the role of the
+'serialVersionUID' in Java Serialization.", "answer": "It is a version number
+for a Serializable class. When an object is deserialized, the JVM checks if the
+ID in the file matches the ID in the class. If they don't match, an
+InvalidClassException is thrown, preventing compatibility issues between
+different versions of the code." }, { "difficulty": "Moderate", "topic":
+"Practical Usage", "question": "Write a snippet to read a file line-by-line
+using Files.lines() and print only lines that contain the word 'Error'.",
+"answer": "try (Stream lines = Files.lines(Path.of("app.log"))) {
+lines.filter(line -> line.contains("Error")).forEach(System.out::println); }
+catch(IOException e) { e.printStackTrace(); }" }, { "difficulty": "Hard",
+"topic": "Practical Usage", "question": "How would you append text to an
+existing file using the 'Files' class without overwriting the previous
+content?", "answer": "You can use the 'Files.write' method with the
+'StandardOpenOption.APPEND' option. Example: Files.writeString(path, "new text",
+StandardOpenOption.APPEND);" }, { "difficulty": "Moderate", "topic": "Common
+Mistake", "question": "Why might a file be empty even though a BufferedWriter
+wrote data to it and the program finished?", "answer": "This usually happens
+because the programmer forgot to call 'flush()' or 'close()'. Buffered streams
+store data in memory and only write to disk when the buffer is full or the
+stream is explicitly closed." }, { "difficulty": "Hard", "topic": "Common
+Mistake", "question": "What happens if you try to serialize a class where one of
+the instance variables is a reference to a class that does NOT implement
+Serializable?", "answer": "The JVM will throw a 'NotSerializableException' at
+runtime as soon as it attempts to serialize the non-serializable object, even if
+the parent class implements the interface." }, { "difficulty": "Moderate",
+"topic": "Coding", "question": "Write a program to count the number of words in
+a file named 'notes.txt'.", "answer": "try { String content =
+Files.readString(Path.of("notes.txt")); String[] words = content.split("\\s+");
+System.out.println(words.length); } catch(IOException e) { ... }" }, {
+"difficulty": "Hard", "topic": "Coding", "question": "Implement a method that
+copies a binary file (like an image) from one path to another using
+BufferedInputStream and BufferedOutputStream.", "answer": "try
+(BufferedInputStream in = new BufferedInputStream(new FileInputStream(src));
+BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest)))
+{ byte[] buffer = new byte[1024]; int bytesRead; while ((bytesRead =
+in.read(buffer)) != -1) { out.write(buffer, 0, bytesRead); } }" } ], "mcqs": [ {
+"question": "Which package contains the modern 'Path' and 'Files' classes?",
+"options": { "A": "java.io", "B": "java.nio.file", "C": "java.util", "D":
+"java.net" }, "answer": "B" }, { "question": "Which interface must a class
+implement to be compatible with ObjectOutputStream?", "options": { "A":
+"java.io.External", "B": "java.io.Serializable", "C": "java.io.Persistent", "D":
+"java.lang.Cloneable" }, "answer": "B" }, { "question": "What is the output of
+writing 'Hello' with FileWriter and not calling close()?", "options": { "A":
+"The file contains 'Hello'", "B": "The file might be empty or incomplete", "C":
+"A RuntimeException is thrown", "D": "The file is deleted" }, "answer": "B" }, {
+"question": "Which keyword prevents a variable from being part of the persistent
+state of an object?", "options": { "A": "volatile", "B": "static", "C":
+"transient", "D": "final" }, "answer": "C" }, { "question": "Predict the output:
+\nFiles.writeString(Path.of("a.txt"),
+"123");\nFiles.writeString(Path.of("a.txt"),
+"456");\nSystem.out.print(Files.readString(Path.of("a.txt")));", "options": {
+"A": "123456", "B": "123", "C": "456", "D": "Error" }, "answer": "C" }, {
+"question": "Find the bug: \ntry (FileReader fr = new FileReader("test.txt")) {
+\n // code \n} catch (IOException e) { } \nfinally { fr.close(); }", "options":
+{ "A": "FileReader cannot be in a try block", "B": "The variable 'fr' is not
+accessible in the finally block", "C": "IOException is the wrong exception",
+"D": "close() is already handled by try-with-resources" }, "answer": "B" }, {
+"question": "Find the bug: \nclass Data implements Serializable { \n static int
+count = 10; \n} \n// Serialize Data, change count to 20, Deserialize Data. \n//
+What is the value of count in deserialized object?", "options": { "A": "10",
+"B": "20", "C": "0", "D": "null" }, "answer": "B" }, { "question": "Complete the
+code: \nPath p = Path.("C:/docs/test.txt");", "options": { "A": "new", "B":
+"create", "C": "of", "D": "get" }, "answer": "C" }, { "question": "Complete the
+code: \ntry (__ in = new ObjectInputStream(new FileInputStream("f.dat"))) { ...
+}", "options": { "A": "InputStream", "B": "ObjectInputStream", "C":
+"BufferedReader", "D": "DataInputStream" }, "answer": "B" }, { "question": "Best
+Approach: You need to read a very large text file (2GB) efficiently. Which is
+best?", "options": { "A": "Files.readString()", "B": "Files.readAllLines()",
+"C": "BufferedReader with readLine() in a loop", "D": "FileReader.read()" },
+"answer": "C" } ] }

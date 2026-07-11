@@ -1,0 +1,512 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 5,
+    "phaseName": "Functions & Variable Scope",
+    "duration": "8-10 hours"
+  },
+  "learningObjectives": [
+    "Master function definition, parameters, and return mechanisms",
+    "Understand variable scope rules (LEGB)",
+    "Implement flexible interfaces with *args and **kwargs",
+    "Utilize functional programming paradigms with lambda functions",
+    "Apply recursion for problem-solving",
+    "Document code professionally with PEP 257 docstrings"
+  ],
+  "prerequisites": [
+    "Phase 1: Basic Variables & I/O",
+    "Phase 2: Operators & Logic",
+    "Phase 4: Control Flow (loops/conditionals)"
+  ],
+  "introduction": "Functions are the fundamental building blocks of modular Python programming. They allow developers to encapsulate reusable logic, improve readability, and manage memory efficiently. In professional environments, functions act as isolated units of work that transform input into predictable output, significantly reducing code duplication and technical debt.",
+  "conceptExplanation": "A function is a subprogram that performs a specific task. By using the 'def' keyword, you define a block of code that is executed only when called. Crucially, Python uses 'Scope' to determine where variables are accessible. The 'LEGB' rule governs this: Local (inside current function), Enclosing (nested outer function), Global (top level of module), and Built-in (predefined Python functions). Understanding this scope is vital for preventing bugs where functions unintentionally overwrite global state.",
+  "syntax": "def function_name(parameter1, parameter2=default_value, *args, **kwargs):\n    \"\"\"Docstring: Explain function purpose.\"\"\"\n    # Function body\n    return result",
+  "syntaxBreakdown": [
+    "def: Keyword to declare a new function.",
+    "parameter1: Mandatory input variable.",
+    "parameter2=default_value: Argument with a fallback value if omitted.",
+    "*args: Tuple of arbitrary positional arguments.",
+    "**kwargs: Dictionary of arbitrary keyword arguments.",
+    "return: Exits the function and passes back a specific value.",
+    "\"\"\"Docstring\"\"\": Metadata for documentation tools."
+  ],
+  "rulesAndKeyPoints": [
+    "Function names should use snake_case (e.g., calculate_tax).",
+    "Always include a docstring immediately after the definition.",
+    "Arguments are passed by assignment (reference-like behavior for mutable objects).",
+    "Use 'global' to modify global variables, though it is usually a bad design choice.",
+    "Use 'nonlocal' for nested functions needing to change parent scope variables.",
+    "Lambda functions are for simple, one-line expressions.",
+    "Recursion requires a base case to prevent infinite recursion/StackOverflowError.",
+    "Default parameter values are evaluated only once at definition time.",
+    "Functions should follow the Single Responsibility Principle: do one thing well.",
+    "Type hints (introduced in PEP 484) are highly encouraged for production code."
+  ],
+  "codeExample1": {
+    "title": "Basic Function Anatomy",
+    "code": "def greet_user(name: str, greeting: str = 'Hello') -> str:\n    \"\"\"Returns a personalized welcome message.\"\"\"\n    return f\"{greeting}, {name}!\"",
+    "explanation": "This example demonstrates parameter definition, default values, and Type Hinting.",
+    "output": "greet_user('Alice') -> 'Hello, Alice!'"
+  },
+  "codeExample2": {
+    "title": "Transaction Processor with *args",
+    "code": "def process_transactions(tax_rate, *amounts):\n    total = sum(amounts)\n    taxed = total * (1 + tax_rate)\n    return round(taxed, 2)\n\nfinal = process_transactions(0.05, 100, 200, 300)",
+    "explanation": "Demonstrates variable positional arguments (*args) to handle an unknown number of transaction inputs.",
+    "output": "630.0"
+  },
+  "dryRunSteps": [
+    {
+      "stepNumber": 1,
+      "lineOfCode": "final = process_transactions(0.05, 100, 200, 300)",
+      "lineNumber": 5,
+      "explanation": "Function called with 0.05 mapped to tax_rate and (100, 200, 300) packed into amounts.",
+      "variablesState": {
+        "tax_rate": "0.05",
+        "amounts": "(100, 200, 300)"
+      }
+    },
+    {
+      "stepNumber": 2,
+      "lineOfCode": "total = sum(amounts)",
+      "lineNumber": 2,
+      "explanation": "Calculating total using built-in sum function on tuple.",
+      "variablesState": {
+        "total": "600"
+      }
+    },
+    {
+      "stepNumber": 3,
+      "lineOfCode": "taxed = total * (1 + tax_rate)",
+      "lineNumber": 3,
+      "explanation": "Applying multiplier.",
+      "variablesState": {
+        "taxed": "630.0"
+      }
+    },
+    {
+      "stepNumber": 4,
+      "lineOfCode": "return round(taxed, 2)",
+      "lineNumber": 4,
+      "explanation": "Rounding and exiting function to return to global scope.",
+      "variablesState": {
+        "final": "630.0"
+      }
+    }
+  ],
+  "memoryVisualization": {
+    "description": "Stack frame lifecycle during function execution.",
+    "elements": [
+      {
+        "id": "s1",
+        "label": "Global Frame",
+        "type": "stack",
+        "value": "final=630.0"
+      },
+      {
+        "id": "s2",
+        "label": "process_transactions Frame",
+        "type": "stack",
+        "value": "tax_rate=0.05"
+      },
+      {
+        "id": "h1",
+        "label": "amounts tuple",
+        "type": "heap",
+        "value": "(100, 200, 300)"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Data pipeline transformation scripts (ETL processes)",
+    "API endpoint controllers in Flask/FastAPI",
+    "Event handlers in GUIs or asynchronous task queues",
+    "Mathematical computation modules for financial software"
+  ],
+  "commonMistakes": [
+    "Using mutable default arguments (e.g., list=[])",
+    "Forgetting to call the function and printing the function object memory address instead",
+    "Trying to modify a global list without using the list methods (it works) vs overwriting the variable (needs global)",
+    "Infinite recursion missing a base case"
+  ],
+  "bestPractices": [
+    "Keep functions small (<20 lines).",
+    "Use type hints for clarity.",
+    "Always return consistent types.",
+    "Prefer keyword arguments for readability when functions have >3 parameters."
+  ],
+  "faqs": [
+    {
+      "question": "When should I use *args vs **kwargs?",
+      "answer": "Use *args when the function needs a variable number of positional values (like summing numbers), and **kwargs when you need to pass named settings or configuration dictionaries."
+    },
+    {
+      "question": "What is the difference between global and nonlocal?",
+      "answer": "Global refers to the module-level scope. Nonlocal allows a nested function to modify a variable in the nearest enclosing function's scope."
+    }
+  ],
+  "summary": "This phase provided a deep dive into functions, scope rules (LEGB), argument handling (*args/**kwargs), and advanced concepts like recursion and lambda expressions. Mastering these enables the creation of highly modular and maintainable software.",
+  "keyTakeaways": [
+    "LEGB rule explains variable access order.",
+    "Functions return 'None' if no return statement is found.",
+    "Docstrings are essential for documentation.",
+    "Recursion replaces iterative loops for hierarchical data.",
+    "Functional tools like lambda simplify simple operations."
+  ],
+  "previewOfNextTopic": "Data Structures: Lists, Tuples, Sets, and Dictionaries.",
+  "mcqs": [
+    {
+      "id": "m1",
+      "type": "theory",
+      "question": "What does the LEGB rule stand for?",
+      "options": [
+        {
+          "key": "A",
+          "text": "Local, Enclosing, Global, Built-in"
+        },
+        {
+          "key": "B",
+          "text": "Level, Entry, Global, Built-in"
+        },
+        {
+          "key": "C",
+          "text": "Local, External, Global, Binary"
+        },
+        {
+          "key": "D",
+          "text": "Loop, Enclosed, Global, Block"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "LEGB is the standard acronym for Python variable resolution order."
+    },
+    {
+      "id": "m2",
+      "type": "output_prediction",
+      "question": "What is output: def f(x=[]): x.append(1); return x; print(f()); print(f())",
+      "options": [
+        {
+          "key": "A",
+          "text": "[1], [1]"
+        },
+        {
+          "key": "B",
+          "text": "[1], [1, 1]"
+        },
+        {
+          "key": "C",
+          "text": "Error"
+        },
+        {
+          "key": "D",
+          "text": "None, None"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Default mutable arguments are stored at definition time, persisting across calls."
+    },
+    {
+      "id": "m3",
+      "type": "output_prediction",
+      "question": "What does `type(lambda x: x+1)` return?",
+      "options": [
+        {
+          "key": "A",
+          "text": "int"
+        },
+        {
+          "key": "B",
+          "text": "function"
+        },
+        {
+          "key": "C",
+          "text": "lambda"
+        },
+        {
+          "key": "D",
+          "text": "None"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "A lambda is simply an anonymous function object."
+    },
+    {
+      "id": "m4",
+      "type": "output_prediction",
+      "question": "What is the result of `(lambda x: x**2)(3)`?",
+      "options": [
+        {
+          "key": "A",
+          "text": "6"
+        },
+        {
+          "key": "B",
+          "text": "9"
+        },
+        {
+          "key": "C",
+          "text": "3"
+        },
+        {
+          "key": "D",
+          "text": "Error"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "3 squared is 9."
+    },
+    {
+      "id": "m5",
+      "type": "find_the_bug",
+      "question": "Find the bug: def add(a, b): return a + b; add(5)",
+      "options": [
+        {
+          "key": "A",
+          "text": "Missing return"
+        },
+        {
+          "key": "B",
+          "text": "Missing argument b"
+        },
+        {
+          "key": "C",
+          "text": "Function name error"
+        },
+        {
+          "key": "D",
+          "text": "Indentation error"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Function is defined with two arguments but only one provided."
+    },
+    {
+      "id": "m6",
+      "type": "find_the_bug",
+      "question": "Find the bug: x = 10; def set_x(): x = 20; set_x(); print(x)",
+      "options": [
+        {
+          "key": "A",
+          "text": "x remains 10 because local scope modification"
+        },
+        {
+          "key": "B",
+          "text": "Syntax error"
+        },
+        {
+          "key": "C",
+          "text": "Runtime error"
+        },
+        {
+          "key": "D",
+          "text": "Should be print(set_x())"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "The 'x = 20' creates a new local variable, not modifying the global one."
+    },
+    {
+      "id": "m7",
+      "type": "complete_the_code",
+      "question": "Complete the decorator logic: def my_func(a, b): ______",
+      "options": [
+        {
+          "key": "A",
+          "text": "return a + b"
+        },
+        {
+          "key": "B",
+          "text": "print(a, b)"
+        },
+        {
+          "key": "C",
+          "text": "x = a; y = b"
+        },
+        {
+          "key": "D",
+          "text": "def inner(): pass"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "A standard function needs to return a value to be useful."
+    },
+    {
+      "id": "m8",
+      "type": "complete_the_code",
+      "question": "Complete to collect unlimited arguments: def collect(____):",
+      "options": [
+        {
+          "key": "A",
+          "text": "*args"
+        },
+        {
+          "key": "B",
+          "text": "args"
+        },
+        {
+          "key": "C",
+          "text": "**args"
+        },
+        {
+          "key": "D",
+          "text": "all"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "*args is the convention for variable positional arguments."
+    },
+    {
+      "id": "m9",
+      "type": "best_approach",
+      "question": "Which is the best way to document a function?",
+      "options": [
+        {
+          "key": "A",
+          "text": "Comments above the function"
+        },
+        {
+          "key": "B",
+          "text": "PEP 257 Docstrings"
+        },
+        {
+          "key": "C",
+          "text": "External text files"
+        },
+        {
+          "key": "D",
+          "text": "Naming the function long descriptive names"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Docstrings allow automated documentation tools (like Sphinx) to work."
+    },
+    {
+      "id": "m10",
+      "type": "theory",
+      "question": "When does a local variable disappear?",
+      "options": [
+        {
+          "key": "A",
+          "text": "When the program ends"
+        },
+        {
+          "key": "B",
+          "text": "When the function returns"
+        },
+        {
+          "key": "C",
+          "text": "After 1 minute"
+        },
+        {
+          "key": "D",
+          "text": "When memory is cleared"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Local variables exist only within the stack frame of the function."
+    }
+  ],
+  "codeQuestions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "Write a program",
+      "title": "Calculate Rectangle Area",
+      "question": "Write a function 'calculate_area(width, height)' that returns the area.",
+      "solutionCode": "def calculate_area(width, height):\n    return width * height",
+      "hints": [
+        "Multiply two inputs",
+        "Use the return keyword"
+      ],
+      "explanation": "Basic function definition and return statement usage."
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "Complete missing code",
+      "title": "Greeting Function",
+      "question": "Complete the code to print 'Hello User'.",
+      "codeTemplate": "def greet():\n    ______\n\ngreet()",
+      "solutionCode": "def greet():\n    print('Hello User')\n\ngreet()",
+      "hints": [
+        "Use the print function"
+      ],
+      "explanation": "Function definition and invocation basics."
+    },
+    {
+      "id": "q3",
+      "difficulty": "Easy-Medium",
+      "type": "Write a program",
+      "title": "Sum All Arguments",
+      "question": "Create a function 'sum_all(*args)' that returns the sum of all numbers passed.",
+      "solutionCode": "def sum_all(*args):\n    return sum(args)",
+      "hints": [
+        "Use *args",
+        "Use the built-in sum()"
+      ],
+      "explanation": "Introduces variable argument length."
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "Debug existing code",
+      "title": "Global Fix",
+      "question": "Fix the function to correctly increment the global variable 'count'.",
+      "buggyCode": "count = 0\ndef increment():\n    count += 1\nincrement()",
+      "solutionCode": "count = 0\ndef increment():\n    global count\n    count += 1\nincrement()",
+      "hints": [
+        "Use the 'global' keyword"
+      ],
+      "explanation": "Scope rules require explicitly declaring global modifications."
+    },
+    {
+      "id": "q5",
+      "difficulty": "Medium",
+      "type": "Write a program",
+      "title": "Lambda Filter",
+      "question": "Use a lambda function to filter a list [1, 2, 3, 4] to keep only even numbers.",
+      "solutionCode": "nums = [1, 2, 3, 4]\nevens = list(filter(lambda x: x % 2 == 0, nums))",
+      "hints": [
+        "Use filter()",
+        "The lambda should return True for evens"
+      ],
+      "explanation": "Demonstrates practical lambda usage in functional programming."
+    },
+    {
+      "id": "q6",
+      "difficulty": "Medium-Hard",
+      "type": "Write a program",
+      "title": "Factorial Recursion",
+      "question": "Implement a recursive function for factorial: n! = n * (n-1)!",
+      "solutionCode": "def factorial(n):\n    if n <= 1: return 1\n    return n * factorial(n-1)",
+      "hints": [
+        "Base case: n is 1",
+        "Recursive case: n * call again"
+      ],
+      "explanation": "Recursion example using base case logic."
+    },
+    {
+      "id": "q7",
+      "difficulty": "Hard",
+      "type": "Modify existing code",
+      "title": "Nonlocal Counter",
+      "question": "Modify a nested function to increment a variable in the outer function scope.",
+      "solutionCode": "def outer():\n    count = 0\n    def inner():\n        nonlocal count\n        count += 1\n        return count\n    return inner",
+      "hints": [
+        "Use 'nonlocal'"
+      ],
+      "explanation": "Closure and scope manipulation."
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "Small implementation",
+      "title": "Dynamic Logger",
+      "question": "Create a function 'dynamic_logger(level, *msgs, **metadata)' that prints a formatted log.",
+      "solutionCode": "def dynamic_logger(level, *msgs, **metadata):\n    print(f'[{level.upper()}] {' '.join(msgs)}')\n    for k, v in metadata.items():\n        print(f'{k}: {v}')",
+      "hints": [
+        "Use *args for messages",
+        "Use **kwargs for extra metadata dictionary"
+      ],
+      "explanation": "Combines positional and keyword variable arguments in a real-world scenario."
+    }
+  ]
+}

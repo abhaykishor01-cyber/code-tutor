@@ -1,0 +1,403 @@
+{
+  "phase_metadata": {
+    "phase_number": 4,
+    "title": "Inheritance",
+    "description": "Mastering hierarchical class modeling, memory layouts, initialization sequences, and multi-faceted access control in modern C++."
+  },
+  "learning_objectives": [
+    "Differentiate and implement the five types of inheritance: Single, Multiple, Multilevel, Hierarchical, and Hybrid.",
+    "Master access specifiers (public, protected, and private) and understand their roles in limiting visibility.",
+    "Demonstrate the construction and destruction sequence of objects inside a multi-tier inheritance hierarchy.",
+    "Design clean multi-parent systems using modern virtual inheritance to eliminate the Diamond Problem."
+  ],
+  "prerequisites": [
+    "C++ Fundamentals, Classes, Objects, and Basic Encapsulation.",
+    "Understanding of Constructor Initializer Lists.",
+    "Stack and Heap allocation concepts."
+  ],
+  "introduction": "Welcome to Phase 4! Up to this point, you have learned how to bundle data and logic into cohesive objects using classes. In this phase, we unlock the true superpower of Object-Oriented Programming: Inheritance. Inheritance allows us to express an 'IS-A' relationship between structures. Instead of recreating similar code across different entities, we build elegant, maintainable hierarchies where generalized structures automatically hand down their properties to specialized behaviors.",
+  "concept_explanation": "Inheritance is the mechanism by which one class (the derived, child class) acquires the properties, behavior, and attributes of another class (the base, parent class). \n\nWe categorize inheritance based on structural relationships:\n1. Single Inheritance: One child inherits directly from one parent.\n2. Multilevel Inheritance: A chain of inheritance where a child becomes a parent to another subclass (Grandparent -> Parent -> Child).\n3. Multiple Inheritance: A child class inherits attributes from more than one direct parent (e.g., a Button is both a UIElement and Clickable).\n4. Hierarchical Inheritance: Multiple child classes inherit from a single, shared base class.\n5. Hybrid Inheritance: A complex combination of multiple structural relationships, which often introduces the 'Diamond Problem'. We use the 'virtual' keyword during parent inheritance to resolve duplicate base-class subobjects.\n\nMemory Allocation:\nWhen a derived object is instantiated, C++ physically copies the layout of the parent class at the very beginning of the derived class memory layout on the stack or heap. Because of this, constructor execution always cascades downwards starting from the top-most parent base down to the derived leaf class, while destructors execute in the precise reverse order to ensure clean scope termination.",
+  "syntax": "class Base {\npublic:\n    Base(int val);\n};\n\nclass Derived : public Base {\npublic:\n    Derived(int val, double extra) : Base(val) {}\n};",
+  "syntax_breakdown": [
+    {
+      "element": "class Derived : public Base",
+      "explanation": "Declares that the class 'Derived' inherits from 'Base'. The 'public' specifier maintains the accessibility of base members: public remains public, and protected remains protected inside the derived class."
+    },
+    {
+      "element": ": Base(val)",
+      "explanation": "Invokes the parent class constructor explicitly via the initializer list. Since the parent class must exist first in memory, it must be initialized before the child's block runs."
+    }
+  ],
+  "rules_and_key_points": [
+    "Derived classes do not inherit private members directly; they must access them via public/protected getters or setters.",
+    "Base constructors are always called first before the derived constructors run.",
+    "Destructors are always called in the reverse order of construction.",
+    "When a base class pointer deletes a derived class object, the base destructor MUST be declared 'virtual' to prevent resource leaks."
+  ],
+  "code_example_1_basic": {
+    "title": "Single & Multilevel Inheritance Syntax and Lifecycle Flow",
+    "code": "#include <iostream>\n#include <string>\n\nclass Device {\nprotected:\n    std::string brand;\npublic:\n    Device(const std::string& b) : brand(b) {\n        std::cout << \"[Device] Constructor: \" << brand << \"\\n\";\n    }\n    ~Device() {\n        std::cout << \"[Device] Destructor\\n\";\n    }\n};\n\nclass Computer : public Device {\nprotected:\n    int ram_gb;\npublic:\n    Computer(const std::string& b, int r) : Device(b), ram_gb(r) {\n        std::cout << \"[Computer] Constructor: \" << ram_gb << \"GB\\n\";\n    }\n    ~Computer() {\n        std::cout << \"[Computer] Destructor\\n\";\n    }\n};\n\nclass Laptop : public Computer {\nprivate:\n    double screen_size;\npublic:\n    Laptop(const std::string& b, int r, double s) : Computer(b, r), screen_size(s) {\n        std::cout << \"[Laptop] Constructor: \" << screen_size << \" inches\\n\";\n    }\n    ~Laptop() {\n        std::cout << \"[Laptop] Destructor\\n\";\n    }\n    void show_info() const {\n        std::cout << \"Specs: \" << brand << \" laptop with \" << ram_gb << \"GB RAM\\n\";\n    }\n};\n\nint main() {\n    {\n        Laptop my_laptop(\"Amdahl\", 16, 14.0);\n        my_laptop.show_info();\n    }\n    return 0;\n}",
+    "explanation": "This code demonstrates basic Multilevel inheritance (Device -> Computer -> Laptop) with constructor propagation. It highlights how variables like 'brand' are modified and accessed, and how C++ guarantees top-to-bottom initialization and bottom-to-top destruction sequence.",
+    "expected_output": "[Device] Constructor: Amdahl\n[Computer] Constructor: 16GB\n[Laptop] Constructor: 14 inches\nSpecs: Amdahl laptop with 16GB RAM\n[Laptop] Destructor\n[Computer] Destructor\n[Device] Destructor",
+    "dry_run": [
+      {
+        "line": "Laptop my_laptop(\"Amdahl\", 16, 14.0);",
+        "description": "Allocates stack space for 'my_laptop'. It cascades base constructors up to the primary ancestor 'Device' first."
+      },
+      {
+        "line": "Device(const std::string& b)",
+        "description": "Initializes 'brand' to 'Amdahl'. Prints '[Device] Constructor: Amdahl'."
+      },
+      {
+        "line": "Computer(const std::string& b, int r)",
+        "description": "Initializes 'ram_gb' to 16. Prints '[Computer] Constructor: 16GB'."
+      },
+      {
+        "line": "Laptop(const std::string& b, int r, double s)",
+        "description": "Initializes 'screen_size' to 14.0. Prints '[Laptop] Constructor: 14 inches'."
+      },
+      {
+        "line": "my_laptop.show_info();",
+        "description": "Prints spec string using accessible 'brand' (protected in Device) and 'ram_gb' (protected in Computer)."
+      },
+      {
+        "line": "} (Scope termination)",
+        "description": "The 'my_laptop' goes out of scope. C++ triggers destructors sequentially: Laptop destructor, then Computer, and finally Device."
+      }
+    ]
+  },
+  "code_example_2_practical": {
+    "title": "Multiple and Hybrid Inheritance in UI Component Systems",
+    "code": "#include <iostream>\n#include <string>\n#include <vector>\n#include <memory>\n\nclass UIElement {\nprotected:\n    int x, y;\npublic:\n    UIElement(int px, int py) : x(px), y(py) {\n        std::cout << \"UIElement built at (\" << x << \", \" << y << \")\\n\";\n    }\n    virtual ~UIElement() = default;\n    virtual void draw() const = 0;\n};\n\nclass Interactive {\nprotected:\n    bool is_focused = false;\npublic:\n    Interactive() {\n        std::cout << \"Interactive focus states initialized\\n\";\n    }\n    void toggle_focus() {\n        is_focused = !is_focused;\n        std::cout << \"Focus state toggled to: \" << (is_focused ? \"True\" : \"False\") << \"\\n\";\n    }\n    virtual ~Interactive() = default;\n};\n\nclass Button : public UIElement, public Interactive {\nprivate:\n    std::string text;\npublic:\n    Button(int px, int py, std::string label) \n        : UIElement(px, py), Interactive(), text(std::move(label)) {\n        std::cout << \"Button '\" << text << \"' fully created\\n\";\n    }\n    void draw() const override {\n        std::cout << \"Button ['\" << text << \"'] displayed at (\" << x << \", \" << y << \")\";\n        if (is_focused) {\n            std::cout << \" <Focused>\";\n        }\n        std::cout << \"\\n\";\n    }\n    ~Button() override {\n        std::cout << \"Button '\" << text << \"' layout destroyed\\n\";\n    }\n};\n\nint main() {\n    std::unique_ptr<UIElement> element = std::make_unique<Button>(100, 200, \"Click Me\");\n    element->draw();\n    \n    Button* raw_btn = dynamic_cast<Button*>(element.get());\n    if (raw_btn) {\n        raw_btn->toggle_focus();\n    }\n    element->draw();\n    return 0;\n}",
+    "explanation": "This represents a production component-based UI framework using Multiple Inheritance. 'Button' inherits both visual dimensions ('UIElement') and interaction logic ('Interactive'). It utilizes safe dynamic_cast to interact with properties of concrete interfaces safely, cleaning resources automatically with smart pointers.",
+    "expected_output": "UIElement built at (100, 200)\nInteractive focus states initialized\nButton 'Click Me' fully created\nButton ['Click Me'] displayed at (100, 200)\nFocus state toggled to: True\nButton ['Click Me'] displayed at (100, 200) <Focused>\nButton 'Click Me' layout destroyed",
+    "dry_run": [
+      {
+        "line": "std::unique_ptr<UIElement> element = std::make_unique<Button>(100, 200, \"Click Me\");",
+        "description": "Invokes the 'Button' constructor. Starts initialization of base 'UIElement' followed by parent 'Interactive'."
+      },
+      {
+        "line": "UIElement(px, py)",
+        "description": "Coordinates 'x' and 'y' initialized to 100, 200 on heap. Prints creation coordinates."
+      },
+      {
+        "line": "Interactive()",
+        "description": "Constructs focus structure tracking 'is_focused' as false."
+      },
+      {
+        "line": "Button(...)",
+        "description": "Button's unique text field 'Click Me' is set. Prints final button initialization confirmation."
+      },
+      {
+        "line": "element->draw();",
+        "description": "Polymorphically resolves the call, drawing the Button layout with label details."
+      },
+      {
+        "line": "raw_btn->toggle_focus();",
+        "description": "Invokes Interactive behavior, switching the boolean focus tracker to True."
+      },
+      {
+        "line": "element->draw();",
+        "description": "Prints updated Button status reflecting the focus state visual overlay."
+      },
+      {
+        "line": "return 0;",
+        "description": "unique_ptr scope closes, cleanly destroying derived classes before destroying bases in strict bottom-up order."
+      }
+    ]
+  },
+  "memory_visualization": {
+    "type": "Stack and Heap Memory Representation",
+    "description": "Contiguous memory layout of a derived class showing how parent structures directly precede derived features in memory.",
+    "entities": [
+      {
+        "name": "btn_ptr (stack)",
+        "address": "0x7ffee3b4a2bc",
+        "value": "0x55d1a2c3f0b0",
+        "segment": "Stack"
+      },
+      {
+        "name": "UIElement::x (heap)",
+        "address": "0x55d1a2c3f0b0",
+        "value": "100",
+        "segment": "Heap"
+      },
+      {
+        "name": "UIElement::y (heap)",
+        "address": "0x55d1a2c3f0b4",
+        "value": "200",
+        "segment": "Heap"
+      },
+      {
+        "name": "Interactive::is_focused (heap)",
+        "address": "0x55d1a2c3f0b8",
+        "value": "true",
+        "segment": "Heap"
+      },
+      {
+        "name": "Button::text (heap pointer)",
+        "address": "0x55d1a2c3f0bc",
+        "value": "0x55d1a2c3f1a0",
+        "segment": "Heap"
+      },
+      {
+        "name": "Button::text payload (heap)",
+        "address": "0x55d1a2c3f1a0",
+        "value": "\"Click Me\"",
+        "segment": "Heap"
+      }
+    ]
+  },
+  "real_world_use_cases": [
+    {
+      "scenario": "Game Engine Entities",
+      "description": "A Base GameActor class handles global 3D space positions. Specialized types like Pawn, Projectile, and Trigger volume derive from GameActor, inheriting baseline spatial features while layer-specializing functionality."
+    },
+    {
+      "scenario": "Network Protocol Drivers",
+      "description": "Abstract low-level interfaces define physical protocols (I2C, SPI). Multiple child implementations derive from these interfaces to implement specific hardware details across diverse chipsets."
+    }
+  ],
+  "common_mistakes": [
+    {
+      "mistake": "Object Slicing",
+      "explanation": "Assigning a derived object to a base class variable by value rather than pointer or reference. This discards the entire child partition of memory.",
+      "fix": "Always use base class references or raw/smart pointers (e.g., const Base& obj) to process polymorphism."
+    },
+    {
+      "mistake": "Non-Virtual Base Destructors",
+      "explanation": "If the base class lacks a virtual destructor, deleting a derived instance via a Base* pointer triggers undefined behavior and leads to memory leaks for resources managed inside the derived class.",
+      "fix": "Always declare the base destructor as 'virtual ~Base() = default;' if you expect to delete instances polymorphically."
+    }
+  ],
+  "best_practices": [
+    "Prefer composition over inheritance unless an undeniable 'IS-A' relationship is present.",
+    "Always mark overridden methods with the C++11 'override' specifier to ensure signature matching at compile time.",
+    "Avoid inheriting publicly from classes with non-virtual destructors (like std::vector or std::string).",
+    "Keep hierarchy depths shallow, ideally to 3 levels or fewer, to avoid complex maintenance challenges."
+  ],
+  "frequently_asked_questions": [
+    {
+      "question": "Can a child class override private methods of a parent class?",
+      "answer": "Yes, but they cannot invoke them directly. The virtual table enables overriding, though visibility rules prevent direct execution of base implementations."
+    },
+    {
+      "question": "What is the Diamond Problem and how is it resolved in C++?",
+      "answer": "The Diamond Problem occurs in hybrid inheritance when a class inherits from two parent classes that both derive from a single grandparent. This duplicates grandparent state data. C++ resolves this using virtual inheritance: 'class Parent : virtual public Grandparent'."
+    }
+  ],
+  "summary": "This phase explored dynamic class architecture modeling through inheritance. You learned to trace sequential construction logic, safely design multi-interface systems using Multiple Inheritance, and avoid standard memory issues like slicing and resource leaks through proper class access rules.",
+  "key_takeaways": [
+    "Inheritance establishes an 'IS-A' design contract.",
+    "C++ initializes classes hierarchically from top to bottom, and destroys them from bottom to top.",
+    "Use the 'virtual' keyword during class definitions to safely handle multiple and hybrid inheritance.",
+    "Polymorphic cleanup requires virtual destructors."
+  ],
+  "preview_next_topic": "In Phase 5, we explore runtime polymorphism, virtual functions, and abstract interfaces, allowing dynamically selected methods to run at execution time.",
+  "questions": [
+    {
+      "id": "Q1",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Access Specifiers in Inheritance",
+      "question": "Explain the behavioral difference between public, protected, and private inheritance specifiers on parent class members inside derived classes.",
+      "hint": "Consider how access modifications affect external consumers versus child subclasses.",
+      "answer": "Under public inheritance, public/protected members retain their access. Under protected inheritance, public/protected members become protected. Under private inheritance, all parent members become private."
+    },
+    {
+      "id": "Q2",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Construction and Destruction Lifecycles",
+      "question": "In a three-level hierarchy (A -> B -> C), trace the execution sequence of constructors and destructors during instantiation and destruction.",
+      "hint": "Recall that foundational memory elements must exist before child objects build on top of them.",
+      "answer": "Construction occurs: A first, then B, and then C. Destruction occurs in the reverse order: C first, then B, and then A."
+    },
+    {
+      "id": "Q3",
+      "difficulty": "Easy-Medium",
+      "type": "Practical",
+      "title": "Modeling a Corporate Hierarchy",
+      "question": "Implement an Employee base class with a string name and double salary. Create a Manager subclass that adds an array of managed departments.",
+      "hint": "Pass the initial values into the base class constructor from the child class initialization list.",
+      "answer": "class Employee {\nprotected:\n    std::string name;\n    double salary;\npublic:\n    Employee(std::string n, double s) : name(std::move(n)), salary(s) {}\n};\n\nclass Manager : public Employee {\nprivate:\n    std::vector<std::string> departments;\npublic:\n    Manager(std::string n, double s, std::vector<std::string> depts)\n        : Employee(std::move(n), s), departments(std::move(depts)) {}\n};"
+    },
+    {
+      "id": "Q4",
+      "difficulty": "Medium",
+      "type": "Debug",
+      "title": "Finding a Memory Leak",
+      "question": "Why does deleting a dynamically allocated Derived object via a Base class pointer cause memory leaks, and how can you fix it?",
+      "hint": "Check the destructor of the Base class.",
+      "answer": "It leaks resources because without a virtual base destructor, C++ calls only the base class destructor during cleanup. Mark the base destructor 'virtual' to ensure both derived and base classes are destructed."
+    },
+    {
+      "id": "Q5",
+      "difficulty": "Medium",
+      "type": "Practical",
+      "title": "Designing a Smart Device Simulator",
+      "question": "Write a base class 'Sensor' with an ID, and a subclass 'ThermalSensor' that tracks temperature thresholds using constructor delegation.",
+      "hint": "Delegate the ID value up to the parent constructor from the derived constructor.",
+      "answer": "class Sensor {\nprotected:\n    int id;\npublic:\n    Sensor(int sensor_id) : id(sensor_id) {}\n};\n\nclass ThermalSensor : public Sensor {\nprivate:\n    double temp_threshold;\npublic:\n    ThermalSensor(int id, double limit) : Sensor(id), temp_threshold(limit) {}\n};"
+    },
+    {
+      "id": "Q6",
+      "difficulty": "Medium-Hard",
+      "type": "Debug",
+      "title": "Resolving Hybrid Ambiguities",
+      "question": "Diagnose the compiler error when compiling this snippet:\nclass A { public: void play() {} };\nclass B : public A {};\nclass C : public A {};\nclass D : public B, public C {};\nint main() { D obj; obj.play(); }",
+      "hint": "This is the Diamond Problem; D inherits duplicate subobjects of A.",
+      "answer": "The call is ambiguous because 'play' exists in both B and C paths. Use virtual inheritance for B and C, or specify 'obj.B::play()' directly."
+    },
+    {
+      "id": "Q7",
+      "difficulty": "Hard",
+      "type": "Application",
+      "title": "Multi-parent Mixins",
+      "question": "Design an item system where an object is an Item and can also inherit behaviors from Enchantable and Stackable classes.",
+      "hint": "Use multiple inheritance with clear, isolated base classes.",
+      "answer": "class Item {\npublic:\n    virtual ~Item() = default;\n};\nclass Enchantable {\npublic:\n    virtual void enchant() = 0;\n};\nclass Stackable {\npublic:\n    virtual int get_max_stack() = 0;\n};\nclass MagicArrow : public Item, public Enchantable, public Stackable {\n    void enchant() override {}\n    int get_max_stack() override { return 64; }\n};"
+    },
+    {
+      "id": "Q8",
+      "difficulty": "Challenge",
+      "type": "Application",
+      "title": "Simulated Component System with RTTI",
+      "question": "Develop a component hierarchy where Entity classes can dynamically query base interfaces using custom RTTI identifiers or virtual methods.",
+      "hint": "Use virtual methods to identify object capabilities dynamically without relying on std::any.",
+      "answer": "class Component {\npublic:\n    virtual std::string get_type_name() const = 0;\n    virtual ~Component() = default;\n};\nclass PhysicsComponent : public Component {\npublic:\n    std::string get_type_name() const override { return \"Physics\"; }\n};"
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "M1",
+      "type": "Theory",
+      "question": "Which constructor and destructor order occurs when initializing an instance of a derived class?",
+      "options": {
+        "A": "Derived constructor runs first; Base destructor runs first.",
+        "B": "Base constructor runs first; Derived destructor runs first.",
+        "C": "Base constructor runs first; Base destructor runs first.",
+        "D": "Derived constructor runs first; Derived destructor runs first."
+      },
+      "answer": "B",
+      "explanation": "To build an object, foundational classes must initialize first (Base to Derived). When clean-up occurs, structures tear down in reverse order (Derived to Base)."
+    },
+    {
+      "id": "M2",
+      "type": "Theory",
+      "question": "If a child inherits from a parent using 'protected' inheritance, what do the public members of the parent become inside the child?",
+      "options": {
+        "A": "They remain public.",
+        "B": "They become private.",
+        "C": "They become protected.",
+        "D": "They become inaccessible."
+      },
+      "answer": "C",
+      "explanation": "Protected inheritance forces public and protected parent components to become protected within the child class."
+    },
+    {
+      "id": "M3",
+      "type": "Output Prediction",
+      "question": "What is the output of the following C++ program?\n#include <iostream>\nclass Parent {\npublic:\n    Parent() { std::cout << \"1\"; }\n};\nclass Child : public Parent {\npublic:\n    Child() { std::cout << \"2\"; }\n};\nint main() {\n    Child c;\n}",
+      "options": {
+        "A": "12",
+        "B": "21",
+        "C": "2",
+        "D": "1"
+      },
+      "answer": "A",
+      "explanation": "The Parent constructor must finish execution (printing '1') before the Child constructor body runs (printing '2')."
+    },
+    {
+      "id": "M4",
+      "type": "Output Prediction",
+      "question": "What is the output of this Multiple Inheritance snippet?\n#include <iostream>\nstruct X { X() { std::cout << \"X\"; } };\nstruct Y { Y() { std::cout << \"Y\"; } };\nstruct Z : public Y, public X { Z() { std::cout << \"Z\"; } };\nint main() { Z obj; }",
+      "options": {
+        "A": "XZY",
+        "B": "XYZ",
+        "C": "YXZ",
+        "D": "ZYX"
+      },
+      "answer": "C",
+      "explanation": "Base constructors are initialized in their order of declaration in the class inheritance list (Y, then X), followed by the child class constructor (Z)."
+    },
+    {
+      "id": "M5",
+      "type": "Output Prediction",
+      "question": "What happens when an object is sliced in this code?\n#include <iostream>\nstruct Base {\n    virtual void show() { std::cout << \"B\"; }\n};\nstruct Derived : public Base {\n    void show() override { std::cout << \"D\"; }\n};\nvoid print(Base b) { b.show(); }\nint main() {\n    Derived d;\n    print(d);\n}",
+      "options": {
+        "A": "Prints 'D'",
+        "B": "Prints 'B'",
+        "C": "Causes a compile-time error.",
+        "D": "Throws a runtime exception."
+      },
+      "answer": "B",
+      "explanation": "Passing 'd' by value to a function expecting 'Base' slices away the 'Derived' portion, creating a pure Base object that outputs 'B'."
+    },
+    {
+      "id": "M6",
+      "type": "Find the Bug",
+      "question": "What compile-time error occurs in this code?\n#include <iostream>\nclass Alpha { public: void perform() {} };\nclass Beta { public: void perform() {} };\nclass Gamma : public Alpha, public Beta {};\nint main() {\n    Gamma g;\n    g.perform();\n}",
+      "options": {
+        "A": "Gamma does not inherit public methods.",
+        "B": "The call is ambiguous since 'perform' exists in both parent classes.",
+        "C": "Gamma must declare virtual destructors.",
+        "D": "Multiple inheritance is not allowed in C++."
+      },
+      "answer": "B",
+      "explanation": "Because 'perform' is defined in both base classes, the compiler cannot determine which method to call on 'g'. This must be resolved using explicit scope resolution, such as 'g.Alpha::perform()'."
+    },
+    {
+      "id": "M7",
+      "type": "Find the Bug",
+      "question": "Why does the following code generate a compile-time error?\nclass Base {\nprotected:\n    int value = 10;\n};\nclass Derived : private Base {};\nint main() {\n    Derived d;\n    int v = d.value;\n}",
+      "options": {
+        "A": "Base variables cannot be accessed within the same folder.",
+        "B": "'value' is private inside 'Base'.",
+        "C": "Private inheritance makes 'value' inaccessible from outside the class hierarchy.",
+        "D": "Variables cannot be initialized inside class declarations."
+      },
+      "answer": "C",
+      "explanation": "Private inheritance makes all inherited members private in the child class, which prevents direct external access to 'value' from main."
+    },
+    {
+      "id": "M8",
+      "type": "Complete the Code",
+      "question": "Fill in the blank so that the derived constructor correctly calls the base constructor:\nclass Base { \npublic: \n    Base(int x) {} \n};\nclass Derived : public Base {\npublic:\n    Derived(int x, int y) : __________ {}\n};",
+      "options": {
+        "A": "Base(x)",
+        "B": "this->Base(x)",
+        "C": "parent::Base(x)",
+        "D": "x"
+      },
+      "answer": "A",
+      "explanation": "The base constructor is called in the initializer list using the base class's name with arguments: ': Base(x)'."
+    },
+    {
+      "id": "M9",
+      "type": "Complete the Code",
+      "question": "To resolve duplicate grandparent instances in a diamond hierarchy, complete the classes using the correct keyword:\nclass Grandparent {};\nclass ParentA : __________ public Grandparent {};\nclass ParentB : __________ public Grandparent {};\nclass Child : public ParentA, public ParentB {};",
+      "options": {
+        "A": "override",
+        "B": "virtual",
+        "C": "protected",
+        "D": "explicit"
+      },
+      "answer": "B",
+      "explanation": "Using 'virtual public' ensures only a single shared instance of the grandparent class is constructed in the final derived class layout."
+    },
+    {
+      "id": "M10",
+      "type": "Best Approach",
+      "question": "When modeling relationships in a system, which guideline best describes choosing between composition and inheritance?",
+      "options": {
+        "A": "Always prefer inheritance because it creates polymorphic classes.",
+        "B": "Prefer inheritance for 'HAS-A' relationships and composition for 'IS-A' relationships.",
+        "C": "Prefer composition ('HAS-A') unless you explicitly need polymorphism or interface-driven 'IS-A' relationships.",
+        "D": "Avoid using composition because it uses more heap memory."
+      },
+      "answer": "C",
+      "explanation": "Composition provides greater flexibility and looser coupling than inheritance, and should be used unless an 'IS-A' relationship is required for polymorphism."
+    }
+  ]
+}

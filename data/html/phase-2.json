@@ -1,0 +1,165 @@
+{ "phase_metadata": { "phase_number": 2, "title": "HTML Links and Media",
+"description": "Connecting pages through hyperlinks and enriching content with
+images, audio, and video.", "estimated_time": "2.5 Hours" },
+"learning_objectives": [ "Create hyperlinks to internal and external web pages",
+"Understand the difference between relative and absolute URLs", "Embed and
+optimize images with proper accessibility descriptions", "Implement audio and
+video players with user controls", "Add a favicon to the browser tab for
+branding" ], "prerequisites": [ "Completion of Phase 1 (HTML Basics)",
+"Understanding of basic HTML structure (head, body, tags)" ], "introduction":
+"Websites are not just static documents; they are a web of connected pages. In
+this phase, we learn how to create 'Hyperlinks' to navigate the internet. We
+will also explore how to add 'Media'—images, sounds, and videos—to make your
+website visually appealing and interactive.", "concept_explanation": {
+"anchor_tags": "The  (anchor) tag is used to create links. The most important
+attribute is 'href', which stands for Hypertext Reference. This tells the
+browser where to go when the link is clicked.", "relative_vs_absolute":
+"Absolute URLs are full addresses starting with 'https://' (used for external
+sites). Relative URLs point to files within your own project folder (e.g.,
+'about.html').", "images": "The  tag displays pictures. It is a 'void' tag,
+meaning it doesn't have a closing tag. It requires 'src' (source path) and 'alt'
+(alternate text for screen readers).", "media_elements": "The  and  tags allow
+you to embed multimedia. You must include the 'controls' attribute so users can
+play/pause.", "favicon": "A favicon is the small icon seen on the browser tab.
+It is defined in the  using the  tag." }, "syntax": { "link_syntax": "<a
+href="URL" target="_blank">Link Text", "image_syntax": "<img
+src="path/to/image.jpg" alt="Description" width="500">", "video_syntax": "<video
+src="video.mp4" controls>Your browser does not support video.",
+"favicon_syntax": "<link rel="icon" type="image/x-icon" href="favicon.ico">" },
+"breakdown_of_syntax": { "href": "The destination URL or file path.",
+"target_blank": "An attribute that tells the browser to open the link in a new
+tab.", "src": "The source path where the image or media file is stored.", "alt":
+"Text description of an image for accessibility and SEO; shown if the image
+fails to load.", "controls": "A boolean attribute that adds play, pause, and
+volume buttons to media.", "rel_icon": "In the favicon link, 'rel' defines the
+relationship (icon) and 'href' specifies the icon file." },
+"rules_and_key_points": { "rule_1": "Always provide 'alt' text for images to
+ensure accessibility (A11y).", "rule_2": "Use target="_blank" when linking to
+external websites to keep users on your site.", "rule_3": "Relative paths are
+better for local files as they don't break if you move the site to a new
+domain.", "rule_4": "Images should be in modern formats like WebP for better
+performance.", "rule_5": "The  tag is self-closing; do not use .", "rule_6":
+"Video and Audio tags need the 'controls' attribute, or they will be
+invisible/unplayable.", "rule_7": "Place the favicon  inside the  section
+only.", "rule_8": "SVG images are best for icons and logos because they don't
+lose quality when scaled.", "rule_9": "Use 'width' and 'height' attributes on
+images to prevent layout shifts during loading.", "rule_10": "Anchor tags can
+also link to email addresses using href="mailto:email@example.com"." },
+"code_example_1": { "title": "Creating Navigation and Images", "description": "A
+simple example showing a link to Google and a local image.", "code": "\n\n\n
+Links and Images\n\n\n Welcome to My Page\n \n Visit <a
+href="https://www.google.com\" target="_blank">Google to search the web.\n\n \n
+My Favorite Landscape\n <img src="https://example.com/nature.webp\" alt="A
+beautiful mountain landscape at sunset" width="400">\n\n" }, "code_example_2": {
+"title": "Embedding Video and Audio", "description": "How to add a video player
+and an audio clip with playback controls.", "code": "Check out this
+Video\n<video width="320" height="240" controls>\n <source src="movie.mp4"
+type="video/mp4">\n Your browser does not support the video tag.\n\n\nListen to
+the Podcast\n\n <source src="audio-file.mp3" type="audio/mpeg">\n Your browser
+does not support the audio element.\n" }, "output": "The user will see a
+heading, a clickable link that opens Google in a new tab, and a landscape image.
+Below that, there will be a video player with play/pause buttons and an audio
+player for music playback.", "step_by_step_dry_run": [ "The browser encounters 
+and creates a clickable area for the text 'Google'.", "Clicking the link
+triggers the 'href' attribute; since target='_blank' is present, a new tab
+opens.", "The browser hits  and looks for the file at the 'src' path.", "It
+reserves space based on the 'width' attribute and displays the 'alt' text while
+loading.", "The  tag is reached; the 'controls' attribute signals the browser to
+draw the play/pause/volume interface.", "The  tag inside the video tells the
+browser which file format to use." ], "memory_visualization": "Visualize a web
+of files: \n[index.html] --(link)--> [about.html] \n | \n +--(img src)-->
+[assets/photo.jpg] \n | \n +--(href)--> [https://external-site.com]",
+"real_world_use_cases": [ "Building a navigation bar to move between 'Home',
+'About', and 'Contact' pages.", "Adding a logo to the top of a webpage using the
+ tag.", "Embedding a product demo video on an e-commerce landing page.", "Adding
+a favicon so users can easily find your site among many open tabs.", "Creating
+'Download' links for PDF resumes or brochures." ], "common_mistakes": [
+"Forgetting the 'href' in an anchor tag, which makes it just plain text.",
+"Using a backslash (\) instead of a forward slash (/) in file paths.", "Missing
+the 'alt' attribute, which is bad for SEO and blind users.", "Forgetting the
+'controls' attribute in audio/video, making the media unplayable.", "Linking to
+a local file on your computer (C:\Users\...) instead of a relative path." ],
+"best_practices": [ "Use descriptive 'alt' text: 'Red sports car' is better than
+'image1'.", "Always use the 'width' and 'height' attributes to reserve space for
+images.", "Organize your images in an 'images' or 'assets' folder for a clean
+project structure.", "Use the .webp format for images to keep your website
+fast.", "Always provide a fallback message inside video/audio tags for old
+browsers." ], "faqs": [ { "question": "What happens if I don't put 'http://' in
+an external link?", "answer": "The browser will think it's a relative path and
+look for a file named 'www.google.com' inside your own folder, which will result
+in a 404 error." }, { "question": "Which image format is best for logos?",
+"answer": "SVG (Scalable Vector Graphics) is best for logos because it remains
+sharp at any size and has a small file size." } ], "summary": "In this phase, we
+learned how to make our web pages interactive and media-rich. We mastered the
+anchor tag for navigation, the image tag for visuals, and the audio/video tags
+for multimedia. We also learned how to properly path these files and the
+importance of accessibility through alt text.", "key_takeaways": [ "The  tag
+creates hyperlinks via the 'href' attribute.", "target='_blank' opens links in a
+new window/tab.", "Absolute URLs are for external sites; Relative URLs are for
+local files.", "The  tag is a void element that requires 'src' and 'alt'.", "Alt
+text is vital for accessibility and screen readers.", "Audio and Video tags must
+have the 'controls' attribute to be usable.", "Multiple  tags can be used for
+browser compatibility.", "Favicons are added in the  using .", "WebP and SVG are
+preferred modern image formats.", "Use forward slashes (/) for all paths in
+HTML." ], "preview_next_topic": "In Phase 3, we will learn how to organize
+information into structured lists and present data clearly using HTML tables.",
+"questions_and_answers": [ { "question": "What attribute is required to make a
+link actually point to a destination?", "answer": "The 'href' (Hypertext
+Reference) attribute.", "difficulty": "Easy Concept" }, { "question": "Explain
+the difference between src='image.jpg' and src='images/photo.jpg'.", "answer":
+"The first one looks for 'image.jpg' in the same folder as the HTML file. The
+second one looks inside a sub-folder named 'images' for a file named
+'photo.jpg'.", "difficulty": "Moderate Concept" }, { "question": "Write the code
+for a link that says 'Visit Portfolio' and opens 'portfolio.html' in a new
+tab.", "answer": "<a href="portfolio.html" target="blank">Visit Portfolio",
+"difficulty": "Moderate Practical" }, { "question": "Create an image element for
+'logo.png' that is 100 pixels wide and has a descriptive text for the blind.",
+"answer": "<img src="logo.png" alt="Company Logo" width="100">", "difficulty":
+"Hard Practical" }, { "question": "Why is the following code considered poor
+practice? <img src="cat.jpg">", "answer": "It is missing the 'alt' attribute.
+This makes the image inaccessible to screen readers and provides no context if
+the image fails to load.", "difficulty": "Moderate Mistake" }, { "question": "A
+student added <video src="clip.mp4"> but no video appears on the page. What is
+missing?", "answer": "The 'controls' attribute is missing. Without it, the
+browser doesn't show the play/pause interface, making the video invisible or
+unplayable.", "difficulty": "Hard Mistake" }, { "question": "Write a snippet
+that creates a small navigation menu with three links: Home, About, and
+Contact.", "answer": "\n <a href="index.html">Home\n <a
+href="about.html">About\n <a href="contact.html">Contact\n", "difficulty":
+"Moderate Coding" }, { "question": "Write the code to embed an audio file named
+'song.mp3' with controls and a fallback message for browsers that don't support
+it.", "answer": "\n <source src="song.mp3" type="audio/mpeg">\n Your browser
+does not support the audio element.\n", "difficulty": "Hard Coding" } ],
+"multiple_choice_questions": [ { "question": "Which attribute is used to open a
+link in a new tab?", "options": { "A": "target="new"", "B": "target="blank"",
+"C": "href="blank"", "D": "window="new"" }, "answer": "B", "type": "Theory" }, {
+"question": "Which tag is used to embed a sound file in HTML5?", "options": {
+"A": "", "B": "", "C": "", "D": "" }, "answer": "C", "type": "Theory" }, {
+"question": "If your HTML file is in the 'root' folder and your image is in a
+folder called 'pics', what is the correct src?", "options": { "A":
+"src="pics/image.jpg"", "B": "src="/image.jpg"", "C": "src="../image.jpg"", "D":
+"src="image.jpg"" }, "answer": "A", "type": "Output Prediction" }, { "question":
+"What will happen if you click a link with href="#"?", "options": { "A": "It
+opens a new tab", "B": "It goes to the top of the current page", "C": "It closes
+the browser", "D": "It deletes the page" }, "answer": "B", "type": "Output
+Prediction" }, { "question": "Predict the output: <a
+href="https://google.com">Click <img src="go.png" alt="Go">", "options": { "A":
+"It shows text 'Click' followed by a clickable image", "B": "It shows only the
+text 'Click'", "C": "It shows only the image", "D": "The image is not clickable"
+}, "answer": "A", "type": "Output Prediction" }, { "question": "Find the bug:
+<img src="dog.jpg" alt="A cute dog">", "options": { "A": "The src attribute is
+wrong", "B": "The alt attribute is mandatory", "C": "The  tag is a void element
+and should not have a closing  tag", "D": "There is no bug" }, "answer": "C",
+"type": "Find the Bug" }, { "question": "Find the bug: <a
+link="index.html">Home", "options": { "A": "The tag should be ", "B": "The
+attribute should be 'href' instead of 'link'", "C": "The text 'Home' should be
+an attribute", "D": "The closing tag is missing" }, "answer": "B", "type": "Find
+the Bug" }, { "question": "Complete the code for a favicon: <link rel=""
+href="fav.ico">", "options": { "A": "favicon", "B": "image", "C": "icon", "D":
+"shortcut" }, "answer": "C", "type": "Complete the Code" }, { "question":
+"Complete the code:  <source src="v.mp4"> ", "options": { "A": "play", "B":
+"buttons", "C": "controls", "D": "show" }, "answer": "C", "type": "Complete the
+Code" }, { "question": "What is the best approach for choosing an 'alt'
+attribute for a decorative line image?", "options": { "A": "alt="line"", "B":
+"alt="decorative line for styling"", "C": "alt="" (leave it empty)", "D": "Don't
+use the alt attribute at all" }, "answer": "C", "type": "Best Approach" } ] }

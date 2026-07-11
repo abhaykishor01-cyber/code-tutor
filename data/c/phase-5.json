@@ -1,0 +1,326 @@
+{
+  "metadata": {
+    "phaseNumber": 5,
+    "title": "Functions",
+    "duration": "6 hours",
+    "difficulty": "Intermediate"
+  },
+  "learningObjectives": [
+    "Deconstruct monolithic codebases into modular, cohesive, and reusable functions.",
+    "Contrast function declarations, definitions, and invocations while navigating scope boundaries.",
+    "Formulate actual and formal arguments and trace parameters passed via the Call-by-Value mechanism.",
+    "Analyze execution call stacks, visualize frame creation and destruction, and construct stable recursive routines.",
+    "Differentiate, evaluate, and employ the C storage classes (auto, register, static, and extern) to manage memory lifetime, visibility, and linkage."
+  ],
+  "prerequisites": [
+    "Phase 3: Control Flow (Conditional execution and loops)",
+    "Phase 2: Data Types, Variables, and Scope boundaries"
+  ],
+  "introduction": "In procedural systems programming, code complexity can quickly spin out of control if left structureless. Functions are the foundational tool C provides to partition large operations into logical, reusable, and isolated modules. By encapsulating logic within distinct execution contexts, functions allow developers to enforce encapsulation, eliminate redundant patterns (DRY - Don't Repeat Yourself), and write clean, maintainable systems. This phase dissects how variables travel across scopes, what happens in system memory (the Call Stack) when a function runs, how recursion leverages the stack for problem-solving, and how to govern variables' physical lifespans using storage classes.",
+  "conceptExplanation": "A function is an independent block of statements designed to perform a dedicated task. To fully harness functions in C, we must decouple their interface (what they do) from their implementation (how they do it). This introduces three primary stages: Declaration (notifying the compiler of the function's signature before it is called), Definition (supplying the actual logic enclosed in a block), and Call (initiating function execution by passing arguments). C strictly implements the 'Call-by-Value' mechanism. When a function is called, the system copies the values of the actual arguments into the formal parameters. Consequently, any modifications made to parameters within the function have no impact on the original caller's scope because they live in a distinct stack frame. Recursion is an elegant extension of this: a function references itself to solve progressively smaller instances of the same problem. Each invocation allocates a separate block of memory called an Activation Record (or Stack Frame) on the system execution stack. If a recursive call lacks a correct 'base case', it executes infinitely, consuming the stack and causing a critical system crash called a Stack Overflow. Lastly, to control the duration, scope, and linker visibility of variables, C provides Storage Classes. The default local storage class 'auto' exists on the stack only within the containing block. 'register' hints that a variable should be stored in high-speed CPU registers instead of RAM. 'static' allows a local variable to persist in the program's data segment across subsequent function calls. 'extern' tells the compiler that a variable or function is defined elsewhere in another source file, enabling multi-file program coordination.",
+  "syntax": "/* 1. Function Declaration (Prototype) */\nreturn_type function_name(parameter_type1 param1, parameter_type2 param2);\n\n/* 2. Function Definition */\n[storage_class] return_type function_name(parameter_type1 param1, parameter_type2 param2) {\n    // Function body (local statements)\n    return expression; // Optional if return_type is void\n}\n\n/* 3. Function Call */\nreturn_type variable = function_name(actual_arg1, actual_arg2);\n\n/* 4. Storage Class Specifiers */\nauto int local_var = 10;\nregister int quick_counter = 0;\nstatic int persistent_state = 5;\nextern int shared_global_var;",
+  "syntaxBreakdown": [
+    "return_type: Specifies the data type of the value returned by the function. Use 'void' if no value is returned.",
+    "function_name: A unique identifier conforming to standard C naming conventions.",
+    "parameter_list: Comma-separated formal parameters with types. Acts as a placeholder local to the function frame.",
+    "storage_class: Specifier (auto, register, static, extern) dictating lifetime, linkage, and physical memory placement of a variable.",
+    "return expression: Transports control and a result value back to the caller's evaluation context."
+  ],
+  "rulesAndKeyPoints": [
+    "Implicit Declaration rule: Always declare your functions before invocation, or define them physically higher in the source code than where they are called. Calling undeclared functions leads to compiler errors or undefined behavior in modern C.",
+    "Call-by-Value isolation: Formal parameters are completely local variables initialized with copies of actual argument values. Changes to parameters do not propagate back to the caller.",
+    "No Nested Functions: Standard ANSI C does not permit defining a function inside another function. All functions must be defined globally at the file level.",
+    "Recursive Base Case: Every recursive routine must contain at least one terminal path (base case) that does not execute a recursive call, preventing infinite stack growth.",
+    "Storage Class Restrictions: The address-of operator '&' cannot be applied to variables declared with the 'register' storage class because registers do not reside at memory addresses within RAM."
+  ],
+  "codeExample1": {
+    "title": "Standard Functional Mechanics, Call-by-Value, and Persistent Local State (Static Storage Class)",
+    "code": "#include <stdio.h>\n\n// Function declarations (prototypes)\nvoid testCallByValue(int dynamicParam);\nint getPersistentID(void);\n\nint main(void) {\n    int originalVar = 100;\n    \n    printf(\"[MAIN] Original value before function call: %d\\n\", originalVar);\n    \n    // Call by Value invocation: copy of originalVar is passed\n    testCallByValue(originalVar);\n    \n    printf(\"[MAIN] Original value after function call: %d (Unchanged!)\\n\\n\", originalVar);\n    \n    // Call a function that uses a static local variable\n    printf(\"[MAIN] Unique ID Call 1: %d\\n\", getPersistentID());\n    printf(\"[MAIN] Unique ID Call 2: %d\\n\", getPersistentID());\n    printf(\"[MAIN] Unique ID Call 3: %d\\n\", getPersistentID());\n    \n    return 0;\n}\n\n// Function Definitions\nvoid testCallByValue(int dynamicParam) {\n    printf(\"[FUNC] Received local copy: %d\\n\", dynamicParam);\n    dynamicParam += 50; // Modify only the local parameter variable\n    printf(\"[FUNC] Modified copy inside function: %d\\n\", dynamicParam);\n}\n\nint getPersistentID(void) {\n    // Static variable is initialized only ONCE when the program starts\n    // Its value persists in memory for the lifetime of the program execution\n    static int generatedID = 1000;\n    generatedID++;\n    return generatedID;\n}",
+    "explanation": "This program highlights scope boundaries. Inside 'main', 'originalVar' is initialized to 100. When 'testCallByValue' is called, its value is copied into 'dynamicParam'. Modifying 'dynamicParam' to 150 inside the function doesn't affect 'originalVar' in 'main', demonstrating Call-by-Value. In contrast, 'getPersistentID' utilizes a local 'static' variable. Unlike 'auto' variables which are destroyed upon function return, the 'static' variable 'generatedID' is allocated in the global data region and survives across calls, incrementing sequentially on each invocation (returning 1001, 1002, 1003)."
+  },
+  "codeExample2": {
+    "title": "System Recursion and Call Stack Propagation (Factorial with Stack Tracing)",
+    "code": "#include <stdio.h>\n\n// Recursive function to compute factorial of a number\nunsigned long long calculateFactorial(int n) {\n    // Print statement to trace Stack Frame activation\n    printf(\"Entering Stack Frame: calculateFactorial(n = %d) at address: %p\\n\", n, (void*)&n);\n    \n    // 1. Base Case: Prevent infinite recursion\n    if (n <= 1) {\n        printf(\"  -> Base case reached! Returning 1 from Frame (n = %d)\\n\", n);\n        return 1;\n    }\n    \n    // 2. Recursive Case\n    unsigned long long subResult = calculateFactorial(n - 1);\n    unsigned long long finalResult = n * subResult;\n    \n    printf(\"Exiting Stack Frame: calculateFactorial(n = %d) with return value: %llu\\n\", n, finalResult);\n    return finalResult;\n}\n\nint main(void) {\n    int targetNumber = 4;\n    printf(\"[MAIN] Initiating execution of calculateFactorial(%d)\\n\\n\", targetNumber);\n    \n    unsigned long long result = calculateFactorial(targetNumber);\n    \n    printf(\"\\n[MAIN] Final computed result: %llu\\n\", result);\n    return 0;\n}",
+    "explanation": "This example visually exposes the mechanics of recursion and the Call Stack. Each recursive call allocates a new stack frame (containing its unique variable 'n' located at distinct memory addresses). The stack grows downward (to lower addresses) or upward based on compilation settings, nesting execution context. When 'n' is reduced to 1, the base case executes, stopping the descent. The stack then winds backward (unwinding), calculating the intermediate products from the deepest frame back to the parent frame, finally returning the complete calculation to main.",
+    "expectedOutput": "[MAIN] Initiating execution of calculateFactorial(4)\n\nEntering Stack Frame: calculateFactorial(n = 4) at address: 0x7ffd5f7c32ac\nEntering Stack Frame: calculateFactorial(n = 3) at address: 0x7ffd5f7c327c\nEntering Stack Frame: calculateFactorial(n = 2) at address: 0x7ffd5f7c324c\nEntering Stack Frame: calculateFactorial(n = 1) at address: 0x7ffd5f7c321c\n  -> Base case reached! Returning 1 from Frame (n = 1)\nExiting Stack Frame: calculateFactorial(n = 2) with return value: 2\nExiting Stack Frame: calculateFactorial(n = 3) with return value: 6\nExiting Stack Frame: calculateFactorial(n = 4) with return value: 24\n\n[MAIN] Final computed result: 24"
+  },
+  "stepByStepDryRun": [
+    "Step 1: 'main' is loaded onto the stack frame. It allocates space for variable 'targetNumber' and initializes it to 4.",
+    "Step 2: 'main' invokes 'calculateFactorial(4)'. A new stack frame for calculateFactorial(4) is pushed. Parameter 'n' is assigned 4. The comparison 'n <= 1' (4 <= 1) yields false.",
+    "Step 3: calculateFactorial(4) pauses at line 14, awaiting the result of 'calculateFactorial(3)'. A new stack frame is pushed on top of the stack. Parameter 'n' is assigned 3.",
+    "Step 4: This process repeats. Stack frames for calculateFactorial(2) and calculateFactorial(1) are successively pushed onto the Call Stack. At this point, 5 stack frames coexist (main, frame(4), frame(3), frame(2), frame(1)).",
+    "Step 5: Inside the frame for calculateFactorial(1), the base case condition 'n <= 1' (1 <= 1) evaluates to true. It directly returns 1 without further recursive calls.",
+    "Step 6: Frame(1) is popped off the Call Stack. Execution control resumes inside Frame(2) at the point of suspension. 'subResult' receives 1. The formula evaluates: 2 * 1 = 2. Frame(2) returns 2 and is popped off.",
+    "Step 7: This execution unwinds recursively. Frame(3) receives subResult = 2, computes 3 * 2 = 6, and pops. Frame(4) receives subResult = 6, computes 4 * 6 = 24, and returns 24.",
+    "Step 8: Execution control lands back inside 'main'. The computed value 24 is printed, and 'main' returns 0, destroying the final active stack frame."
+  ],
+  "memoryVisualization": {
+    "type": "Call Stack Frame Layout",
+    "description": "The layout of active Activation Records (Frames) on the execution stack during the execution of recursive calculateFactorial(3). This diagram illustrates active storage contexts, parameters, return pointers, and how they stack in memory.",
+    "nodes": [
+      {
+        "label": "Stack Frame: calculateFactorial(1)",
+        "value": "n = 1 [base case reached, returns 1]",
+        "address": "0x7FFF0040",
+        "color": "emerald"
+      },
+      {
+        "label": "Stack Frame: calculateFactorial(2)",
+        "value": "n = 2 [blocked, waiting on calculateFactorial(1)]",
+        "address": "0x7FFF0080",
+        "color": "sky"
+      },
+      {
+        "label": "Stack Frame: calculateFactorial(3)",
+        "value": "n = 3 [blocked, waiting on calculateFactorial(2)]",
+        "address": "0x7FFF00C0",
+        "color": "amber"
+      },
+      {
+        "label": "Stack Frame: main()",
+        "value": "targetNumber = 3 [waiting for call result]",
+        "address": "0x7FFF0100",
+        "color": "violet"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Directory Structure Traversal: Reading hierarchical folder directories on operating systems using recursive file search APIs.",
+    "Unique Resource Identifier Allocators: Utilizing local 'static' storage variables in database drivers or socket handlers to hand out incrementally generated local sequence numbers securely without polluting global namespaces.",
+    "External Library Integration: Using 'extern' to integrate global system configuration parameters defined in a device driver config file across separate user-space modular application layers."
+  ],
+  "commonMistakes": [
+    "Omission of function prototype: Calling a function before declaring it can lead to compilation errors or lead the compiler to assume an incorrect return type, causing undefined data conversion issues.",
+    "Confusing Local Copies with Original Variables: Attempting to modify a variable's value inside a function using call-by-value and expecting it to persist in the caller's context.",
+    "Stack Overflow due to Infinite Recursion: Omitting a base case or creating a base case that is mathematically unreachable (e.g. testing for 'n == 0' with 'n -= 2' on odd inputs), filling up physical system stack space.",
+    "Applying Address-of Operator on 'register' variable: Attempting to retrieve a memory address using '&' on registers, which leads directly to an absolute compilation error.",
+    "Misinterpreting Static Scope: Believing a 'static' local variable can be modified or accessed outside its enclosing function block. Its lifetime persists globally, but its scope remains strictly restricted to its container."
+  ],
+  "bestPractices": [
+    "Strictly follow the Single Responsibility Principle (SRP): Design each function to perform exactly one task and perform it reliably.",
+    "Enforce Prototypes: Ensure every function prototype is visible to calls, preferably grouping external signatures in clean headers.",
+    "Prevent Memory Footprint Waste: Use recursion sparingly. Ensure the base-case is thoroughly bounded. If efficiency and runtime stack overhead are performance bottlenecks, use iterative loop patterns instead.",
+    "Limit Variable Scope and Visibility: Keep global variables to a absolute minimum. Use local 'static' storage classes instead of public globally scoped definitions whenever possible to avoid namespace collision.",
+    "Always specify 'void' explicitly in parameters if a function does not accept arguments: e.g. 'int fetchCode(void);' rather than 'int fetchCode();' to prevent old-style ambiguous arguments passing compilation."
+  ],
+  "faqs": [
+    {
+      "question": "What is the key functional difference between local static variables and global variables?",
+      "answer": "Lifetime and Scope bounds. Both persistent structures reside inside the global data segment and exist for the program's entire runtime. However, a global variable is visible to any block within the file (and potentially external files with 'extern'), while a local static variable is strictly restricted to its declaring function block, keeping the variable's state safe from unexpected outer-scope modifications."
+    },
+    {
+      "question": "Can C simulate passing variables by reference since it only supports Call-by-Value?",
+      "answer": "Yes, C achieves Call-by-Reference behavior by passing a memory address (pointer) by value. When you pass a pointer variable to a function, the address value itself is copied. However, because this copied address points to the original variable, dereferencing the copied pointer lets the function modify the original variable in the caller's scope. This is explored fully in Phase 6."
+    },
+    {
+      "question": "Why does a modern C compiler sometimes ignore the 'register' storage class specifier?",
+      "answer": "The 'register' keyword is merely a optimization hint. Modern compilers use sophisticated register allocation algorithms that perform far better static-analysis than manual directives. Modern optimizers typically treat the 'register' keyword as a design indicator rather than a hard command, though they still strictly enforce the rule that prohibits taking the address of a 'register' variable."
+    }
+  ],
+  "summary": "This phase provided a deep dive into C functions, parameter passing, and storage class mechanics. We explored functional decomposition, scope isolation, and call-by-value behaviors. We traced stack frame allocation and destruction during nested function and recursive calls. Finally, we studied storage classes, which provide fine-grained control over variable lifetime, scope, and physical location.",
+  "keyTakeaways": [
+    "Functions partition monolithic operations into clean, testable, and reusable blocks.",
+    "The Call-by-Value design guarantees isolation: passing variables copies their values, protecting calling frames from unmanaged local alterations.",
+    "Every recursive descent depends on a sound base case condition to prevent stack exhaustion.",
+    "The storage class controls lifetime and linkage: static variables retain their states across subsequent calls, and extern connects variables across compilation modules."
+  ],
+  "nextTopicPreview": "In Phase 6: Pointers and Memory Management, we will study low-level hardware interaction. We will explore how passing pointer references breaks call-by-value boundaries, enabling direct address manipulations and dynamic memory allocation.",
+  "questionsAndAnswers": [
+    {
+      "id": "q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What is the semantic difference between a Function Prototype (Declaration) and a Function Definition?",
+      "answer": "A Function Prototype acts as an interface specification. It informs the compiler of the return type, the function name, and its parameter list, allowing the compiler to validate calls and verify type safety before it has parsed the function's internal logic. A Function Definition is the physical implementation of the function, containing the opening/closing braces and the actual executable statements. Declarations describe the function's signature, while definitions describe the function's behavior.",
+      "explanation": "Declaring functions at the top of a file or in a header file allows for clean organization. The definition can reside anywhere in the file or even in a separate compilation unit."
+    },
+    {
+      "id": "q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "How does using the 'static' specifier on a global file-scope variable affect its linkage compared to a standard global variable?",
+      "answer": "When the 'static' specifier is applied to a global variable (outside of any function), it limits the variable's linkage to internal linkage. This means the global variable is visible only to functions within that specific translation unit (.c file). Any attempts to reference it from other files using the 'extern' keyword will result in linker errors. In contrast, a standard global variable has external linkage and is accessible across multiple source files.",
+      "explanation": "This is a key systems programming technique used to prevent namespace pollution. It hides module implementation details and prevents global variable name collisions across compiled objects."
+    },
+    {
+      "id": "q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Trace the exact output of the following code:\n#include <stdio.h>\nint computeAccumulation(int x) {\n    static int total = 0;\n    total += x;\n    return total;\n}\nint main(void) {\n    printf(\"%d \", computeAccumulation(5));\n    printf(\"%d \", computeAccumulation(15));\n    printf(\"%d\", computeAccumulation(-10));\n    return 0;\n}",
+      "answer": "The output of the code is: '5 20 10'",
+      "explanation": "On the first call to computeAccumulation(5), the static variable 'total' is initialized to 0. 5 is added, setting it to 5 and returning 5. On the second call computeAccumulation(15), the initialization 'static int total = 0' is skipped because 'total' already exists. 15 is added to the existing 5, setting 'total' to 20 and returning 20. On the third call computeAccumulation(-10), -10 is added to 20, leaving 'total' at 10, which is returned. This demonstrates how static variables preserve their values across calls."
+    },
+    {
+      "id": "q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Analyze and explain what occurs in the system if file_a.c defines 'int systemValue = 42;' and file_b.c defines 'static int systemValue = 99;' inside a shared application workspace.",
+      "answer": "The program will compile and link successfully without duplicate symbol errors. 'static int systemValue = 99;' inside file_b.c has internal linkage, restricting its visibility to file_b.c. Inside file_b.c, any reference to 'systemValue' will safely resolve to the local static variable (value 99). Meanwhile, file_a.c defines 'systemValue = 42' with external linkage, making it accessible to any other file using 'extern int systemValue;'. Because file_b.c declared its 'systemValue' as static, they are treated as two separate, isolated variables.",
+      "explanation": "Static linkage creates private namespaces. This helps prevent conflicts when integrating multiple third-party libraries that might use identical variable names."
+    },
+    {
+      "id": "q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Diagnose the error in this recursive function. What happens when calling computePower(2, -3)?\n\nint computePower(int base, int exp) {\n    if (exp == 0) return 1;\n    return base * computePower(base, exp - 1);\n}",
+      "answer": "The error is that the recursive function fails to handle negative exponents, resulting in infinite recursion and a stack overflow.",
+      "explanation": "When computePower(2, -3) is called, the base case checking for 'exp == 0' is bypassed because -3 does not equal 0. The next call is computePower(2, -4), then computePower(2, -5), and so on. The exponent decrements indefinitely, moving away from the base case of 0. Stack frames accumulate rapidly until physical system memory is exhausted, leading to a stack overflow crash."
+    },
+    {
+      "id": "q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "A developer writes the following code to swap two numbers but notices the numbers do not swap in main. Why does this swap fail, and how does the call-by-value mechanism explain this behavior?\n\nvoid swapValues(int a, int b) {\n    int temp = a;\n    a = b;\n    b = temp;\n}\nint main(void) {\n    int x = 10, y = 20;\n    swapValues(x, y);\n    return 0;\n}",
+      "answer": "The swap fails because C uses a call-by-value mechanism for passing arguments.",
+      "explanation": "When swapValues(x, y) is called, the values of 'x' (10) and 'y' (20) are copied into newly allocated formal parameters 'a' and 'b' on swapValues's stack frame. Inside swapValues, 'a' and 'b' are swapped successfully within their local scope. However, when swapValues returns, its stack frame is destroyed along with 'a' and 'b'. The variables 'x' and 'y' in main's stack frame remain untouched because swapValues never had access to their memory locations."
+    },
+    {
+      "id": "q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write a self-contained helper function 'isPrime' that takes an integer and returns 1 if the number is prime, or 0 otherwise. Include a prototype and explain the execution boundary conditions.",
+      "answer": "Here is the code:\n\n#include <stdio.h>\n\n// Prototype\nint isPrime(int val);\n\nint isPrime(int val) {\n    if (val <= 1) return 0; // Check boundary cases\n    if (val == 2) return 1; // 2 is prime\n    if (val % 2 == 0) return 0; // Eliminate even numbers\n    \n    // Test odd factors up to the square root of val\n    for (int i = 3; i * i <= val; i += 2) {\n        if (val % i == 0) {\n            return 0; // Found a factor, not prime\n        }\n    }\n    return 1; // Prime\n}",
+      "explanation": "The function checks several boundary conditions. Numbers less than or equal to 1 are not prime. 2 is identified as a prime, and all other even numbers are excluded. The loop then tests odd factors up to the square root of the value, which reduces the number of iterations and improves efficiency."
+    },
+    {
+      "id": "q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Write a recursive function 'fibonacci' to calculate the Nth number in the Fibonacci sequence (N=0 returns 0, N=1 returns 1). Analyze the call tree and explain why this recursion can be computationally inefficient.",
+      "answer": "Here is the code:\n\n#include <stdio.h>\n\nunsigned long long fibonacci(int n) {\n    if (n < 0) return 0; // Handle invalid bounds\n    if (n == 0) return 0; // Base Case 1\n    if (n == 1) return 1; // Base Case 2\n    return fibonacci(n - 1) + fibonacci(n - 2);\n}",
+      "explanation": "While this recursive implementation matches the mathematical definition of the Fibonacci sequence, it is highly inefficient for larger values of N. This is due to its O(2^N) exponential time complexity. The function makes two recursive calls at each step, resulting in a binary recursion tree with many redundant calculations. For example, to calculate fibonacci(5), fibonacci(3) is calculated twice, and fibonacci(2) is calculated three times. This redundancy increases rapidly as N grows."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "category": "Theory",
+      "question": "Which of the following statements accurately describes the lifetime and scope of a local static variable in C?",
+      "options": {
+        "A": "Its scope is global, but its lifetime is limited to the function execution.",
+        "B": "Its scope is limited to the function block, but its lifetime extends for the entire duration of the program.",
+        "C": "Both its scope and lifetime are restricted to the execution of the declaring function.",
+        "D": "It is allocated on the runtime heap and accessible by any thread in any file."
+      },
+      "correctOption": "B",
+      "explanation": "A local static variable is allocated in the program's permanent data segment, giving it a lifetime that lasts until the program terminates. However, its scope is restricted to the function block where it is defined, meaning it cannot be referenced outside of that function."
+    },
+    {
+      "id": "m2",
+      "category": "Theory",
+      "question": "Why is it illegal to retrieve the memory address of a 'register' storage class variable using the address-of operator (&)?",
+      "options": {
+        "A": "Register variables are stored in the CPU registers, which do not reside within the system RAM address space.",
+        "B": "The compiler automatically promotes register variables to static variables.",
+        "C": "Register variables do not have names in the symbol table.",
+        "D": "The & operator is only valid for variables allocated on the heap."
+      },
+      "correctOption": "A",
+      "explanation": "The address-of operator (&) queries a variable's address within the system RAM. If the compiler successfully allocates a variable to a CPU register, it does not reside in RAM and therefore does not have a standard memory address, making the use of '&' illegal."
+    },
+    {
+      "id": "m3",
+      "category": "Output Prediction",
+      "question": "Predict the output of the following code snippet:\n#include <stdio.h>\nvoid incrementValue(int val) {\n    val++;\n}\nint main(void) {\n    int val = 42;\n    incrementValue(val);\n    printf(\"%d\", val);\n    return 0;\n}",
+      "options": {
+        "A": "43",
+        "B": "42",
+        "C": "0",
+        "D": "Compilation Error"
+      },
+      "correctOption": "B",
+      "explanation": "Because C utilizes Call-by-Value parameter passing, 'incrementValue' receives a copy of 'val'. The increment operation inside the function only modifies this local copy. The original 'val' variable in main remains unchanged at 42."
+    },
+    {
+      "id": "m4",
+      "category": "Output Prediction",
+      "question": "What will be printed when the following recursive function is called as 'traceOutput(3)'?\nvoid traceOutput(int n) {\n    if (n == 0) return;\n    printf(\"%d \", n);\n    traceOutput(n - 1);\n    printf(\"%d \", n);\n}",
+      "options": {
+        "A": "3 2 1 1 2 3",
+        "B": "3 2 1 3 2 1",
+        "C": "3 2 1",
+        "D": "1 2 3 3 2 1"
+      },
+      "correctOption": "A",
+      "explanation": "As the recursion descends, 'printf(\"%d \", n)' prints the current value before calling 'traceOutput(n - 1)'. This outputs '3 2 1'. Once 'n' reaches 0, the function returns and begins unwinding the stack. The remaining statements are executed in reverse order, printing '1 2 3'. The combined output is '3 2 1 1 2 3'."
+    },
+    {
+      "id": "m5",
+      "category": "Output Prediction",
+      "question": "What is the output of the following code sequence?\n#include <stdio.h>\nint compute(void) {\n    static int x = 5;\n    x *= 2;\n    return x;\n}\nint main(void) {\n    int a = compute();\n    int b = compute();\n    printf(\"%d %d\", a, b);\n    return 0;\n}",
+      "options": {
+        "A": "10 10",
+        "B": "10 20",
+        "C": "5 10",
+        "D": "Compilation Error"
+      },
+      "correctOption": "B",
+      "explanation": "On the first call to compute(), 'x' is initialized to 5. It is multiplied by 2, setting it to 10, which is returned. On the second call to compute(), the static variable 'x' retains its value of 10. It is multiplied by 2 again, setting it to 20, which is returned. Therefore, the values returned are 10 and 20."
+    },
+    {
+      "id": "m6",
+      "category": "Find the Bug",
+      "question": "Identify the compiler error in the following code snippet:",
+      "options": {
+        "A": "C does not allow function declarations to be placed in global scope.",
+        "B": "The compiler cannot evaluate '&myCounter' because 'register' variables do not have accessible RAM addresses.",
+        "C": "The variable 'myCounter' is not initialized correctly.",
+        "D": "You cannot initialize a register variable inside the main function."
+      },
+      "correctOption": "B",
+      "explanation": "Applying the address-of operator (&) to a variable declared with the 'register' storage class will trigger a compile-time error, because register variables are meant to be kept in high-speed registers rather than addressable RAM."
+    },
+    {
+      "id": "m7",
+      "category": "Find the Bug",
+      "question": "What bug is present in the following program? (Assuming standard compilation settings)\n\n#include <stdio.h>\nint main(void) {\n    int res = multiply(3, 4);\n    printf(\"%d\", res);\n    return 0;\n}\nint multiply(int a, int b) {\n    return a * b;\n}",
+      "options": {
+        "A": "There is a syntax error in the return statement.",
+        "B": "The 'multiply' function is called before it is declared or defined in the compilation unit.",
+        "C": "The main function cannot call functions that return integers.",
+        "D": "The parameters 'a' and 'b' must be declared as static."
+      },
+      "correctOption": "B",
+      "explanation": "In standard C, functions must be declared or defined before they can be called. Calling 'multiply' before its declaration or definition will result in a compiler error or warning about an implicit declaration."
+    },
+    {
+      "id": "m8",
+      "category": "Complete the Code",
+      "question": "Choose the correct code snippet to complete this recursive power calculation function:\n\ndouble power(double base, int exp) {\n    /* BASE CASE MISSING */\n    if (exp > 0) return base * power(base, exp - 1);\n    if (exp < 0) return (1.0 / base) * power(base, exp + 1);\n}",
+      "options": {
+        "A": "if (exp == 0) return 0.0;",
+        "B": "if (exp == 0) return 1.0;",
+        "C": "if (exp == 1) return base;",
+        "D": "if (exp == 0) return base;"
+      },
+      "correctOption": "B",
+      "explanation": "Any number to the power of 0 is 1.0. This acts as the base case for the recursion, stopping further division or multiplication."
+    },
+    {
+      "id": "m9",
+      "category": "Complete the Code",
+      "question": "How do you declare a global variable 'appConfigCode' defined in another file (config.c) to make it accessible inside main.c?",
+      "options": {
+        "A": "static int appConfigCode;",
+        "B": "extern int appConfigCode;",
+        "C": "auto int appConfigCode;",
+        "D": "register int appConfigCode;"
+      },
+      "correctOption": "B",
+      "explanation": "The 'extern' keyword tells the compiler that the variable 'appConfigCode' is defined in another translation unit, allowing the linker to resolve its address."
+    },
+    {
+      "id": "m10",
+      "category": "Best Approach",
+      "question": "What is the best design approach to limit the scope of a global state variable to a single file, avoiding namespace pollution and conflict with other modules?",
+      "options": {
+        "A": "Declare the variable inside the header file as 'extern'.",
+        "B": "Declare the variable as a 'static' global variable at the top of the source file.",
+        "C": "Pass the variable by value to every function in the project.",
+        "D": "Declare the variable using the 'register' storage class inside main."
+      },
+      "correctOption": "B",
+      "explanation": "Declaring a global variable as 'static' limits its scope to the file in which it is defined. This prevents conflicts with variables of the same name in other source files."
+    }
+  ]
+}

@@ -1,0 +1,263 @@
+{
+  "phase_metadata": {
+    "phase_number": 13,
+    "phase_name": "Web Basics with Python",
+    "description": "Connecting Python to the internet. Learn to consume external data using the Requests library and build your own web servers using the Flask framework.",
+    "estimated_time": "10 Hours"
+  },
+  "learning_objectives": [
+    "Understand the HTTP Request-Response lifecycle and status codes.",
+    "Consume REST APIs to fetch and send data using the Requests library.",
+    "Build a functional local web server using the Flask framework.",
+    "Implement dynamic routing and template rendering in web applications.",
+    "Master JSON serialization and deserialization for web data exchange."
+  ],
+  "prerequisites": [
+    "Phase 6: Data Structures (Dictionaries are essential for JSON).",
+    "Phase 9: Modules and Pip (Installing external libraries).",
+    "Phase 11: Advanced Python (Understanding Decorators for Flask routing)."
+  ],
+  "introduction": "So far, your Python programs have lived inside your computer. In Phase 13, we break those boundaries. You will learn how Python talks to other computers over the internet using HTTP. Whether you want to pull live weather data, automate social media, or build your own website, these tools are the bridge. We focus on two industry standards: 'Requests' for acting as a client (fetching data) and 'Flask' for acting as a server (providing data).",
+  "concept_explanation": {
+    "http_protocol": "HyperText Transfer Protocol is the language of the web. A Client (your script) sends a Request (GET/POST), and a Server (Google, Facebook) sends back a Response (HTML, JSON) plus a Status Code (like 200 OK or 404 Not Found).",
+    "requests_library": "A human-friendly Python library used to send HTTP requests. It handles the complexity of sockets and headers, letting you fetch data in just one line of code.",
+    "flask_framework": "A 'micro' web framework. Unlike heavy frameworks, Flask gives you the bare essentials to build a web server. It uses Decorators to map URLs (like /home) to Python functions.",
+    "rest_api": "Representational State Transfer. It is a set of rules for how computers should exchange data. Usually, it involves sending and receiving JSON (JavaScript Object Notation), which Python handles as a dictionary.",
+    "routing": "The process of mapping a URL path to a specific piece of code. In Flask, this determines what happens when a user visits 'yoursite.com/profile'."
+  },
+  "syntax": {
+    "requests_get": "import requests\nresponse = requests.get('https://api.example.com/data')\ndata = response.json()",
+    "flask_app": "from flask import Flask\napp = Flask(__name__)\n\n@app.route('/')\ndef home():\n    return 'Hello World'",
+    "json_handling": "import json\njson_string = json.dumps(my_dict)  # Dict to String\nmy_dict = json.loads(json_string)  # String to Dict"
+  },
+  "syntax_breakdown": {
+    "response_json": "The .json() method in Requests automatically converts a raw JSON string from a website into a Python dictionary or list.",
+    "app_route_decorator": "The @app.route('/') tells Flask: 'When the user visits the root address, run the function immediately below this line.'",
+    "__name___argument": "Flask(__name__) helps the framework locate resources like templates and static files relative to the script's location.",
+    "status_codes": "response.status_code allows you to check if a request succeeded (200-299) or failed (400+)."
+  },
+  "rules_and_key_points": [
+    "HTTP GET is for fetching data; POST is for sending/creating data.",
+    "Status code 200 means success; 404 means the page/resource doesn't exist.",
+    "Flask routes must return a string, a dictionary, or a Response object.",
+    "JSON keys must be strings enclosed in double quotes.",
+    "The 'Requests' library must be installed via 'pip install requests'.",
+    "Flask's default port is 5000.",
+    "Always use 'with' or close connections when handling sessions (though Requests handles most automatically).",
+    "Never hardcode API keys in your scripts; use environment variables.",
+    "API documentation is your best friend—always check the expected JSON structure.",
+    "The 'requests.post()' method uses the 'json=' parameter to send data automatically."
+  ],
+  "code_example_1": {
+    "title": "Consuming a Public API",
+    "description": "Fetching real data from a sample API and checking for errors.",
+    "code": "import requests\n\ndef get_user_data(user_id):\n    url = f'https://jsonplaceholder.typicode.com/users/{user_id}'\n    try:\n        response = requests.get(url)\n        # Raise an error if the status is 4xx or 5xx\n        response.raise_for_status()\n        \n        user = response.json()\n        return f\"User: {user['name']}, Email: {user['email']}\"\n    except requests.exceptions.HTTPError as err:\n        return f\"Error occurred: {err}\"\n\nprint(get_user_data(1))\nprint(get_user_data(999)) # Likely returns a 404",
+    "output": "User: Leanne Graham, Email: Sincere@april.biz\nError occurred: 404 Client Error: Not Found for url..."
+  },
+  "code_example_2": {
+    "title": "Creating a Simple JSON API with Flask",
+    "description": "A basic server that returns different data based on the URL.",
+    "code": "from flask import Flask, jsonify\n\napp = Flask(__name__)\n\n# Database simulation\nproducts = [\n    {'id': 1, 'name': 'Laptop', 'price': 999},\n    {'id': 2, 'name': 'Mouse', 'price': 25}\n]\n\n@app.route('/')\ndef index():\n    return \"Welcome to the Store API! Visit /api/products\"\n\n@app.route('/api/products')\ndef get_products():\n    # jsonify converts Python lists/dicts into real JSON responses\n    return jsonify(products)\n\nif __name__ == '__main__':\n    # In a real script, this starts the server\n    # app.run(debug=True)\n    pass",
+    "output": "Server starts at http://127.0.0.1:5000/"
+  },
+  "dry_run": {
+    "step_1": "The Flask app is initialized and the @app.route decorators register paths in a 'URL Map'.",
+    "step_2": "The script enters the app.run() loop, waiting for incoming network requests.",
+    "step_3": "A user visits '/api/products' in their browser.",
+    "step_4": "Flask looks up the path in the URL Map and identifies the get_products() function.",
+    "step_5": "The function executes, takes the 'products' list, and passes it to jsonify().",
+    "step_6": "jsonify() sets the Content-Type header to 'application/json' and returns the stringified list to the user's browser."
+  },
+  "memory_visualization": "A 'Request' object in memory contains a URL, a Method (GET), and Headers. When 'response.json()' is called, Python allocates new memory for a Dictionary. The raw text '{\"a\": 1}' is parsed, and a dictionary {'a': 1} is created. The original raw text is eventually garbage collected.",
+  "real_world_use_cases": [
+    "Weather Apps: Fetching current temperatures from OpenWeatherMap API.",
+    "Discord Bots: Sending messages to a channel using Webhooks.",
+    "IoT Dashboards: A Flask server displaying data from temperature sensors in your house.",
+    "Payment Processing: Sending transaction details to Stripe or PayPal APIs via POST requests."
+  ],
+  "common_mistakes": [
+    "Forgetting to call .json() and trying to index the raw response object.",
+    "Not checking the status code and assuming the API always returns data.",
+    "Flask error: 'The view function did not return a valid response.' (Missing return statement).",
+    "Installing 'flask' but trying to import 'Flask' (it is case-sensitive).",
+    "Trying to run two Flask apps on port 5000 at the same time."
+  ],
+  "best_practices": [
+    "Always use response.raise_for_status() to catch network errors early.",
+    "Set a timeout in requests.get(url, timeout=5) to prevent your script from hanging forever.",
+    "Use Flask's 'debug=True' only during development, never in production.",
+    "Structure your Flask routes to return JSON for APIs and HTML (via render_template) for websites.",
+    "Keep your API logic in separate functions, away from the route decorators, to keep code clean."
+  ],
+  "frequently_asked_questions": [
+    {
+      "question": "What is the difference between response.text and response.json()?",
+      "answer": "response.text returns the raw content as a string. response.json() parses that string into a Python object (like a dict or list)."
+    },
+    {
+      "question": "Do I need a browser to test my Flask API?",
+      "answer": "No. You can use your own 'Requests' scripts or tools like Postman to test your endpoints."
+    }
+  ],
+  "summary": "Phase 13 introduced web connectivity. You learned to act as a client using the Requests library to pull data from APIs and as a server using Flask to host your own logic. You also mastered JSON, the universal language of web data.",
+  "key_takeaways": [
+    "HTTP is a request-response protocol.",
+    "Requests library is for consuming data; Flask is for serving data.",
+    "JSON is the standard format for API communication.",
+    "Decorators in Flask map URLs to Python functions.",
+    "Status codes tell you the result of your network request."
+  ],
+  "preview_next": "In Phase 14, you will combine everything you have learned into full-scale Mini Projects, from a Grade Calculator to a real-time Weather App.",
+  "questions_and_answers": [
+    {
+      "type": "Concept",
+      "difficulty": "Easy",
+      "question": "What does a 404 HTTP status code indicate?",
+      "answer": "It indicates 'Not Found'—the client was able to communicate with the server, but the server could not find the specific resource requested."
+    },
+    {
+      "type": "Concept",
+      "difficulty": "Moderate",
+      "question": "What is the difference between a GET request and a POST request?",
+      "answer": "GET is used to request data from a specified resource (read-only). POST is used to send data to a server to create or update a resource."
+    },
+    {
+      "type": "Practical",
+      "difficulty": "Moderate",
+      "question": "Write a snippet using 'requests' to fetch data from 'https://api.test.com' and print the value of a key named 'status' from the response.",
+      "answer": "import requests\nresp = requests.get('https://api.test.com')\ndata = resp.json()\nprint(data.get('status'))"
+    },
+    {
+      "type": "Practical",
+      "difficulty": "Hard",
+      "question": "Create a Flask route '/greet/<name>' that returns 'Hello, [name]!' where [name] is part of the URL.",
+      "answer": "@app.route('/greet/<name>')\ndef greet(name):\n    return f'Hello, {name}!'"
+    },
+    {
+      "type": "Mistake",
+      "difficulty": "Moderate",
+      "question": "Find the bug: \n@app.route('/data')\ndef show():\n    x = 10 + 5\n    print(x)",
+      "answer": "The Flask view function 'show' does not return anything. Every Flask route must return a string, dict, or response object. Add 'return str(x)'."
+    },
+    {
+      "type": "Mistake",
+      "difficulty": "Hard",
+      "question": "Why would 'requests.get(url).json()' raise an error even if the website loads?",
+      "answer": "If the website returns HTML (like a standard webpage) instead of JSON, the .json() method will fail to parse it and raise a json.decoder.JSONDecodeError."
+    },
+    {
+      "type": "Application",
+      "difficulty": "Moderate",
+      "question": "How do you check if a request was successful (200 OK) before processing it?",
+      "answer": "Use 'if response.status_code == 200:' or 'if response.ok:'."
+    },
+    {
+      "type": "Application",
+      "difficulty": "Hard",
+      "question": "Implement a Flask route that receives a JSON payload with 'score' and returns 'Pass' if score >= 50 else 'Fail'.",
+      "answer": "from flask import request\n\n@app.route('/check', methods=['POST'])\ndef check():\n    data = request.json\n    if data.get('score', 0) >= 50:\n        return 'Pass'\n    return 'Fail'"
+    }
+  ],
+  "multiple_choice_questions": [
+    {
+      "question": "Which Python library is the standard for making HTTP requests to external APIs?",
+      "options": {
+        "A": "http.server",
+        "B": "requests",
+        "C": "flask",
+        "D": "urllib"
+      },
+      "answer": "B"
+    },
+    {
+      "question": "In Flask, which decorator is used to link a function to a URL?",
+      "options": {
+        "A": "@app.link",
+        "B": "@app.path",
+        "C": "@app.route",
+        "D": "@app.url"
+      },
+      "answer": "C"
+    },
+    {
+      "question": "What will 'response.status_code' be if a request is successful?",
+      "options": {
+        "A": "404",
+        "B": "500",
+        "C": "200",
+        "D": "301"
+      },
+      "answer": "C"
+    },
+    {
+      "question": "Which format is most commonly used for exchanging data in REST APIs?",
+      "options": {
+        "A": "XML",
+        "B": "CSV",
+        "C": "JSON",
+        "D": "TXT"
+      },
+      "answer": "C"
+    },
+    {
+      "question": "Predict the output: import json; d = {'a': 1}; print(type(json.dumps(d)))",
+      "options": {
+        "A": "<class 'dict'>",
+        "B": "<class 'str'>",
+        "C": "<class 'list'>",
+        "D": "<class 'json'>"
+      },
+      "answer": "B"
+    },
+    {
+      "question": "Find the bug: requests.get('https://api.com', json={'id': 1})",
+      "options": {
+        "A": "GET requests cannot have a URL",
+        "B": "The 'json' parameter is only for POST/PUT requests",
+        "C": "The URL must be a variable",
+        "D": "Missing API key"
+      },
+      "answer": "B"
+    },
+    {
+      "question": "How do you start a Flask app to listen on all network interfaces?",
+      "options": {
+        "A": "app.run(host='0.0.0.0')",
+        "B": "app.run(public=True)",
+        "C": "app.run(port=80)",
+        "D": "app.start()"
+      },
+      "answer": "A"
+    },
+    {
+      "question": "What does the 'jsonify()' function in Flask do?",
+      "options": {
+        "A": "Converts HTML to JSON",
+        "B": "Parses incoming JSON data",
+        "C": "Wraps a Python object in a JSON response with the correct headers",
+        "D": "Encrypts JSON data"
+      },
+      "answer": "C"
+    },
+    {
+      "question": "Complete the code: res = requests.____('site.com/api', data={'key': 'val'}) # to create a resource",
+      "options": {
+        "A": "get",
+        "B": "send",
+        "C": "post",
+        "D": "push"
+      },
+      "answer": "C"
+    },
+    {
+      "question": "What is the best approach to handle a possible connection timeout in 'requests'?",
+      "options": {
+        "A": "Use a while loop",
+        "B": "Pass the 'timeout' argument",
+        "C": "Use time.sleep()",
+        "D": "Re-run the script manually"
+      },
+      "answer": "B"
+    }
+  ]
+}

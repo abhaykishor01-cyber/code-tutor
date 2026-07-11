@@ -1,0 +1,209 @@
+{ "phase_metadata": { "phase_number": 12, "phase_name": "Data Science Intro:
+NumPy, Pandas, and Matplotlib", "description": "A high-performance deep dive
+into numerical computing, structured data analysis, and professional
+visualization. Master the tools that transform Python into a powerhouse for AI
+and analytics.", "estimated_time": "12 Hours" }, "learning_objectives": [
+"Analyze the architectural difference between Python's object-pointer lists and
+NumPy's contiguous memory arrays.", "Master Vectorization and Broadcasting to
+eliminate performance-killing Python loops.", "Implement robust data pipelines
+using Pandas DataFrames, handling alignment, missing data, and relational
+operations.", "Expertly navigate data using label-based (.loc) and integer-based
+(.iloc) indexing protocols.", "Construct production-quality visualizations using
+the Matplotlib Object-Oriented API for fine-grained control." ],
+"prerequisites": [ "Phase 6: Data Structures (Deep understanding of dictionaries
+and list indexing).", "Phase 9: Modules & Packages (Proficiency with pip and
+library imports).", "Phase 11: Advanced Python (Understanding of Iterators and
+List Comprehensions)." ], "introduction": "Phase 12 marks your transition from
+'General Programming' to 'Data Engineering.' While standard Python is elegant,
+it is slow for processing millions of data points because every number is a
+heavy object. This phase introduces the 'Scientific Stack.' We move logic into
+C-implemented libraries: NumPy for raw numerical speed via the Buffer Protocol,
+Pandas for structured data manipulation via the Block Manager, and Matplotlib
+for visual storytelling. You are not just learning libraries; you are learning
+to write code that leverages the hardware efficiency of your CPU and RAM.",
+"concept_explanation": { "numpy": "NumPy (Numerical Python) is the foundation of
+the ecosystem. It provides the 'ndarray' (n-dimensional array). Internally,
+NumPy stores data in a single contiguous block of memory. It uses 'Strides' to
+jump between elements, allowing for O(1) access. Unlike lists, which store
+pointers to objects, NumPy stores raw binary data, enabling SIMD (Single
+Instruction, Multiple Data) processing.", "pandas": "Pandas is the industry
+standard for tabular data. It builds on NumPy but adds 'Alignment.' If you add
+two DataFrames, Pandas ensures that data with the same labels is combined,
+regardless of their order. Its core structures are the Series (1D) and the
+DataFrame (2D), which act as highly optimized, programmable spreadsheets.",
+"matplotlib": "Matplotlib is a multi-platform visualization library. It follows
+an 'Artist' hierarchy. The Figure is the top-level container (the window). The
+Axes is the actual plot area. By using the Object-Oriented API, you manipulate
+'Axes' objects to control labels, labels, and data points with surgical
+precision.", "vectorization": "Vectorization is the practice of replacing
+explicit Python 'for' loops with array-wide operations. When you write 'arr
+* 2', the operation happens in optimized C-code. Execution flow: Python calls
+the C-extension → The C-extension loops over the contiguous memory buffer →
+Results are returned as a new array. This bypasses the Global Interpreter Lock
+(GIL) overhead for numerical tasks.", "broadcasting": "Broadcasting is the
+mechanism that allows NumPy to perform arithmetic on arrays of different shapes.
+If one dimension is 1 and the other is N, NumPy 'stretches' the smaller
+dimension to match the larger one without actually copying the data in memory,
+saving significant RAM." }, "syntax": { "numpy_array": "import numpy as np\narr
+= np.array([1, 2, 3], dtype=np.int64)", "pandas_df": "import pandas as pd\ndf =
+pd.DataFrame({'A': [10, 20], 'B': [30, 40]}, index=['R1', 'R2'])",
+"matplotlib_oo": "import matplotlib.pyplot as plt\nfig, ax =
+plt.subplots()\nax.plot([1, 2, 3], [4, 5, 6], label='Trend')", "filtering":
+"subset = df.loc[df['A'] > 15, 'B']" }, "syntax_breakdown": { "dtype_parameter":
+"Specifies the bit-depth of the data. np.float32 uses half the memory of
+np.float64, crucial for large-scale data engineering.", "loc_indexer": "Accesses
+data by labels. 'df.loc[row_label, col_label]'. It is inclusive of the end point
+during slicing.", "iloc_indexer": "Accesses data by integer position
+(0-indexed). It is exclusive of the end point during slicing, following standard
+Python slicing rules.", "subplots_tuple": "plt.subplots() returns (Figure,
+Axes). The 'ax' object is where 90% of your work happens (setting titles,
+labels, and plots)." }, "rules_and_key_points": [ "NumPy arrays are homogeneous
+(all elements must be the same type).", "Never loop over a DataFrame with 'for
+index, row in df.iterrows()' if a vectorized solution exists.", "NumPy slicing
+returns a 'View', not a Copy. Changing a slice changes the original array.",
+"Pandas NaN (Not a Number) is technically a float; columns with integers and
+NaNs will cast to float64.", "Broadcasting Rule: Dimensions must either be equal
+or one of them must be 1.", "Axis 0 refers to Rows (vertical), Axis 1 refers to
+Columns (horizontal).", "Use 'df.info()' to check memory usage and
+'df.describe()' for statistical snapshots.", "Matplotlib 'plt.show()' should
+only be called once at the end of the script.", "Pandas indices are immutable;
+you cannot change a single index value directly.", "Always use 'df.copy()' when
+creating a subset you intend to modify to avoid 'SettingWithCopy' warnings." ],
+"code_example_1": { "title": "Performance Comparison: Python Loops vs NumPy
+Vectorization", "description": "Benchmark showing why NumPy is required for
+large data. We compute the square of 1 million numbers.", "code": "import numpy
+as np\nimport time\n\nsize = 1_000_000\npython_list =
+list(range(size))\nnumpy_arr = np.arange(size)\n\n# Python Loop Timing\nstart =
+time.perf_counter()\nlist_res = [x2 for x in python_list]\nprint(f'Python List
+Time: {time.perf_counter() - start:.4f}s (Approximate)')\n\n# NumPy
+Vectorization Timing\nstart = time.perf_counter()\narr_res =
+numpy_arr2\nprint(f'NumPy Vectorized Time: {time.perf_counter() - start:.4f}s
+(Approximate)')\n\n# Verify exact match\nprint(f'Match:
+{np.array_equal(np.array(list_res), arr_res)}')", "output": "Python List
+Time: 0.0500s (Approximate)\nNumPy Vectorized Time: 0.0010s
+(Approximate)\nMatch: True" }, "code_example_2": { "title": "Complete Data
+Analysis Pipeline", "description": "Loading, filtering, aggregating, and
+visualizing data using the Object-Oriented API.", "code": "import pandas as
+pd\nimport matplotlib.pyplot as plt\n\n# 1. Data Creation (Simulating a
+dataset)\ndata = {\n 'Department': ['IT', 'HR', 'IT', 'Sales', 'HR', 'Sales',
+'IT'],\n 'Salary': [95000, 60000, 105000, 80000, 62000, 85000, 98000]\n}\ndf =
+pd.DataFrame(data)\n\n# 2. Aggregation (Grouping)\navg_salaries =
+df.groupby('Department')['Salary'].mean().sort_values()\n\n# 3. Professional
+Visualization (OO-API)\nfig, ax = plt.subplots(figsize=(8, 5))\n\n# Plotting on
+the Axes object\nax.bar(avg_salaries.index, avg_salaries.values,
+color='skyblue', edgecolor='navy')\n\n# Customizing the
+layout\nax.set_title('Average Salary by Department', fontsize=14,
+pad=15)\nax.set_ylabel('Annual Salary
+($)')\nax.set_xlabel('Department')\nax.grid(axis='y', linestyle='--',
+alpha=0.6)\n\nplt.tight_layout()\nplt.show()", "output": "(A clean bar chart is
+displayed with sorted salaries per department)" }, "dry_run": { "step_1": "The
+dictionary is converted to a DataFrame. Pandas creates two NumPy arrays
+internally and an Index ['IT', 'HR', ...].", "step_2": "The
+groupby('Department') operation creates a mapping of unique keys to row
+indices.", "step_3": "The .mean() function is applied to each group's 'Salary'
+values using vectorized C-code.", "step_4": "plt.subplots() creates the Figure
+(canvas) and Axes (drawing zone).", "step_5": "ax.bar() translates the Pandas
+Series into rectangular patches on the Axes object.", "step_6": "The final
+result is rendered to the UI backend." }, "memory_visualization": "PYTHON LIST:
+A 'Pointer Array'. Each slot points to a PyObject (Integers). These objects are
+scattered in memory (Non-contiguous). Memory overhead is ~28 bytes per
+integer.\nNUMPY ARRAY: A 'Buffer'. It is one solid block of bytes (Contiguous).
+Memory overhead is exactly 4 or 8 bytes per integer. Analogy: A List is a
+scattered treasure map; a NumPy array is a solid gold bar. Faster because the
+CPU pre-fetches the next number before Python even asks for it.",
+"real_world_use_cases": [ "Financial Modeling: Calculating Moving Averages and
+Volatility for stock prices in real-time.", "Machine Learning: Normalizing
+features (scaling inputs between 0 and 1) using vectorized division.", "Log
+Analysis: Processing millions of server logs to find 404 errors using Pandas
+filtering.", "Scientific Research: Plotting experimental results with Matplotlib
+for publication-grade journals." ], "common_mistakes": [ "Looping Mania: Using
+'for i in range(len(df))' instead of 'df['col'] * 2'. This makes code 100x
+slower.", "Index Alignment Error: Adding two Series with different indices
+results in NaNs. Check your indices before arithmetic.", "The 'View' Trap:
+Modifying a slice 'arr_slice = arr[0:5]' and being surprised that the original
+'arr' changed.", "Matplotlib State Mixing: Mixing 'plt.title()' with
+'ax.set_title()'. Stick to the Object-Oriented (ax) approach." ],
+"best_practices": [ "Use 'df.head()' and 'df.tail()' frequently to verify data
+integrity after every transformation.", "Explicitly set 'dtype' for massive
+arrays to prevent 64-bit memory bloat if 32-bit is sufficient.", "Always label
+axes and provide legends in plots; data without context is noise.", "Use boolean
+indexing (masking) for filters: 'mask = df['A'] > 10' then 'df[mask]'. It is
+cleaner and faster.", "Follow the 'DRY' principle: If you are formatting 5 plots
+similarly, write a function that takes an 'ax' as an argument." ],
+"frequently_asked_questions": [ { "question": "What is the difference between a
+Series and a 1D NumPy array?", "answer": "A Series is a NumPy array with an
+'Index'. The index allows for label-based lookups and automatic data alignment,
+whereas the NumPy array is strictly positional." }, { "question": "Why do I see
+'SettingWithCopyWarning' in Pandas?", "answer": "This happens when you try to
+modify a subset of data that might be a 'View' of the original. Use
+'.loc[row_indexer, col_indexer] = value' to ensure the change is applied
+correctly." } ], "summary": "Phase 12 introduced the foundation of
+high-performance Python. We explored NumPy's memory efficiency, Pandas'
+structural power, and Matplotlib's visualization capabilities. You now have the
+skills to process data at an industrial scale by thinking in 'Arrays' rather
+than 'Elements.'", "key_takeaways": [ "Contiguous memory is the secret to
+NumPy's speed.", "Vectorization bypasses Python's slow loop overhead.", "Pandas
+is for 'Data Alignment'; NumPy is for 'Math Computation'.", "The Object-Oriented
+API in Matplotlib is the professional standard for plotting.", "Always prefer
+.loc and .iloc for explicit data selection." ], "preview_next": "In Phase 13, we
+transition to Web Development. You will learn how to connect these Data Science
+tools to the internet using APIs (Requests) and how to serve your data via Web
+Frameworks (Flask).", "questions_and_answers": [ { "type": "Concept",
+"difficulty": "Easy", "question": "What happens if you try to put a string into
+a NumPy integer array?", "answer": "NumPy will attempt to 'cast' (convert) the
+string to an integer. If it fails (e.g., np.array(['hello'], dtype=int)), it
+will raise a ValueError." }, { "type": "Concept", "difficulty": "Moderate",
+"question": "Explain 'Broadcasting' with a practical example.", "answer": "If
+you have a 3x3 matrix and you add a 1x3 row to it, NumPy 'broadcasts' the row
+across all three rows of the matrix, performing the addition element-wise
+without copying the row three times in memory." }, { "type": "Practical",
+"difficulty": "Moderate", "question": "Write a line of code to remove all rows
+in DataFrame 'df' that contain any missing (NaN) values.", "answer": "clean_df =
+df.dropna(axis=0, how='any')" }, { "type": "Practical", "difficulty": "Hard",
+"question": "Using NumPy, create a 10x10 matrix where the borders are 1 and the
+inside is 0.", "answer": "arr = np.ones((10, 10))\narr[1:-1, 1:-1] = 0" }, {
+"type": "Mistake", "difficulty": "Moderate", "question": "Find the bug: \nimport
+numpy as np\narr = np.array([1, 2, 3])\nslice_arr = arr[0:2]\nslice_arr[0]
+= 99\nprint(arr[0])", "answer": "There is no bug, but the result might be
+unexpected for beginners. 'arr[0]' will print 99 because slices in NumPy are
+'Views', not copies. They share the same memory." }, { "type": "Mistake",
+"difficulty": "Hard", "question": "Why does this fail? \ndf =
+pd.DataFrame({'val': [1, 2]}, index=['a', 'b'])\nprint(df.iloc['a'])", "answer":
+"iloc is 'Integer Location'. It only accepts integers (positions). To access by
+label 'a', you must use df.loc['a']." }, { "type": "Application", "difficulty":
+"Moderate", "question": "How do you change the color of a Matplotlib line to
+'green' and add a dashed linestyle?", "answer": "ax.plot(x, y, color='green',
+linestyle='--')" }, { "type": "Application", "difficulty": "Hard", "question":
+"Implement a script to find the 'Price' of the most expensive item in each
+'Category' using Pandas.", "answer": "result =
+df.groupby('Category')['Price'].max()" } ], "multiple_choice_questions": [ {
+"question": "What is the primary reason NumPy is faster than Python lists?",
+"options": { "A": "It is written in Python 3.13", "B": "Contiguous memory and
+C-extensions", "C": "It uses more RAM", "D": "It avoids using the CPU" },
+"answer": "B" }, { "question": "In Matplotlib, what is the 'Axes'?", "options":
+{ "A": "The plural of Axis (X and Y)", "B": "A single plot inside a Figure",
+"C": "A line drawn on the chart", "D": "The command to show the plot" },
+"answer": "B" }, { "question": "What does df.iloc[0:3] return?", "options": {
+"A": "Rows 0, 1, 2, 3", "B": "Rows 1, 2, 3", "C": "Rows 0, 1, 2", "D":
+"Columns 0, 1, 2" }, "answer": "C" }, { "question": "How do you access the
+'Shape' of a DataFrame?", "options": { "A": "df.shape()", "B": "df.get_shape",
+"C": "df.shape", "D": "df.dimensions" }, "answer": "C" }, { "question": "Which
+broadcasting operation is valid for an array of shape (3, 3)?", "options": {
+"A": "Adding an array of shape (2, 2)", "B": "Adding an array of shape (3, 1)",
+"C": "Adding an array of shape (1, 2)", "D": "Adding an array of shape (3, 2)"
+}, "answer": "B" }, { "question": "What is the output of np.array([1, 2]) *
+np.array([1, 2])?", "options": { "A": "5 (Dot product)", "B": "[1, 4]
+(Element-wise)", "C": "Error", "D": "[[1, 2], [2, 4]]" }, "answer": "B" }, {
+"question": "In Pandas, which method is best for viewing basic statistics like
+Mean and Std Dev?", "options": { "A": "df.info()", "B": "df.stats()", "C":
+"df.describe()", "D": "df.mean_all()" }, "answer": "C" }, { "question": "Predict
+the result: pd.Series([1], index=['a']) + pd.Series([1], index=['b'])",
+"options": { "A": "Series with index 'a', 'b' and values 1, 1", "B": "Series
+with index 'a', 'b' and values NaN, NaN", "C": "Series with value 2", "D":
+"TypeError" }, "answer": "B" }, { "question": "What is the most 'Pythonic' way
+to update every value in a column?", "options": { "A": "A for loop with
+iterrows", "B": "df['col'] = df['col'].apply(lambda x: x + 1)", "C": "df['col']
+= df['col'] + 1", "D": "Manual indexing in a while loop" }, "answer": "C" }, {
+"question": "Which command creates 50 points between 0 and 10?", "options": {
+"A": "np.arange(0, 10, 50)", "B": "np.linspace(0, 10, 50)", "C":
+"np.random(0, 10, 50)", "D": "np.array(0, 10, 0.2)" }, "answer": "B" } ] }

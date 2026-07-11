@@ -1,0 +1,301 @@
+{
+  "metadata": {
+    "phaseNumber": 2,
+    "title": "Operators, Expressions & Precedence",
+    "duration": "1 Week",
+    "difficulty": "Beginner"
+  },
+  "learningObjectives": [
+    "Master arithmetic, relational, logical, and assignment operators.",
+    "Understand the subtle difference between prefix and postfix increment/decrement operations.",
+    "Learn to execute low-level bitwise operations.",
+    "Grasp the ternary conditional operator and the sizeof operator.",
+    "Analyze operator precedence hierarchies and safe type casting principles."
+  ],
+  "prerequisites": [
+    "Completion of Phase 1 Basics. Solid understanding of variables and data types."
+  ],
+  "introduction": "In C, operators are symbols that trigger computational actions on data (operands). Mastering operators enables you to perform calculations, control decisions, and manipulate data at the bit level.",
+  "conceptExplanation": "Operators in C are classified into: Unary (act on one operand), Binary (two operands), and Ternary (three operands). We will explore mathematical operations, conditional evaluations, bitwise calculations, and the exact order in which expressions are computed (precedence and associativity).",
+  "syntax": "// Arithmetic: a + b\n// Relational: a > b\n// Logical: a && b\n// Ternary: condition ? expr1 : expr2\n// Sizeof: sizeof(int)\n// Type Cast: (double)a",
+  "syntaxBreakdown": [
+    "Arithmetic: +, -, *, /, % (modulo returns the remainder of integer division).",
+    "Relational: ==, !=, <, >, <=, >= (return 1 for true, 0 for false).",
+    "Logical: && (AND), || (OR), ! (NOT). They exhibit short-circuit behavior.",
+    "Prefix/Postfix: ++x increments first, x++ evaluates first, then increments.",
+    "Ternary (?:): A compact inline if-else statement.",
+    "sizeof: Evaluates the exact size of a data type or expression in bytes."
+  ],
+  "rulesAndKeyPoints": [
+    "The modulo operator (%) can ONLY be used with integer operands.",
+    "Division of two integers (e.g. 5 / 2) produces integer division (2), truncating decimals.",
+    "Logical AND (&&) and OR (||) are short-circuiting: evaluation stops as soon as the result is known.",
+    "Precedence determines the grouping of operands, while associativity determines the direction of evaluation (left-to-right or right-to-left) when precedence is equal."
+  ],
+  "codeExample1": {
+    "title": "Increment Prefix vs Postfix",
+    "code": "#include <stdio.h>\n\nint main() {\n    int x = 5, y;\n    y = x++; // Postfix: y gets 5, then x becomes 6\n    printf(\"Postfix - x: %d, y: %d\\n\", x, y);\n    \n    x = 5;\n    y = ++x; // Prefix: x becomes 6, then y gets 6\n    printf(\"Prefix  - x: %d, y: %d\\n\", x, y);\n    return 0;\n}",
+    "explanation": "This program highlights the timing differences between prefix and postfix increment operations."
+  },
+  "codeExample2": {
+    "title": "Bitwise Operators and Ternary Checks",
+    "code": "#include <stdio.h>\n\nint main() {\n    int a = 12; // Binary: 1100\n    int b = 25; // Binary: 11001\n    \n    int bitAnd = a & b; // Binary: 01000 = 8\n    int bitOr = a | b;  // Binary: 11101 = 29\n    int isEven = (a % 2 == 0) ? 1 : 0;\n    \n    printf(\"And: %d, Or: %d\\n\", bitAnd, bitOr);\n    printf(\"a is %s\\n\", isEven ? \"even\" : \"odd\");\n    return 0;\n}",
+    "explanation": "Demystifies using bitwise AND, bitwise OR, and utilizing a ternary operation to print odd/even strings easily.",
+    "expectedOutput": "And: 8, Or: 29\na is even"
+  },
+  "stepByStepDryRun": [
+    "1. Initialize 'a' with decimal 12 (binary 01100) and 'b' with 25 (binary 11001).",
+    "2. Perform bitwise AND: alignment compares each digit. Only index 3 aligns, resulting in binary 01000 (8).",
+    "3. Perform bitwise OR: returns true for active bits in either. Yields binary 11101 (29).",
+    "4. Check parity: 12 % 2 evaluates to 0. Semicolon test executes condition check, resolving 'isEven' to 1 (true).",
+    "5. Print terminal details."
+  ],
+  "memoryVisualization": {
+    "type": "Bit Register Comparison",
+    "description": "Bitwise AND comparison between 12 and 25",
+    "nodes": [
+      {
+        "label": "a (12)",
+        "value": "0 0 0 0 1 1 0 0 (binary)",
+        "color": "emerald"
+      },
+      {
+        "label": "b (25)",
+        "value": "0 0 0 1 1 0 0 1 (binary)",
+        "color": "sky"
+      },
+      {
+        "label": "a & b (8)",
+        "value": "0 0 0 0 1 0 0 0 (binary)",
+        "color": "rose"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Creating permission bitmasks where individual bits encode read, write, and execute flags.",
+    "Efficient hardware graphics scaling and scaling integers via left/right shifting."
+  ],
+  "commonMistakes": [
+    "Confusing assignment '=' with equality check '=='. Writing if(x = 5) assigns 5 to x and evaluates to true instead of checking if x is 5.",
+    "Performing standard decimal division with integers (e.g. 1/2 evaluates to 0). Use typecasting: ((double)1)/2."
+  ],
+  "bestPractices": [
+    "Always use parentheses in complex mathematical statements to enforce explicit evaluation order, rather than relying on compiler defaults.",
+    "Avoid chaining multiple increment statements (e.g. x = x++ + ++x) as it creates undefined behavior under C standards."
+  ],
+  "faqs": [
+    {
+      "question": "What is short-circuit evaluation?",
+      "answer": "In logical expressions && and ||, the compiler stops checking conditions as soon as the outcome is guaranteed. For example, in 'A && B', if A is false, B is never evaluated."
+    },
+    {
+      "question": "Is 'sizeof' a function or an operator?",
+      "answer": "It is a compile-time operator. Although it uses parentheses like a function, its evaluation happens during compilation, replacing itself with a constant size."
+    }
+  ],
+  "summary": "Phase 2 introduced the full suite of C operators, including math, logic, bitwise, and conditional calculations. We also mastered increment timing and type conversions.",
+  "keyTakeaways": [
+    "Prefix vs postfix timing governs when changes are written back.",
+    "Bit operations work directly with binary representations.",
+    "Type casting converts variables safely to avoid truncation."
+  ],
+  "nextTopicPreview": "In Phase 3, we master decision-making structures, exploring if-else, nested control routes, else-if ladders, and switch-cases.",
+  "questionsAndAnswers": [
+    {
+      "id": "q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "Explain the difference between '/' and '%' operators.",
+      "answer": "The '/' operator performs division, yielding the quotient (integer division truncates decimals). The '%' operator performs modulo division, returning only the remainder.",
+      "explanation": "Modulo only works with integer data types."
+    },
+    {
+      "id": "q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "How does type casting work and what is the difference between implicit and explicit casting?",
+      "answer": "Implicit casting is handled automatically by the compiler when converting a smaller type to a larger one (e.g., int to float). Explicit casting is manually forced by the programmer using syntax like (type)variable to resolve truncations.",
+      "explanation": "Explicit casting protects against precision loss."
+    },
+    {
+      "id": "q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "What is the result of the expression: '5 + 3 * 2 - 8 / 4' according to operator precedence?",
+      "answer": "The result is 9.",
+      "explanation": "Order: 3*2 = 6, 8/4 = 2. Then addition and subtraction: 5 + 6 - 2 = 9."
+    },
+    {
+      "id": "q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Given int x = 5; int r = x++ + ++x; explain why this code has undefined behavior.",
+      "answer": "According to the C standard, modifying a variable multiple times within the same sequence point (expression) without an intervening sequence checkpoint produces undefined behavior. Different compilers may evaluate the registers in varying orders.",
+      "explanation": "Never combine multiple side effects on the same variable in a single statement."
+    },
+    {
+      "id": "q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "What is the issue with writing: if (x = 0) { ... } inside a conditional statement?",
+      "answer": "It uses assignment '=' instead of comparison '=='. The expression assigns 0 to x and evaluates to 0 (false), making the block unreachable.",
+      "explanation": "Use '==' for comparison checks."
+    },
+    {
+      "id": "q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Explain why double x = 1 / 2; stores 0.0 in x, and how to fix it.",
+      "answer": "Because 1 and 2 are both integer literals, the compiler performs integer division, yielding 0. It then implicitly casts 0 to 0.0. To fix it, use floating-point literals: double x = 1.0 / 2.0; or explicit casting: (double)1 / 2;",
+      "explanation": "Ensure at least one operand is a float or double to perform decimal division."
+    },
+    {
+      "id": "q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write a short C program that uses the sizeof operator to display the byte size of int, char, float, and double variables.",
+      "answer": "#include <stdio.h>\n\nint main() {\n    printf(\"int: %zu\\n\", sizeof(int));\n    printf(\"char: %zu\\n\", sizeof(char));\n    printf(\"float: %zu\\n\", sizeof(float));\n    printf(\"double: %zu\\n\", sizeof(double));\n    return 0;\n}",
+      "explanation": "Uses the %zu format specifier which is the standard format code for size_t values returned by sizeof."
+    },
+    {
+      "id": "q8",
+      "category": "Coding/Application",
+      "difficulty": "Challenge",
+      "question": "Write a single bitwise expression that checks whether the 3rd bit (index 2) of an integer 'x' is set (1) or not.",
+      "answer": "int isSet = (x & (1 << 2)) != 0;",
+      "explanation": "1 << 2 shifts binary 1 left by 2 positions to create a mask (binary 100). Bitwise ANDing with x isolates that bit."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "category": "Theory",
+      "question": "Which of the following operators has the highest precedence in C?",
+      "options": {
+        "A": "+",
+        "B": "&&",
+        "C": "() (Parentheses)",
+        "D": "="
+      },
+      "correctOption": "C",
+      "explanation": "Parentheses always override the default precedence hierarchy."
+    },
+    {
+      "id": "m2",
+      "category": "Theory",
+      "question": "Which operator can ONLY be used with integer operands?",
+      "options": {
+        "A": "/",
+        "B": "*",
+        "C": "%",
+        "D": "+"
+      },
+      "correctOption": "C",
+      "explanation": "The modulo operator (%) is mathematically defined only for integers in C."
+    },
+    {
+      "id": "m3",
+      "category": "Output Prediction",
+      "question": "What is stored in 'val' after execution?\n\nint val = 5 / 2;",
+      "options": {
+        "A": "2.5",
+        "B": "2",
+        "C": "3",
+        "D": "0"
+      },
+      "correctOption": "B",
+      "explanation": "Integer division truncates decimals, resulting in 2."
+    },
+    {
+      "id": "m4",
+      "category": "Output Prediction",
+      "question": "What is the output of this program?\n\nint x = 5;\nprintf(\"%d\", x++);",
+      "options": {
+        "A": "5",
+        "B": "6",
+        "C": "0",
+        "D": "Error"
+      },
+      "correctOption": "A",
+      "explanation": "Postfix x++ evaluates first (prints 5), then increments to 6."
+    },
+    {
+      "id": "m5",
+      "category": "Find the Bug",
+      "question": "Identify the error in: if (a &&= b)",
+      "options": {
+        "A": "&&= is not a valid operator",
+        "B": "Missing double brackets",
+        "C": "Should be &=",
+        "D": "There is no error"
+      },
+      "correctOption": "A",
+      "explanation": "C does not have a logical assignment AND operator '&&='."
+    },
+    {
+      "id": "m6",
+      "category": "Find the Bug",
+      "question": "What is the bug in this bitwise logic?\n\nint result = 5 && 3; // Intended bitwise AND",
+      "options": {
+        "A": "Should use '&' instead of '&&'",
+        "B": "Operators must be capitalized",
+        "C": "Bitwise calculation cannot use odd values",
+        "D": "Should be &="
+      },
+      "correctOption": "A",
+      "explanation": "'&&' is logical AND, which evaluates to true (1). '&' is the correct bitwise AND operator."
+    },
+    {
+      "id": "m7",
+      "category": "Complete the Code",
+      "question": "Complete the ternary statement to check for odd values:\n\nconst char* res = (x % 2 != 0) ____ \"Odd\" : \"Even\";",
+      "options": {
+        "A": ":",
+        "B": "?",
+        "C": "??",
+        "D": "if"
+      },
+      "correctOption": "B",
+      "explanation": "Ternary statements follow the syntax: condition ? expr1 : expr2."
+    },
+    {
+      "id": "m8",
+      "category": "Complete the Code",
+      "question": "Complete the statement to explicitly cast float 'f' to int 'i':\n\ni = ____ f;",
+      "options": {
+        "A": "(int)",
+        "B": "[int]",
+        "C": "int",
+        "D": "reinterpret_cast"
+      },
+      "correctOption": "A",
+      "explanation": "Explicit type casting in C uses the type name wrapped in parentheses: (type)variable."
+    },
+    {
+      "id": "m9",
+      "category": "Best Approach",
+      "question": "How should you structure complex mathematical expressions to ensure correct evaluation?",
+      "options": {
+        "A": "Rely entirely on default compiler rules",
+        "B": "Use explicit parentheses () to group operations clearly",
+        "C": "Declare separate variables for every single calculation step",
+        "D": "Convert all integers to double variables"
+      },
+      "correctOption": "B",
+      "explanation": "Parentheses make mathematical logic explicit, readable, and compiler-independent."
+    },
+    {
+      "id": "m10",
+      "category": "Best Approach",
+      "question": "What is the most robust way to check if an integer 'num' is even?",
+      "options": {
+        "A": "num / 2 == 1",
+        "B": "(num % 2) == 0",
+        "C": "num & 0",
+        "D": "num == 0"
+      },
+      "correctOption": "B",
+      "explanation": "Dividing by 2 and checking if the modulo remainder is 0 is the most readable and standard approach."
+    }
+  ]
+}

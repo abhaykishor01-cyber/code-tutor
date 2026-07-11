@@ -1,0 +1,201 @@
+{ "phase_metadata": { "phase_number": 9, "phase_name": "Exception Handling",
+"description": "Master the art of writing resilient Java programs by handling
+runtime errors, managing resources, and creating custom error types.",
+"java_version": "21 LTS" }, "learning_objectives": [ "Understand the Throwable
+hierarchy and the difference between Error and Exception", "Distinguish between
+Checked and Unchecked exceptions", "Implement try-catch-finally blocks for
+robust error management", "Use 'throw' to trigger exceptions and 'throws' to
+delegate them", "Utilize try-with-resources for automatic resource management",
+"Create and implement custom user-defined exceptions" ], "prerequisites": [
+"Phase 5: OOP Basics (Classes and Objects)", "Phase 6: Inheritance (for
+Exception hierarchy understanding)" ], "introduction": "In the real world,
+things go wrong: files are missing, network connections drop, or users enter
+invalid data. If these situations aren't handled, a Java program will 'crash'
+(terminate abruptly). Exception Handling is Java's mechanism to intercept these
+errors, handle them gracefully, and allow the program to continue running or
+shut down safely.", "concept_explanation": { "what_is_it": "An Exception is an
+unwanted or unexpected event that occurs during the execution of a program at
+runtime. Exception Handling is a way to manage these errors without stopping the
+JVM.", "why_do_we_need_it": "Without it, an error in one line of code stops the
+entire application. With it, we can provide fallback logic, log the error, and
+keep the application alive.", "exception_hierarchy": "All exceptions stem from
+the 'Throwable' class. It branches into 'Error' (serious JVM problems like
+OutOfMemory) and 'Exception' (programmatic issues). 'Exception' is further
+divided into Checked (compile-time) and Unchecked (runtime) exceptions.",
+"checked_vs_unchecked": "Checked exceptions (e.g., IOException) must be handled
+or declared at compile time. Unchecked exceptions (e.g., NullPointerException)
+occur at runtime due to logic flaws and aren't forced by the compiler.",
+"try_with_resources": "Introduced in Java 7, this feature ensures that resources
+like file streams or database connections are closed automatically at the end of
+the block, even if an exception occurs." }, "syntax": { "try_catch_finally":
+"try {\n // Code that might throw an exception\n} catch (ExceptionType e) {\n //
+Code to handle the exception\n} finally {\n // Code that always executes\n}",
+"throw_keyword": "throw new ArithmeticException("Cannot divide by zero");",
+"throws_keyword": "void myMethod() throws IOException { ... }",
+"try_with_resources": "try (BufferedReader br = new BufferedReader(new
+FileReader(path))) {\n // Resource is automatically closed\n}" },
+"syntax_breakdown": { "try": "Defines a block of code to be tested for errors
+while it is being executed.", "catch": "Defines a block of code to be executed
+if an error occurs in the try block.", "finally": "A block that executes
+regardless of whether an exception was caught or not. Used for cleanup.",
+"throw": "Used to explicitly throw an exception from a method or block of
+code.", "throws": "Used in a method signature to indicate that this method might
+throw specific exceptions to its caller.", "multi_catch": "Catching multiple
+exceptions in one block: catch (IOException | SQLException e) { ... }" },
+"rules_and_key_points": [ "A try block must be followed by at least one catch
+block or a finally block.", "The catch block for a subclass exception must
+appear before the catch block for a superclass exception.", "The finally block
+always executes unless the JVM exits during the try/catch (e.g.,
+System.exit()).", "Checked exceptions are checked at compile-time; Unchecked
+exceptions are not.", "The 'throws' keyword is used for exception delegation
+(ducking the exception).", "A method can throw any number of exceptions
+separated by commas in the signature.", "Custom exceptions should extend the
+Exception class (checked) or RuntimeException (unchecked).", "Try-with-resources
+only works with classes that implement the AutoCloseable interface.", "Once an
+exception is thrown, the normal flow of the program stops and the JVM searches
+for a matching catch block.", "Never leave a catch block empty (swallowing
+exceptions); at least log the error." ], "code_example_1": { "title": "Basic
+Try-Catch-Finally", "description": "Demonstrating how to handle a potential
+division by zero and ensure cleanup code runs.", "code": "public class
+BasicException {\n public static void main(String[] args) {\n try {\n int result
+= 10 / 0; // Throws ArithmeticException\n System.out.println("Result: " +
+result);\n } catch (ArithmeticException e) {\n System.out.println("Error: You
+cannot divide by zero!");\n } finally {\n System.out.println("Cleanup: This
+always runs.");\n }\n System.out.println("Program continues...");\n }\n}" },
+"code_example_2": { "title": "Custom Exception and Try-With-Resources",
+"description": "Creating a custom 'InvalidAgeException' and using
+try-with-resources with a custom AutoCloseable class.", "code": "class
+InvalidAgeException extends Exception {\n public InvalidAgeException(String
+message) {\n super(message);\n }\n}\n\nclass Resource implements AutoCloseable
+{\n public void use() { System.out.println("Using resource..."); }\n @Override\n
+public void close() { System.out.println("Resource closed automatically.");
+}\n}\n\npublic class AdvancedException {\n static void checkAge(int age) throws
+InvalidAgeException {\n if (age < 18) throw new InvalidAgeException("Access
+denied - Age must be 18+");\n else System.out.println("Access granted!");\n
+}\n\n public static void main(String[] args) {\n try (Resource res = new
+Resource()) {\n res.use();\n checkAge(15);\n } catch (InvalidAgeException e) {\n
+System.out.println("Caught Custom Error: " + e.getMessage());\n } catch
+(Exception e) {\n System.out.println("General Error: " + e);\n }\n }\n}" },
+"expected_output": "Error: You cannot divide by zero!\nCleanup: This always
+runs.\nProgram continues...\nUsing resource...\nResource closed
+automatically.\nCaught Custom Error: Access denied - Age must be 18+",
+"step_by_step_dry_run": "1. In BasicException, '10 / 0' triggers an
+ArithmeticException object.\n2. The JVM looks for a matching catch. It finds
+'catch (ArithmeticException e)'.\n3. The error message is printed.\n4. The
+finally block executes regardless of the error.\n5. In AdvancedException, the
+try-with-resources block starts and 'res' is initialized.\n6. 'checkAge(15)' is
+called. Since 15 < 18, it 'throws' an InvalidAgeException.\n7. Before jumping to
+the catch block, the try-with-resources automatically calls 'res.close()'.\n8.
+The catch block for InvalidAgeException then executes.", "memory_visualization":
+"When an exception occurs, the JVM creates an Exception Object on the Heap. This
+object contains the stack trace (a snapshot of the method calls). The JVM then
+stops the current execution and searches the Stack for a matching 'catch'
+handler. If it reaches the bottom of the stack (main) without finding one, the
+default exception handler prints the stack trace and terminates the thread.",
+"real_world_use_cases": [ "Database Connectivity: Handling cases where the
+database server is offline.", "User Input: Validating that a user enters a
+number where a string is expected.", "File Processing: Gracefully handling 'File
+Not Found' errors.", "Network Communication: Managing timeouts when a website is
+slow to respond." ], "common_mistakes": [ "Catching 'Exception' or 'Throwable'
+as the first catch block (this masks more specific errors).", "Using Exception
+handling for normal control flow (it is computationally expensive).",
+"Forgetting to close resources in the finally block (use try-with-resources
+instead).", "Not logging the stack trace, making debugging impossible later.",
+"Throwing a checked exception but forgetting to add 'throws' to the method
+signature." ], "best_practices": [ "Catch specific exceptions instead of the
+generic Exception class.", "Throw early, catch late (throw the error where it
+happens, handle it where you can make a decision).", "Always use
+try-with-resources for streams and database connections.", "Include meaningful
+messages in your exceptions.", "Use custom exceptions to make your API more
+readable and business-oriented." ], "faq": [ { "question": "Can we have a try
+block without a catch block?", "answer": "Yes, but only if there is a finally
+block. However, if an exception occurs, it will not be handled in that method."
+}, { "question": "What is the difference between final, finally, and finalize?",
+"answer": "'final' is a modifier for variables/classes/methods. 'finally' is a
+block for exception cleanup. 'finalize()' is a method used by the Garbage
+Collector before an object is destroyed (deprecated)." }, { "question": "Does
+finally execute if I use System.exit(0)?", "answer": "No. System.exit(0)
+terminates the JVM immediately, so the finally block will not execute." } ],
+"summary": "Phase 9 taught us how to handle unexpected errors in Java. We
+explored the try-catch-finally structure, learned the difference between checked
+and unchecked exceptions, and saw how modern Java uses try-with-resources to
+manage resources efficiently. We also learned how to define our own exception
+types for specific business logic.", "key_takeaways": [ "Exception handling
+prevents program crashes.", "Checked exceptions are enforced by the compiler.",
+"Finally is the 'cleanup' king.", "Try-with-resources is the best way to handle
+auto-closable objects.", "Throws delegates; Throw triggers." ],
+"preview_of_the_next_topic": "In Phase 10, we will dive into the Java
+Collections Framework, learning how to store and manipulate groups of objects
+using Lists, Sets, and Maps.", "questions": [ { "difficulty": "Easy", "topic":
+"Concept", "question": "What is the base class for all classes that can be
+thrown in Java?", "answer": "The 'java.lang.Throwable' class is the superclass
+of all errors and exceptions in the Java language." }, { "difficulty":
+"Moderate", "topic": "Concept", "question": "Explain the 'Exception Propagation'
+mechanism.", "answer": "If an exception is not caught in the method where it
+occurred, it 'propagates' or drops down to the previous method in the call
+stack. This continues until it is caught or reaches the main method, where the
+JVM terminates the program if unhandled." }, { "difficulty": "Moderate",
+"topic": "Practical Usage", "question": "Provide a code snippet showing how to
+catch both 'NullPointerException' and 'ArithmeticException' in a single catch
+block.", "answer": "try { ... } catch (NullPointerException |
+ArithmeticException e) { System.out.println("Handled: " + e); }" }, {
+"difficulty": "Hard", "topic": "Practical Usage", "question": "Create a custom
+exception 'InsufficientFundsException' and a method 'withdraw(int amount)' that
+throws it if the amount is greater than 1000.", "answer": "class
+InsufficientFundsException extends Exception { public
+InsufficientFundsException(String s) { super(s); } }\n// ... in a class
+...\nvoid withdraw(int amount) throws InsufficientFundsException {\n if (amount
+> 1000) throw new InsufficientFundsException("Balance low");\n}" }, {
+"difficulty": "Moderate", "topic": "Common Mistake", "question": "What is wrong
+with this code? catch(Exception e) { ... } catch(ArithmeticException a) { ...
+}", "answer": "The code will not compile. ArithmeticException is a subclass of
+Exception. Since catch blocks are checked in order, the Exception block will
+catch everything, making the ArithmeticException block 'unreachable code'." }, {
+"difficulty": "Hard", "topic": "Common Mistake", "question": "Why would a
+'try-with-resources' block fail to compile if used with a 'String' object inside
+the parentheses?", "answer": "Try-with-resources requires the object declared
+inside the parentheses to implement the 'java.lang.AutoCloseable' interface. The
+'String' class does not implement this interface, so it cannot be used there."
+}, { "difficulty": "Moderate", "topic": "Coding", "question": "Write a method
+that takes a String, converts it to an Integer using Integer.parseInt(), and
+catches the potential NumberFormatException.", "answer": "void convert(String s)
+{ try { int i = Integer.parseInt(s); } catch (NumberFormatException e) {
+System.out.println("Invalid number format"); } }" }, { "difficulty": "Hard",
+"topic": "Coding", "question": "Implement a try-finally block where the try
+block returns a value, and explain if the finally block still executes.",
+"answer": "int test() { try { return 10; } finally {
+System.out.println("Finally!"); } }\n// Yes, the finally block executes even
+after the return statement is encountered, but before the value is actually
+returned to the caller." } ], "mcqs": [ { "question": "Which of these is a
+checked exception?", "options": { "A": "NullPointerException", "B":
+"IOException", "C": "ArrayIndexOutOfBoundsException", "D": "ArithmeticException"
+}, "answer": "B" }, { "question": "Which block is used to write cleanup code
+like closing a database connection?", "options": { "A": "catch", "B": "try",
+"C": "finally", "D": "throw" }, "answer": "C" }, { "question": "What is the
+output? try { int x = 5/0; } catch(Exception e) { System.out.print("Err "); }
+finally { System.out.print("Fin"); }", "options": { "A": "Err", "B": "Fin", "C":
+"Err Fin", "D": "Compilation Error" }, "answer": "C" }, { "question": "Which
+keyword is used in a method signature to declare an exception?", "options": {
+"A": "throw", "B": "throws", "C": "exception", "D": "try" }, "answer": "B" }, {
+"question": "Predict the output: try { throw new NullPointerException(); }
+catch(ArithmeticException e) { System.out.print("A"); } finally {
+System.out.print("B"); }", "options": { "A": "A", "B": "B", "C": "AB", "D": "B
+followed by Exception trace" }, "answer": "D" }, { "question": "Find the bug:
+try (Scanner sc = new Scanner(System.in)) { // code } catch(Exception e) {
+sc.close(); }", "options": { "A": "Scanner cannot be used in
+try-with-resources", "B": "sc.close() is redundant because try-with-resources
+closes it automatically", "C": "The catch block is mandatory", "D": "The scanner
+variable sc is accessible outside the try block" }, "answer": "B" }, {
+"question": "Which exception is thrown by the JVM when an array is accessed with
+an invalid index?", "options": { "A": "ArrayException", "B": "IndexException",
+"C": "ArrayIndexOutOfBoundsException", "D": "NoSuchElementException" },
+"answer": "C" }, { "question": "Complete the code: throw ____
+ArithmeticException("Error");", "options": { "A": "new", "B": "exception", "C":
+"the", "D": "an" }, "answer": "A" }, { "question": "Can a catch block exist
+without a try block?", "options": { "A": "Yes", "B": "No", "C": "Only if it is
+in an interface", "D": "Only if it is static" }, "answer": "B" }, { "question":
+"Best Approach: How should you handle a Checked Exception if you cannot resolve
+it locally in the method?", "options": { "A": "Wrap it in a try-catch and do
+nothing", "B": "Declare it using the 'throws' keyword in the method signature",
+"C": "Print the stack trace and return null", "D": "Use System.exit(0)" },
+"answer": "B" } ] }

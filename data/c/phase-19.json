@@ -1,0 +1,328 @@
+{
+  "metadata": {
+    "phaseNumber": 19,
+    "title": "Error Handling in C",
+    "duration": "3 Hours",
+    "difficulty": "Advanced"
+  },
+  "learningObjectives": [
+    "Understand the philosophy of structural error handling in procedural languages without built-in exception constructs.",
+    "Utilize assertions for validating system invariants and internal consistency during development.",
+    "Manipulate the global, thread-local errno to diagnose standard library runtime failures.",
+    "Differentiate and correctly implement logging, diagnostic messaging with perror(), and localized custom message translation with strerror().",
+    "Differentiate the side-effects of exit(), _Exit(), and abort() in terms of resource cleanup, buffers, and system signals."
+  ],
+  "prerequisites": [
+    "Pointers and Memory Addresses",
+    "Preprocessors and Macros",
+    "Standard Library File I/O Operations"
+  ],
+  "introduction": "Unlike modern high-level languages that rely on dynamic exception models such as try-catch blocks, the C programming language implements a manual, explicit, and highly performant paradigm for error handling. At the compilation and debug levels, developers rely on assertions to enforce physical conditions that must never be violated. At runtime, C depends on explicit system call return codes, thread-local status flags such as errno, diagnostic reporting tools, and direct control-flow interruption mechanisms. Mastery of these primitive error constructs is essential to writing enterprise-grade, highly secure, and resilient system software.",
+  "conceptExplanation": "Error handling in C is categorized into development-time validation (assertions) and runtime-time validation (errno, diagnostic output, and execution control). Assertions (assert.h) are static or dynamic assumptions that instantly terminate the program if violated. They act as automated specifications to identify developer bugs, but they can be completely removed from release builds using the NDEBUG macro. For real-world runtime conditions (such as missing files, network drops, or allocation failures), C uses return codes paired with the thread-local integer 'errno'. The standard C library provides 'perror()' and 'strerror()' to convert numerical error codes into human-readable messages. In catastrophic scenarios where continuous program execution is unsafe, control-flow termination functions can be called: exit() terminates the program gracefully, clearing files and executing handlers, whereas abort() forces an immediate, abnormal termination, raising the SIGABRT signal and typically dumping a core file to disk for post-mortem debugging.",
+  "syntax": "/* 1. Assertions */\\n#include <assert.h>\\nassert(expression);\\n\\n/* 2. errno validation */\\n#include <errno.h>\\n#include <string.h>\\nextern int errno;\\nchar *strerror(int errnum);\\n\\n/* 3. Diagnostic reporting */\\n#include <stdio.h>\\nvoid perror(const char *s);\\n\\n/* 4. Execution control */\\n#include <stdlib.h>\\nvoid exit(int status);\\nvoid abort(void);",
+  "syntaxBreakdown": [
+    "assert(expression): If the expression evaluates to zero (false), a diagnostic message is printed to stderr containing the failed expression, the source file name, and line number, followed by a call to abort().",
+    "errno: A thread-local global variable of type int. When standard system calls or library functions fail, they write a non-zero code to this location. It is never cleared by successful library calls; it must be manually reset or inspected immediately after a failed call.",
+    "perror(s): Prints the user-supplied string 's' to stderr, followed by a colon, a space, and the localized system message describing the current value of errno.",
+    "strerror(errnum): Maps the integer code 'errnum' to a locale-dependent string pointer, allowing flexible formatting of system error logs without direct writing to standard streams.",
+    "exit(status): Gracefully shuts down the process. It flushes and closes all open stdio streams, deletes temporary files, and executes clean-up functions registered with the atexit() routine.",
+    "abort(): Triggers an immediate, ungraceful termination of the process by raising the SIGABRT signal. Open stream buffers are not flushed, and no cleanup handlers are executed."
+  ],
+  "rulesAndKeyPoints": [
+    "Never use assert() to handle runtime scenarios (like user input validation or allocation failure). Assertions are strictly for development-level diagnostic checks.",
+    "Always check the return code of standard functions (e.g., fopen returning NULL or malloc returning NULL) before inspecting errno. Successful functions do not clear errno.",
+    "errno is thread-safe on modern compliant systems. It is implemented as a thread-local variable or function call macro to prevent concurrency conflicts.",
+    "The preprocessor flag -DNDEBUG must be passed during production compilation to strip assertions from the generated binary, improving runtime performance.",
+    "Always prefer exit() over abort() for expected termination paths so that file buffers are successfully committed to persistent storage."
+  ],
+  "codeExample1": {
+    "title": "Robust Runtime File Reader using errno, perror, and exit",
+    "code": "#include <stdio.h>\\n#include <stdlib.h>\\n#include <errno.h>\\n#include <string.h>\\n\\nint main(void) {\\n    FILE *file;\\n    \\n    /* Reset errno before a library call to avoid stale states */\\n    errno = 0;\\n    \\n    file = fopen(\\\"critical_system_config.dat\\\", \\\"r\\\");\\n    if (file == NULL) {\\n        /* Print descriptive error to standard error stream */\\n        perror(\\\"System Error when opening config file\\\");\\n        \\n        /* Alternatively, log using strerror for customized output */\\n        fprintf(stderr, \\\"Diagnostic Details: (code %d) -> %s\\\\n\\\", errno, strerror(errno));\\n        \\n        /* Exit gracefully with a failure code */\\n        exit(EXIT_FAILURE);\\n    }\\n    \\n    /* Perform work if successfully opened */\\n    printf(\\\"File opened successfully!\\\\n\\\");\\n    fclose(file);\\n    return EXIT_SUCCESS;\\n}",
+    "explanation": "This example shows the production standard for error handling during standard library file operations. First, errno is cleared. The code checks the return value of fopen() first (which returns NULL on failure). If it fails, the application prints a localized error message to stderr via perror() and prints a detailed customized message using strerror(). The application then terminates gracefully using exit(EXIT_FAILURE), guaranteeing that any other system buffers are cleanly processed."
+  },
+  "codeExample2": {
+    "title": "Invariant Assertions and Abortive Control Flow for Critical Allocations",
+    "code": "#include <stdio.h>\\n#include <stdlib.h>\\n#include <assert.h>\\n\\n#define MAX_BUFFER_SIZE 1024\\n\\nvoid process_payload(const int *payload, size_t size) {\\n    /* Developer Invariant validation: Pointers must never be null and sizes must stay bounded */\\n    assert(payload != NULL);\\n    assert(size > 0 && size <= MAX_BUFFER_SIZE);\\n    \\n    printf(\\\"Processing payload of size %zu...\\\\n\\\", size);\\n}\\n\\nint main(void) {\\n    int *data = NULL;\\n    size_t data_size = 500;\\n    \\n    /* Simulating a dynamic allocation scenario */\\n    data = (int *)malloc(data_size * sizeof(int));\\n    \\n    /* Fallback handler: Allocation failures at runtime are handled with exit or abort, not asserts */\\n    if (data == NULL) {\\n        fprintf(stderr, \\\"CRITICAL: Out of memory. Aborting execution...\\\\n\\\");\\n        abort();\\n    }\\n    \\n    /* Run operations under protected developer conditions */\\n    process_payload(data, data_size);\\n    \\n    free(data);\\n    return 0;\\n}",
+    "explanation": "This demonstrates the difference between development-time validations and actual runtime checks. Inside 'process_payload', assertions ensure that calling developers pass valid inputs. In contrast, 'malloc' returning NULL is a real runtime hazard, so it is handled with an explicit conditional check that invokes abort() to stop execution immediately, rather than using an assert which would disappear in production builds.",
+    "expectedOutput": "Processing payload of size 500...\n"
+  },
+  "stepByStepDryRun": [
+    "Compilation: The program is compiled. If -DNDEBUG is not specified, assertions inside 'process_payload' remain active.",
+    "Memory Allocation: The main stack frame initializes 'data' as NULL. malloc() is called on the heap for 500 integers. On successful systems, a valid heap address (e.g., 0x00A0) is returned and assigned.",
+    "Validation Check: The program checks if 'data == NULL'. Since 0x00A0 is not NULL, the block is bypassed, skipping abort().",
+    "Function Execution: process_payload(0x00A0, 500) is pushed to the stack.",
+    "Assertion Check 1: assert(payload != NULL) checks if 0x00A0 is non-zero. The expression evaluates to true; execution continues.",
+    "Assertion Check 2: assert(size > 0 && size <= 1024) checks if 500 satisfies the bounds. It evaluates to true; execution continues.",
+    "Stdout Output: 'Processing payload of size 500...' is printed to stdout.",
+    "Cleanup: process_payload pops off stack, memory is freed with free(0x00A0), and the application exits cleanly with code 0."
+  ],
+  "memoryVisualization": {
+    "type": "Process Memory Allocation Map",
+    "description": "The virtual address layout showing standard error flow state across standard streams, Thread-Local Storage (TLS), stack variables, and execution points.",
+    "nodes": [
+      {
+        "label": "Thread-Local Storage (TLS)",
+        "value": "errno = 2 (ENOENT - File Not Found)",
+        "address": "0x00007FFF0041",
+        "color": "rose"
+      },
+      {
+        "label": "Main Stack Frame",
+        "value": "file_ptr = 0x00000000 (NULL pointer)",
+        "address": "0x00007FFF0010",
+        "color": "sky"
+      },
+      {
+        "label": "Standard Error Output Buffer (stderr)",
+        "value": "System Error when opening config file: No such file...",
+        "address": "0x00007FFF00E4",
+        "color": "amber"
+      },
+      {
+        "label": "Registered Cleanup (atexit)",
+        "value": "cleanup_handler_ptr -> 0x0040FA82",
+        "address": "0x00007FFF00F2",
+        "color": "violet"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Highly reliable embedded and medical systems where checking errors gracefully prevents software crashes and preserves safety states.",
+    "System daemon logs (/var/log/syslog) where strerror() matches error codes to system failure causes.",
+    "Critical memory-restricted real-time kernels that use assertions during continuous integration (CI) tests to enforce complex constraints without affecting shipping code.",
+    "Mission-critical transaction databases that invoke abort() when memory tables become corrupted, avoiding compromised data writes."
+  ],
+  "commonMistakes": [
+    "Placing code with side effects (such as memory allocation or variable assignments) inside assert() statements, which gets stripped out under release compilation.",
+    "Using assert() for production user validations (e.g., checking if a user-provided file exists). When the production binary is built with -DNDEBUG, these checks will vanish.",
+    "Checking errno without checking the library function's return code first, causing false positives from stale error values set by previous functions.",
+    "Confusing exit() with abort() and failing to flush active output buffers when debugging execution flows."
+  ],
+  "bestPractices": [
+    "Always check standard API return values (e.g., -1, NULL) before inspecting errno.",
+    "Set errno back to 0 prior to invoking library operations that do not have distinct error return values (like strtol).",
+    "Never execute statements with critical side effects (like modifications or allocations) within assert expressions.",
+    "Ensure cleanup routines are registered with atexit() for elegant and automatic memory recovery during normal program exit.",
+    "Direct all diagnostic, debugging, and system recovery warnings explicitly to stderr, preserving stdout for formatted clean system output."
+  ],
+  "faqs": [
+    {
+      "question": "Why shouldn't I use assert to check if malloc succeeded in production?",
+      "answer": "If you compile with -DNDEBUG, the preprocessor strips every single assert() statement out of your program. If you use assert(ptr != NULL), the check is ignored in your production build, and your application will crash with a segmentation fault when trying to use that NULL pointer."
+    },
+    {
+      "question": "Does errno work correctly when multiple threads are executing simultaneously?",
+      "answer": "Yes. On modern, POSIX-compliant systems and implementations of C11 and later, errno is defined as a thread-local variable. Each thread has its own isolated error instance, preventing threads from overwriting each other's status values."
+    },
+    {
+      "question": "What is the key difference between exit() and _Exit()?",
+      "answer": "exit() performs helper cleanup operations before closing the program (calling atexit handlers, flushing standard buffer channels, etc.). _Exit() terminates the application immediately without executing cleanup functions or flushing buffered output streams."
+    }
+  ],
+  "summary": "C's error handling model is based on explicit return values, thread-safe global error indicators (errno), and execution state management. Assertions provide automated testing support during development but are completely compiled out in production code. During runtime, system routines communicate unexpected conditions using return values and the global variable errno. Developers must use perror() and strerror() to write diagnostic messages to stderr and employ exit() or abort() depending on whether graceful recovery or immediate termination is needed.",
+  "keyTakeaways": [
+    "Use assertions strictly to catch logic errors during development, not runtime system errors.",
+    "Inspect the return values of library routines first before looking at the global errno variable.",
+    "Convert numeric error codes into readable diagnostic messages using perror() or strerror().",
+    "Use exit() for orderly process termination, and use abort() for unrecoverable structural anomalies requiring core dumps."
+  ],
+  "nextTopicPreview": "Now that you have mastered runtime error safety and program validation, the next phase will introduce Advanced Preprocessor Macros, conditional compilation flags, and custom build headers to build configurable system tools.",
+  "questionsAndAnswers": [
+    {
+      "id": "q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What is the critical semantic difference between utilizing exit() and utilizing abort() in a C application?",
+      "answer": "The critical difference lies in the level of grace and cleanup that occurs during execution termination. exit() performs a clean shutdown: it flushes all standard output buffers, closes opened streams, deletes temp files, and executes any cleanup functions registered via the atexit() hook. Conversely, abort() causes immediate, abnormal program termination by raising the SIGABRT signal. It bypasses all buffers, skips atexit() cleanup routines, and forces the host operating system to attempt a core dump for offline diagnostics.",
+      "explanation": "This distinction is critical for system programming where uncleaned hardware configurations can lock systems, while abrupt aborts help write state dumps for developer evaluation."
+    },
+    {
+      "id": "q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Explain why checking errno immediately after a standard library call is necessary, and why checking it without verifying the return status can produce bugs.",
+      "answer": "The global variable errno is updated by standard library calls when an error occurs, but it is never reset to 0 upon a successful execution. If a developer checks errno without first checking if the function's return code indicates failure (such as fopen returning NULL), they may read a stale error code set by a previous, unrelated failed operation, leading to a false positive error report.",
+      "explanation": "Standard C specification guarantees write access to errno on failures but does not require functions to clear errno on success. Hence, checking the return code first is the only correct way to verify an error."
+    },
+    {
+      "id": "q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a code snippet demonstrating how to use assertions to validate that pointers are non-NULL before copying memory, and explain how to completely disable this check in production compilation.",
+      "answer": "#include <stdio.h>\\n#include <string.h>\\n#include <assert.h>\\n\\nvoid safe_copy(char *dest, const char *src, size_t n) {\\n    assert(dest != NULL);\\n    assert(src != NULL);\\n    memcpy(dest, src, n);\\n}\\n\\n/* To disable this validation check during compilation, compile with: gcc -DNDEBUG -O2 main.c */",
+      "explanation": "By defining the preprocessor macro NDEBUG, all assert() expressions are replaced with no-ops by the preprocessor, avoiding validation overhead in release builds."
+    },
+    {
+      "id": "q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Write a safe division function that validates inputs using a mixture of assertions (for developer errors) and return-code status checks with errno (for runtime division by zero).",
+      "answer": "#include <stdio.h>\\n#include <errno.h>\\n#include <assert.h>\\n\\nint safe_divide(int numerator, int denominator, int *result) {\\n    /* Assert that the pointer to save result is valid (Developer Error if null) */\\n    assert(result != NULL);\\n    \\n    /* Handle Division by zero as a Runtime Error using errno */\\n    if (denominator == 0) {\\n        errno = EDOM; /* Domain error code */\\n        return -1;\\n    }\\n    \\n    *result = numerator / denominator;\\n    return 0;\\n}",
+      "explanation": "In this design, passing a NULL result pointer is a developer programming error, so it is handled with an assertion. Division by zero is a runtime input error, so it sets the standard domain error (EDOM) in errno and returns a failure status."
+    },
+    {
+      "id": "q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Identify and correct the bug in the following error diagnostic snippet: \\n\\nFILE *f = fopen(\\\"data.txt\\\", \\\"r\\\");\\nif (f == NULL) {\\n    printf(\\\"Log: fopen failed.\\\\n\\\");\\n    if (errno == ENOENT) {\\n        printf(\\\"File does not exist.\\\\n\\\");\\n    }\\n}",
+      "answer": "The bug is that printf() is called between the failed fopen() call and checking the value of errno. printf() is itself a system operation that can modify the value of errno, potentially overwriting the error code set by fopen(). The correct implementation is:\\n\\nFILE *f = fopen(\\\"data.txt\\\", \\\"r\\\");\\nif (f == NULL) {\\n    int saved_err = errno; /* Instantly capture the error code */\\n    printf(\\\"Log: fopen failed.\\\\n\\\");\\n    if (saved_err == ENOENT) {\\n        printf(\\\"File does not exist.\\\\n\\\");\\n    }\\n}",
+      "explanation": "Always save the global errno value to a local variable immediately after a failure if any other library functions are called before checking its value."
+    },
+    {
+      "id": "q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Identify and fix the resource leak bug in this function on early failure exit: \\n\\nint process_log(const char *path) {\\n    FILE *file = fopen(path, \\\"r\\\");\\n    if (!file) return -1;\\n    char *buffer = malloc(1024);\\n    if (!buffer) return -1;\\n    if (fgets(buffer, 1024, file) == NULL) {\\n        return -1;\\n    }\\n    free(buffer);\\n    fclose(file);\\n    return 0;\\n}",
+      "answer": "The bug is that if fgets() fails, the function returns -1 immediately, failing to free the allocated 'buffer' and failing to close the open 'file' descriptor. This causes memory and file handle resource leaks. The correct approach uses structured cleanup labels:\\n\\nint process_log(const char *path) {\\n    FILE *file = fopen(path, \\\"r\\\");\\n    if (!file) return -1;\\n    \\n    char *buffer = malloc(1024);\\n    if (!buffer) {\\n        fclose(file);\\n        return -1;\\n    }\\n    \\n    int status = 0;\\n    if (fgets(buffer, 1024, file) == NULL) {\\n        status = -1;\\n    }\\n    \\n    free(buffer);\\n    fclose(file);\\n    return status;\\n}",
+      "explanation": "Using a unified exit pathway or clearing resources before returning prevents resource leaks when handling intermediate failures."
+    },
+    {
+      "id": "q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write a robust string-to-long conversion function using the standard strtol() routine that correctly validates against underflow, overflow, and invalid inputs using errno.",
+      "answer": "#include <stdio.h>\\n#include <stdlib.h>\\n#include <errno.h>\\n#include <limits.h>\\n\\nlong robust_atoi(const char *str, int *valid) {\\n    char *endptr;\\n    errno = 0;\\n    *valid = 1;\\n    \\n    long val = strtol(str, &endptr, 10);\\n    \\n    /* Check for overflow/underflow or standard range validation errors */\\n    if ((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)) || (errno != 0 && val == 0)) {\\n        *valid = 0;\\n        return 0;\\n    }\\n    /* If no digits were found, it's an error */\\n    if (endptr == str) {\\n        *valid = 0;\\n        return 0;\\n    }\\n    return val;\\n}",
+      "explanation": "This safe conversion resets errno to 0, calls strtol(), and checks for ERANGE and endptr pointer modifications to catch conversion failures."
+    },
+    {
+      "id": "q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Design a memory-managed structure representing a Custom Integer Array with dynamic resizing. Implement double checks using assertions to guarantee memory boundaries are never crossed during write operations, and handle heap exhaustion with graceful diagnostic error prints and controlled process termination.",
+      "answer": "#include <stdio.h>\\n#include <stdlib.h>\\n#include <assert.h>\\n\\ntypedef struct {\\n    int *data;\\n    size_t size;\\n    size_t capacity;\\n} IntArray;\\n\\nIntArray* create_array(size_t init_capacity) {\\n    assert(init_capacity > 0);\\n    IntArray *arr = malloc(sizeof(IntArray));\\n    if (!arr) {\\n        perror(\\\"Failed to allocate array structure\\\");\\n        exit(EXIT_FAILURE);\\n    }\\n    arr->data = malloc(init_capacity * sizeof(int));\\n    if (!arr->data) {\\n        free(arr);\\n        perror(\\\"Failed to allocate array buffer\\\");\\n        exit(EXIT_FAILURE);\\n    }\\n    arr->size = 0;\\n    arr->capacity = init_capacity;\\n    return arr;\\n}\\n\\nvoid write_at(IntArray *arr, size_t index, int value) {\\n    assert(arr != NULL);\\n    /* Array index safety validation using assertions (Developer API contracts) */\\n    assert(index < arr->capacity);\\n    \\n    arr->data[index] = value;\\n    if (index >= arr->size) {\\n        arr->size = index + 1;\\n    }\\n}",
+      "explanation": "This dynamic array implementation uses assertions to verify structural rules (such as array pointers being valid and writes staying within allocated bounds) while using clean runtime checks to handle allocation failure safely."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "category": "Theory",
+      "question": "Which of the following is true regarding assertions when the preprocessor macro NDEBUG is defined?",
+      "options": {
+        "A": "They cause compile-time errors.",
+        "B": "They are evaluated at runtime but do not terminate execution.",
+        "C": "They are completely ignored and generate no machine instructions.",
+        "D": "They write output to stdout instead of stderr."
+      },
+      "correctOption": "C",
+      "explanation": "Defining NDEBUG removes all assert() macros from the preprocessed source code, making them produce zero runtime performance overhead."
+    },
+    {
+      "id": "m2",
+      "category": "Theory",
+      "question": "Which header file declares the external global error flag errno?",
+      "options": {
+        "A": "<assert.h>",
+        "B": "<stdlib.h>",
+        "C": "<stdio.h>",
+        "D": "<errno.h>"
+      },
+      "correctOption": "D",
+      "explanation": "<errno.h> is the standard header file containing declarations for errno, along with standard error constants like EDOM, ERANGE, and EILSEQ."
+    },
+    {
+      "id": "m3",
+      "category": "Output Prediction",
+      "question": "What is the output of the following program if compiled with the flag -DNDEBUG?\\n\\n#include <stdio.h>\\n#include <assert.h>\\n\\nint main(void) {\\n    int x = 5;\\n    assert(x == 10);\\n    printf(\\\"%d\\\\n\\\", x);\\n    return 0;\\n}",
+      "options": {
+        "A": "Assertion failed: x == 10",
+        "B": "5",
+        "C": "10",
+        "D": "The program fails to compile."
+      },
+      "correctOption": "B",
+      "explanation": "Because -DNDEBUG is defined, the assert statement is skipped during compilation. The program executes normally and prints 5."
+    },
+    {
+      "id": "m4",
+      "category": "Output Prediction",
+      "question": "What is printed to stderr by calling perror(\\\"Error\\\") when errno contains the value ENOENT?",
+      "options": {
+        "A": "Error",
+        "B": "ENOENT: File not found",
+        "C": "Error: No such file or directory",
+        "D": "No such file or directory: Error"
+      },
+      "correctOption": "C",
+      "explanation": "perror() prints the user's string, followed by a colon, a space, and the system message corresponding to the value in errno (ENOENT translates to 'No such file or directory')."
+    },
+    {
+      "id": "m5",
+      "category": "Output Prediction",
+      "question": "What happens when abort() is executed in a standard C console application?",
+      "options": {
+        "A": "The program closes cleanly and flushes all stdout buffers.",
+        "B": "The OS is notified and registers registered cleanups via atexit.",
+        "C": "The program raises SIGABRT, terminates immediately, and typically leaves a core dump.",
+        "D": "The program loops infinitely."
+      },
+      "correctOption": "C",
+      "explanation": "abort() triggers an abnormal termination by raising the SIGABRT signal, skipping standard file cleanups and running a core dump."
+    },
+    {
+      "id": "m6",
+      "category": "Find the Bug",
+      "question": "Identify the bug in the following source code pattern:\\n\\nvoid process(int *ptr) {\\n    assert(ptr = malloc(sizeof(*ptr)));\\n    *ptr = 100;\\n}",
+      "options": {
+        "A": "The assert condition should use the comparison operator == instead of assignment =.",
+        "B": "The macro assert does not accept functions with return statements.",
+        "C": "If NDEBUG is defined, malloc will be completely removed in release builds, causing a memory bug.",
+        "D": "malloc returns a void pointer, which cannot be cast inside assertions."
+      },
+      "correctOption": "C",
+      "explanation": "Putting operations with critical side effects (like memory allocation with malloc) inside an assert means they will not run when NDEBUG is defined."
+    },
+    {
+      "id": "m7",
+      "category": "Find the Bug",
+      "question": "Find the issue in the following code block:\\n\\nFILE *f = fopen(\\\"log.txt\\\", \\\"r\\\");\\nif (errno != 0) {\\n    perror(\\\"Failed\\\");\\n}",
+      "options": {
+        "A": "fopen does not affect the value of errno.",
+        "B": "The code checks errno without first checking if the return value of fopen indicates a failure.",
+        "C": "perror must only be called with NULL.",
+        "D": "errno can only be checked inside a switch block."
+      },
+      "correctOption": "B",
+      "explanation": "Checking errno without verifying that fopen() returned NULL can cause false positives since errno may hold a stale value from a previous operation."
+    },
+    {
+      "id": "m8",
+      "category": "Complete the Code",
+      "question": "Fill in the blank to safely convert errno into a descriptive string pointer for dynamic logging:\\n\\nchar log_buf[256];\\nsprintf(log_buf, \\\"Log failure description: %s\\\", ___________(errno));",
+      "options": {
+        "A": "strerror",
+        "B": "perror",
+        "C": "errstring",
+        "D": "strerr"
+      },
+      "correctOption": "A",
+      "explanation": "strerror() returns a pointer to the error string corresponding to the error number argument, making it perfect for custom log formatting."
+    },
+    {
+      "id": "m9",
+      "category": "Complete the Code",
+      "question": "Which function is used to register a custom cleanup routine that runs automatically when exit() is called?",
+      "options": {
+        "A": "on_exit",
+        "B": "register_cleanup",
+        "C": "atexit",
+        "D": "exit_handler"
+      },
+      "correctOption": "C",
+      "explanation": "atexit() registers a void-returning, parameterless function that will be executed automatically during clean, normal process termination."
+    },
+    {
+      "id": "m10",
+      "category": "Best Approach",
+      "question": "When designing a public library API in C, what is the industry-standard way to notify callers of runtime errors (like resource unavailability)?",
+      "options": {
+        "A": "Use assert() statements to stop execution.",
+        "B": "Call abort() immediately to prevent invalid execution.",
+        "C": "Return a status error code, and set a thread-safe errno, allowing the caller to handle the recovery.",
+        "D": "Use longjmp to escape the call stack directly to main."
+      },
+      "correctOption": "C",
+      "explanation": "Libraries should be flexible and non-intrusive. Returning status codes and using errno allows calling applications to handle errors without forcing crashes."
+    }
+  ]
+}

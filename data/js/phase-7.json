@@ -1,0 +1,255 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 7,
+    "phaseTitle": "DOM Manipulation: Bringing Web Pages to Life",
+    "description": "Learn how to bridge the gap between static HTML and interactive JavaScript. Master the Document Object Model (DOM) to select, create, modify, and handle events on web elements.",
+    "estimatedTime": "180 minutes"
+  },
+  "learningObjectives": [
+    "Understand the DOM as a tree-like data structure.",
+    "Master modern selection techniques using querySelector and querySelectorAll.",
+    "Dynamically modify HTML content, attributes, and CSS styles via JavaScript.",
+    "Create, append, and remove DOM elements programmatically.",
+    "Implement robust event handling and understand the Event Object.",
+    "Optimize performance using Event Delegation and understanding Bubbling."
+  ],
+  "prerequisites": [
+    "Phase 1 - Basic Variables and Data Types",
+    "Phase 4 - Functions and Arrow functions",
+    "Phase 6 - Objects (The DOM is an object-based API)"
+  ],
+  "introduction": "The Document Object Model (DOM) is the programming interface for web documents. Think of it as a bridge: on one side you have your static HTML/CSS, and on the other, your JavaScript code. When a web page loads, the browser creates a 'tree' of the page where every HTML tag is a 'node' (an object) that JavaScript can talk to. Without the DOM, JavaScript would have no way to change what the user sees on the screen.",
+  "conceptExplanation": "### What is the DOM?\nThe DOM is a representation of the HTML document as a tree of objects. Each element (like a <div> or <h1>) is an object that you can manipulate.\n\n### Why do we need it?\nWe need it to create interactive experiences—like showing a popup when a button is clicked, updating a score in a game, or validation on a form without refreshing the page.\n\n### How does it work?\nJavaScript uses the `document` object to enter the tree. We 'Select' an element, then we 'Modify' it or 'Listen' for user interaction (Events). \n\n### Core Operations:\n1. **Selecting:** Finding the element in the HTML.\n2. **Manipulation:** Changing text, color, or structure.\n3. **Events:** Waiting for clicks, keypresses, or scrolls.",
+  "syntax": "// 1. Selection\nconst button = document.querySelector('#submit-btn');\nconst items = document.querySelectorAll('.list-item');\n\n// 2. Manipulation\nbutton.textContent = 'Click Me';\nbutton.style.backgroundColor = 'blue';\n\n// 3. Event Listening\nbutton.addEventListener('click', (event) => {\n  console.log('Button clicked!', event.target);\n});",
+  "breakdownOfSyntax": {
+    "document": "The entry point to the DOM; the root object of the entire HTML document.",
+    "querySelector": "A modern method to find the first element matching a CSS selector (ID, Class, or Tag).",
+    "textContent": "A property used to change only the text inside an element (safer than innerHTML).",
+    "addEventListener": "The standard method to attach an 'event listener' to an element without overwriting existing ones.",
+    "event (parameter)": "An object automatically passed to the callback containing details like mouse coordinates or which key was pressed."
+  },
+  "rulesAndKeyPoints": [
+    "The DOM is NOT JavaScript; it is a Web API provided by the browser.",
+    "Always prefer querySelector/querySelectorAll over older methods like getElementById.",
+    "Use .textContent for plain text and .innerHTML only when you need to render HTML tags (beware of security risks).",
+    "Changing .style directly adds 'inline styles' to the HTML element.",
+    "Class manipulation via .classList.add() or .classList.toggle() is cleaner than changing .style directly.",
+    "The 'Event Object' contains a wealth of information about the user's action.",
+    "Event Bubbling means an event starts at the target and 'bubbles up' to its parents.",
+    "Event Delegation is a performance technique where you listen for events on a parent instead of every single child.",
+    "NodeList (returned by querySelectorAll) looks like an array but requires Array.from() for older array methods.",
+    "Always place your <script> tag at the end of the <body> or use the 'defer' attribute to ensure the DOM is loaded before JS runs."
+  ],
+  "codeExample1": {
+    "title": "Basic Selection and Styling",
+    "description": "How to grab an element and change its appearance dynamically.",
+    "code": "const title = document.querySelector('h1');\n\n// Change content\ntitle.textContent = 'Hello JavaScript DOM!';\n\n// Change style\ntitle.style.color = 'tomato';\ntitle.style.fontSize = '3rem';\n\n// Change classes\ntitle.classList.add('highlight-effect');"
+  },
+  "codeExample2": {
+    "title": "Interactive List Manager",
+    "description": "Creating elements, handling clicks, and using the Event object.",
+    "code": "const input = document.querySelector('#taskInput');\nconst addBtn = document.querySelector('#addBtn');\nconst list = document.querySelector('#taskList');\n\naddBtn.addEventListener('click', () => {\n  if (input.value.trim() === '') return;\n\n  // 1. Create a new <li> element\n  const newItem = document.createElement('li');\n  \n  // 2. Set its content\n  newItem.textContent = input.value;\n  \n  // 3. Add a click listener to remove it (individual)\n  newItem.addEventListener('click', function() {\n    this.remove();\n  });\n\n  // 4. Append to the list\n  list.appendChild(newItem);\n  \n  // 5. Clear input\n  input.value = '';\n});"
+  },
+  "output": "Example 1 Output:\nThe H1 on the page turns tomato-red, gets larger, and receives a new CSS class.\n\nExample 2 Output:\nWhen a user types 'Buy Milk' and clicks add, a new list item appears. Clicking the item itself removes it from the page.",
+  "stepByStepDryRun": {
+    "method": "Event Bubbling",
+    "code": "<div id='parent'><button id='child'>Click</button></div>",
+    "steps": [
+      "Step 1: User clicks the <button> (the Target).",
+      "Step 2: The browser checks for a click listener on the button and fires it.",
+      "Step 3: The event 'bubbles' to the <div>. If the div has a click listener, it fires too.",
+      "Step 4: The event continues bubbling up to <body>, <html>, and finally the document.",
+      "Note: Use event.stopPropagation() if you want to stop the event from reaching the parent."
+    ]
+  },
+  "memoryVisualization": "DOM TREE VISUALIZATION:\n[Document] -> [html] -> [body]\n                     |-> [header] -> [h1]\n                     |-> [main] -> [p], [ul] -> [li], [li]\n\nWhen JS executes 'document.createElement', a new Object is created in the Heap. It is 'detached' (not visible) until you call 'appendChild', which links that memory object into the DOM Tree active in the browser's renderer.",
+  "realWorldUseCases": [
+    "Form Validation: Checking if an email is valid and showing a red error message instantly.",
+    "Dark Mode Toggles: Switching CSS classes on the body element.",
+    "Infinite Scroll: Automatically creating and appending new post elements as the user scrolls down.",
+    "Search Filters: Hiding/showing elements based on user input in a search bar.",
+    "Modals: Opening and closing popup windows by changing their display style."
+  ],
+  "commonMistakes": [
+    "Trying to select an element before the HTML has loaded (returns null).",
+    "Forgetting the '#' or '.' in querySelector('.className').",
+    "Using innerHTML = '...' which deletes all existing children inside an element.",
+    "Assuming querySelectorAll returns an actual Array (it's a NodeList).",
+    "Not removing event listeners on complex apps, leading to 'memory leaks'."
+  ],
+  "bestPractices": [
+    "Cache your selections: Store `document.querySelector` results in variables instead of re-selecting inside loops.",
+    "Use .classList for styling instead of editing .style properties one by one.",
+    "Use Event Delegation (one listener on the parent) when handling many similar child elements.",
+    "Use 'defer' in your script tag to ensure the DOM is ready.",
+    "Minimize 'reflows': Batch DOM changes together instead of changing one small thing every millisecond."
+  ],
+  "frequentlyAskedQuestions": [
+    {
+      "difficulty": "Easy Concept",
+      "question": "What is the difference between innerHTML and textContent?",
+      "answer": "textContent treats everything as raw text, making it fast and safe. innerHTML parses the string as HTML, which allows you to insert tags but can be dangerous if the content comes from a user (Cross-Site Scripting)."
+    },
+    {
+      "difficulty": "Moderate Concept",
+      "question": "What is Event Bubbling?",
+      "answer": "Event bubbling is the order in which event handlers are called when one element is nested inside a second element, and both elements have registered a listener for the same event (e.g., a click). The event starts at the target and moves up to the root."
+    },
+    {
+      "difficulty": "Moderate Practical",
+      "question": "Why is querySelector preferred over getElementById?",
+      "answer": "querySelector is more versatile. You can use the same method for IDs, classes, and complex CSS selectors like 'div > p:first-child', whereas getElementById only works for IDs."
+    },
+    {
+      "difficulty": "Hard Practical",
+      "question": "What is Event Delegation and why use it?",
+      "answer": "Event Delegation is a pattern where you attach a single event listener to a parent element to manage events for all its current and future children. It is much more memory-efficient than attaching 100 listeners to 100 separate items."
+    },
+    {
+      "difficulty": "Moderate Mistake",
+      "question": "Why does my script return 'null' for an element that I know exists?",
+      "answer": "Usually, this happens because the JavaScript is executing before the browser has finished parsing the HTML. Place your script at the bottom of the body or use the 'defer' attribute."
+    },
+    {
+      "difficulty": "Hard Mistake",
+      "question": "What happens if I use 'this' inside an arrow function event listener?",
+      "answer": "Unlike a regular function (where 'this' refers to the element that triggered the event), an arrow function inherits 'this' from the surrounding scope (usually the window). Use 'event.currentTarget' instead to get the element reliably."
+    },
+    {
+      "difficulty": "Moderate Coding",
+      "question": "How do you change the background color of an element when it is clicked?",
+      "answer": "element.addEventListener('click', (e) => { e.target.style.backgroundColor = 'red'; });"
+    },
+    {
+      "difficulty": "Hard Coding",
+      "question": "How can you create a list item and add it to a <ul> without using innerHTML?",
+      "answer": "const li = document.createElement('li'); li.textContent = 'New Item'; document.querySelector('ul').appendChild(li);"
+    }
+  ],
+  "summary": "Phase 7 introduced the Document Object Model (DOM), the API that allows JavaScript to control HTML and CSS. We learned how to select elements, modify their content and style, and respond to user interactions via events.",
+  "keyTakeaways": [
+    "The DOM represents HTML as a tree of objects.",
+    "document.querySelector is the modern standard for selection.",
+    "textContent is safer than innerHTML.",
+    "classList is the best way to manage CSS styles via JS.",
+    "document.createElement creates elements in memory first.",
+    "Events are user actions that JS can 'listen' for.",
+    "The Event Object provides details about the interaction.",
+    "Event Bubbling allows events to propagate up the tree.",
+    "Event Delegation improves performance by using parent listeners.",
+    "Proper script placement (defer) is crucial for DOM access."
+  ],
+  "previewOfNextTopic": "In Phase 8, we explore Asynchronous JavaScript, learning how to handle data fetching, timers, and tasks that take time to complete without freezing the browser.",
+  "mcqs": [
+    {
+      "type": "Theory",
+      "question": "Which object represents the root of the entire HTML document in the DOM?",
+      "options": {
+        "A": "window",
+        "B": "root",
+        "C": "document",
+        "D": "html"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Theory",
+      "question": "What is the correct way to add a CSS class 'active' to an element?",
+      "options": {
+        "A": "element.class = 'active'",
+        "B": "element.classList.add('active')",
+        "C": "element.style.class = 'active'",
+        "D": "element.addClass('active')"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "What happens if you run: document.querySelector('.my-btn').textContent = '<b>Hello</b>'?",
+      "options": {
+        "A": "The text becomes bold",
+        "B": "It shows the literal string '<b>Hello</b>'",
+        "C": "It throws an error",
+        "D": "Nothing happens"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "What does document.querySelectorAll('div').length return?",
+      "options": {
+        "A": "The total number of div elements on the page",
+        "B": "The first div element",
+        "C": "An array of all divs",
+        "D": "True or False"
+      },
+      "answer": "A"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "If you click a button inside a div, and both have click listeners, which fires first by default?",
+      "options": {
+        "A": "The Div listener",
+        "B": "The Button listener",
+        "C": "They fire simultaneously",
+        "D": "Only the Button listener fires"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "Why is this failing? const btn = document.querySelector('myButton'); btn.onclick = () => alert('Hi');",
+      "options": {
+        "A": "Selector is missing # for ID or . for class",
+        "B": "onclick is not a valid property",
+        "C": "Alert is not a function",
+        "D": "const cannot be used for elements"
+      },
+      "answer": "A"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "What is wrong with this? list.appendChild('<li>Item</li>');",
+      "options": {
+        "A": "appendChild requires a Node object, not a string",
+        "B": "list is a reserved word",
+        "C": "It should be appendChildNode",
+        "D": "Strings must use double quotes"
+      },
+      "answer": "A"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "Fill the blank to stop an event from bubbling: event._______();",
+      "options": {
+        "A": "stop()",
+        "B": "stopPropagation",
+        "C": "preventBubbling",
+        "D": "cancel"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "To create a new div: const myDiv = document._______('div');",
+      "options": {
+        "A": "newElement",
+        "B": "make",
+        "C": "createElement",
+        "D": "add"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Best Approach",
+      "question": "Which method is best for performance when adding click listeners to 50 list items?",
+      "options": {
+        "A": "A forEach loop adding 50 listeners",
+        "B": "Adding a single listener to the parent <ul> (Event Delegation)",
+        "C": "Adding onclick attributes in HTML",
+        "D": "None of the above"
+      },
+      "answer": "B"
+    }
+  ]
+}

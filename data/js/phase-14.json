@@ -1,0 +1,258 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 14,
+    "phaseTitle": "Node.js Basics: Server-Side JavaScript",
+    "description": "Transition from the browser to the server. Master the Node.js runtime, built-in modules, npm package management, and build your first REST API using Express.js.",
+    "estimatedTime": "180 minutes"
+  },
+  "learningObjectives": [
+    "Understand the Node.js runtime environment and the V8 engine.",
+    "Manage dependencies and projects using npm and package.json.",
+    "Utilize built-in modules like 'fs', 'path', and 'http' for system operations.",
+    "Create a functional HTTP server from scratch.",
+    "Master Express.js for routing and middleware management.",
+    "Build a basic REST API that handles JSON data."
+  ],
+  "prerequisites": [
+    "Phase 4 - Functions and Callbacks",
+    "Phase 8 - Asynchronous JavaScript (Promises/Async-Await)",
+    "Phase 11 - Modules (ES Modules)"
+  ],
+  "introduction": "For years, JavaScript lived only inside web browsers. Node.js changed everything by bringing JavaScript to the server. Built on Chrome's V8 engine, Node.js allows you to write high-performance, scalable backend applications, command-line tools, and servers using the same language you use for the frontend. It uses an 'event-driven, non-blocking I/O model' that makes it incredibly efficient for data-intensive real-time applications.",
+  "conceptExplanation": "### What is Node.js?\nNode.js is not a programming language; it is a **runtime environment**. It takes the JavaScript engine from the browser and places it on your computer, giving it access to your file system, network, and operating system. \n\n### The NPM Ecosystem\nNPM (Node Package Manager) is the world's largest software registry. It allows you to download and use code written by other developers (packages) to speed up your development. \n\n### Non-Blocking I/O\nIn traditional servers, if a process reads a large file, the whole server waits. In Node.js, the 'Event Loop' delegates that task to the operating system and moves on to the next request immediately. When the file is ready, Node.js triggers a callback to handle the result. \n\n### Express.js\nWhile Node.js can create servers using the built-in 'http' module, it is verbose. Express.js is a 'minimalist web framework' that simplifies routing (mapping URLs to functions) and handling requests.",
+  "syntax": "// --- 1. Built-in Module (FileSystem) ---\nimport fs from 'node:fs/promises';\n\n// --- 2. Simple HTTP Server (Native) ---\nimport http from 'node:http';\nconst server = http.createServer((req, res) => {\n  res.end('Hello from Node!');\n});\n\n// --- 3. Express.js Basic Route ---\nimport express from 'express';\nconst app = express();\napp.get('/api', (req, res) => {\n  res.json({ message: 'Success' });\n});",
+  "breakdownOfSyntax": {
+    "import ... from 'node:...'": "The modern way to load built-in Node.js modules using the 'node:' prefix for clarity.",
+    "package.json": "The manifest file for your project that tracks dependencies, scripts, and versioning.",
+    "req (Request)": "An object containing information about the incoming data (URL, headers, body).",
+    "res (Response)": "An object used to send data back to the client (status codes, JSON, HTML).",
+    "Middleware": "Functions that execute during the lifecycle of a request to the Express server before reaching the final route handler."
+  },
+  "rulesAndKeyPoints": [
+    "Node.js has no 'window' or 'document' objects; use 'global' and 'process' instead.",
+    "Always initialize a project with 'npm init' to create a package.json file.",
+    "Use 'node --watch' (in Node 18+) or 'nodemon' to automatically restart the server during development.",
+    "Built-in modules must be imported before use (e.g., node:fs, node:path, node:os).",
+    "HTTP status codes (200=OK, 404=Not Found, 500=Server Error) are essential for APIs.",
+    "Express middleware order matters; code runs from top to bottom.",
+    "Always use 'app.use(express.json())' to allow Express to read JSON data from requests.",
+    "The 'path' module is required to handle file paths across different operating systems (Windows vs Linux).",
+    "Never commit your 'node_modules' folder to Git; use a .gitignore file.",
+    "Environment variables (process.env) should be used for sensitive data like API keys."
+  ],
+  "codeExample1": {
+    "title": "File System Operations",
+    "description": "Reading and writing files asynchronously using the modern Promises API.",
+    "code": "import fs from 'node:fs/promises';\nimport path from 'node:path';\n\nconst filePath = path.join(process.cwd(), 'hello.txt');\n\nasync function handleFile() {\n  try {\n    // Writing a file\n    await fs.writeFile(filePath, 'Welcome to Node.js!');\n    console.log('File created successfully.');\n\n    // Reading the file\n    const content = await fs.readFile(filePath, 'utf-8');\n    console.log('File content:', content);\n  } catch (err) {\n    console.error('Error handling file:', err.message);\n  }\n}\n\nhandleFile();"
+  },
+  "codeExample2": {
+    "title": "A Basic REST API with Express",
+    "description": "Creating a server that can handle multiple routes and JSON responses.",
+    "code": "import express from 'express';\n\nconst app = express();\nconst PORT = 3000;\n\n// Middleware to parse JSON\napp.use(express.json());\n\nconst users = [\n  { id: 1, name: 'Alice' },\n  { id: 2, name: 'Bob' }\n];\n\n// GET Route: Fetch all users\napp.get('/users', (req, res) => {\n  res.status(200).json(users);\n});\n\n// POST Route: Add a new user\napp.post('/users', (req, res) => {\n  const newUser = { id: Date.now(), ...req.body };\n  users.push(newUser);\n  res.status(201).json(newUser);\n});\n\napp.listen(PORT, () => {\n  console.log(`Server running at http://localhost:${PORT}`);\n});"
+  },
+  "output": "Example 1 Output:\nFile created successfully.\nFile content: Welcome to Node.js!\n\nExample 2 Output:\nServer running at http://localhost:3000\n(Accessing GET /users returns the JSON list of users)"
+  },
+  "stepByStepDryRun": {
+    "method": "Express Request-Response Cycle",
+    "code": "app.get('/hi', (req, res) => res.send('Hi'));",
+    "steps": [
+      "Step 1: The browser sends a GET request to 'http://localhost:3000/hi'.",
+      "Step 2: The request enters the Node.js process and is handed to the Express app.",
+      "Step 3: Express checks its 'Routing Table' for a GET method with the path '/hi'.",
+      "Step 4: Express finds the matching function and executes it, passing the 'req' and 'res' objects.",
+      "Step 5: The 'res.send()' method is called. This sets the Content-Type to text/html and the Status to 200.",
+      "Step 6: The response is sent back over the network and the connection is closed."
+    ]
+  },
+  "memoryVisualization": "NODE.JS PROCESS MEMORY:\n1. [V8 HEAP]: Stores JavaScript objects, variables, and closures (similar to browser).\n2. [C++ BINDINGS]: The bridge between JS and the OS (provides File System and Network access).\n3. [LIBUV THREAD POOL]: Background workers that handle heavy tasks like file compression or disk access, keeping the main JS thread free.\n4. [EVENT QUEUE]: Holds completed async tasks waiting for the Event Loop to push them back into the V8 Heap for processing.",
+  "realWorldUseCases": [
+    "Building Microservices: Creating small, independent server applications that communicate with each other.",
+    "Real-time Chat: Using Node.js with WebSockets for instant messaging (like WhatsApp Web).",
+    "Streaming Services: Handling large video/audio streams efficiently (like Netflix).",
+    "DevOps Tools: Creating custom CLI (Command Line Interface) tools to automate workflows.",
+    "Full-stack Apps: Using the same language for both frontend (React/Vue) and backend (Node)."
+  ],
+  "commonMistakes": [
+    "Forgetting to call 'res.send()' or 'res.json()', which leaves the browser loading forever until it timeouts.",
+    "Trying to use 'window' or 'alert()' which only exist in the browser DOM.",
+    "Using synchronous file methods (fs.readFileSync) in a web server (this blocks all other users!).",
+    "Installing packages without '--save' (legacy) or forgetting to check package.json for accuracy.",
+    "Handling sensitive API keys in plain text instead of using .env files."
+  ],
+  "bestPractices": [
+    "Always use the asynchronous/promise-based versions of built-in modules.",
+    "Use environment variables for configuration (ports, database URLs).",
+    "Structure your project with separate folders for 'routes', 'controllers', and 'models'.",
+    "Implement proper error handling middleware in Express to catch server crashes.",
+    "Keep your middleware functions small and focused on one task.",
+    "Use a linter (like ESLint) to maintain consistent code style across the team."
+  ],
+  "frequentlyAskedQuestions": [
+    {
+      "difficulty": "Easy Concept",
+      "question": "Is Node.js a programming language?",
+      "answer": "No, Node.js is a runtime environment that allows you to execute JavaScript code outside of a web browser."
+    },
+    {
+      "difficulty": "Moderate Concept",
+      "question": "What is the role of the package.json file?",
+      "answer": "It acts as a manifest for your project. It lists all installed dependencies, project metadata (name, version), and custom scripts (like 'start' or 'test')."
+    },
+    {
+      "difficulty": "Moderate Practical",
+      "question": "What is the difference between req.params and req.query?",
+      "answer": "req.params refers to variables in the URL path (e.g., /users/:id), while req.query refers to variables after the question mark in a URL (e.g., /search?name=bob)."
+    },
+    {
+      "difficulty": "Hard Practical",
+      "question": "How does Node.js handle multiple users if it only has one thread?",
+      "answer": "Node.js uses an Event Loop. It doesn't stay 'busy' with a single user. It starts a task (like fetching data), moves to the next user, and only comes back to the first user when the data is ready."
+    },
+    {
+      "difficulty": "Moderate Mistake",
+      "question": "Why do we need express.json() middleware?",
+      "answer": "By default, Node.js sees incoming POST data as a raw stream of bytes. express.json() parses that stream and turns it into a clean JavaScript object available in req.body."
+    },
+    {
+      "difficulty": "Hard Mistake",
+      "question": "What happens if you block the event loop?",
+      "answer": "If you run a very heavy calculation (like a massive loop) synchronously, the server cannot respond to any other requests from any other users until that calculation finishes. This effectively 'freezes' the server."
+    },
+    {
+      "difficulty": "Moderate Coding",
+      "question": "How do you start an Express server on port 5000?",
+      "answer": "app.listen(5000, () => console.log('Server started'));"
+    },
+    {
+      "difficulty": "Hard Coding",
+      "question": "Write a route that returns a specific user based on an ID in the URL.",
+      "answer": "app.get('/users/:id', (req, res) => { const user = users.find(u => u.id == req.params.id); res.json(user); });"
+    }
+  ],
+  "summary": "Phase 14 introduced the fundamentals of server-side development with Node.js. We covered the architecture of the Node runtime, how to manage packages via npm, the use of built-in system modules, and how to build modern web APIs using Express.js.",
+  "keyTakeaways": [
+    "Node.js runs JavaScript on the server using the V8 engine.",
+    "The Event Loop allows for high concurrency with a single thread.",
+    "npm is the standard tool for managing project dependencies.",
+    "Built-in modules like 'fs' provide access to the operating system.",
+    "Express.js simplifies the creation of web servers and REST APIs.",
+    "Middleware are the building blocks of an Express application.",
+    "The Request (req) and Response (res) objects are the core of web communication.",
+    "Asynchronous code is mandatory for server performance.",
+    "Status codes tell the client the result of their request.",
+    "Never block the event loop with synchronous operations."
+  ],
+  "previewOfNextTopic": "In Phase 15, we will apply everything we've learned to build a series of Mini Projects, including a Todo App, a Weather App, and a full REST API.",
+  "mcqs": [
+    {
+      "type": "Theory",
+      "question": "Which engine powers Node.js?",
+      "options": {
+        "A": "SpiderMonkey",
+        "B": "Chakra",
+        "C": "V8",
+        "D": "JavaScriptCore"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Theory",
+      "question": "Which command is used to initialize a new Node.js project?",
+      "options": {
+        "A": "npm start",
+        "B": "npm init",
+        "C": "npm install",
+        "D": "node init"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "In Node.js, what is the output of 'console.log(window)'?",
+      "options": {
+        "A": "The Window Object",
+        "B": "undefined",
+        "C": "ReferenceError: window is not defined",
+        "D": "null"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "What does 'res.json({id: 1})' do in Express?",
+      "options": {
+        "A": "Downloads a file",
+        "B": "Sends a JSON response to the client",
+        "C": "Saves the object to a database",
+        "D": "Redirects to another page"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "What is the default value of req.body if no middleware is used?",
+      "options": {
+        "A": "{}",
+        "B": "undefined",
+        "C": "null",
+        "D": "An empty string"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "app.get('/', (res) => { res.send('Hello'); });",
+      "options": {
+        "A": "Missing 'req' parameter in the callback",
+        "B": "res.send is not a function",
+        "C": "Method should be app.push",
+        "D": "Missing status code"
+      },
+      "answer": "A"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "const fs = require('fs'); fs.readFile('file.txt', (data) => console.log(data));",
+      "options": {
+        "A": "Callback is missing the 'err' first parameter",
+        "B": "data must be a string",
+        "C": "require is not allowed in Node",
+        "D": "readFile only works with URLs"
+      },
+      "answer": "A"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "To get a parameter from '/users/:userId', use req.____.userId.",
+      "options": {
+        "A": "query",
+        "B": "body",
+        "C": "params",
+        "D": "data"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "To install a package named 'cors': ____ install cors.",
+      "options": {
+        "A": "node",
+        "B": "npm",
+        "C": "get",
+        "D": "pkg"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Best Approach",
+      "question": "What is the best way to handle a file upload in a high-traffic Node.js server?",
+      "options": {
+        "A": "fs.readFileSync()",
+        "B": "Loading the whole file into a variable",
+        "C": "Using Streams (fs.createReadStream)",
+        "D": "Writing to the global object"
+      },
+      "answer": "C"
+    }
+  ]
+}

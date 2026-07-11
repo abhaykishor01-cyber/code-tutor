@@ -1,0 +1,328 @@
+{
+  "metadata": {
+    "phaseNumber": 9,
+    "title": "Structures and Unions",
+    "duration": "6 Hours",
+    "difficulty": "Intermediate"
+  },
+  "learningObjectives": [
+    "Understand the need for user-defined composite data types in C.",
+    "Declare, define, and initialize structures and nested structures.",
+    "Access structure members using dot (.) and arrow (->) operators.",
+    "Pass structures to functions efficiently by value and by pointer.",
+    "Declare and use arrays of structures.",
+    "Define and use unions to optimize memory usage.",
+    "Differentiate between structures and unions in terms of memory layout and alignment.",
+    "Utilize 'typedef' to simplify compound type declarations."
+  ],
+  "prerequisites": [
+    "Pointers (dereferencing, pointer arithmetic, and parameter passing)",
+    "Arrays and multi-dimensional structures",
+    "Memory models (stack vs heap, byte sizing)",
+    "Basic functions and scope rules"
+  ],
+  "introduction": "In C, primitive data types like int, float, and char are single values. Real-world systems require modeling complex entities—such as a user account (combining name, ID, and balance) or a hardware control register (combining bitfields). Structures (structs) allow us to group variable elements of differing data types under a single user-defined container, which is allocated sequentially in memory. Unions allow us to share the exact same physical memory location among different data types. Understanding how structs and unions behave in memory, including alignment, padding, and access operators, is essential for writing low-level systems software, file systems, and driver layers.",
+  "conceptExplanation": "Structures and unions represent user-defined composite types. \n\n1. Structures: A structure is a contiguous block of memory large enough to hold all its member variables. However, the exact size is often larger than the sum of its parts due to 'structure padding'. Compilers insert padding bytes to align data types with natural CPU word boundaries (e.g., aligning a 4-byte integer to a 4-byte boundary). This maximizes hardware-level memory access speeds.\n\n2. Nested Structures: You can place one structure inside another. The outer structure contains the inner structure as a member block, which also obeys padding and alignment rules.\n\n3. Structure Pointers and the Arrow Operator (->): When you have a pointer to a structure, accessing a member requires dereferencing the pointer first: (*ptr).member. Because this is syntactically heavy, C provides the arrow operator (ptr->member) as an elegant, cleaner equivalent.\n\n4. Passing to Functions: Passing a structure by value copies the entire memory block of the struct onto the call stack. For large structures, this wastes memory and cycles. Passing a pointer to the structure is faster and more efficient, only copying the pointer size (usually 4 or 8 bytes) and allowing the function to modify the caller's struct directly.\n\n5. Unions: A union is declared similarly to a structure, but it allocates only enough space to hold its *largest* member. All members share the same starting memory address. Modifying one member of a union immediately overwrites the data shared by other members. This is useful for variant data types, memory saving, and register manipulation.\n\n6. typedef: This keyword creates an alias for a data type, hiding complex syntax like 'struct Student' and replacing it with a concise alias like 'Student_t'.",
+  "syntax": "/* Structure Syntax */\nstruct TagName {\n    dataType member1;\n    dataType member2;\n} instance1, instance2;\n\n/* Typedef with Structure */\ntypedef struct {\n    dataType member1;\n    dataType member2;\n} TypeAlias;\n\n/* Union Syntax */\nunion UnionTag {\n    dataType member1;\n    dataType member2;\n} unionInstance;\n\n/* Accessing Members */\ninstance1.member1 = value;   /* Dot operator for direct variables */\nTypeAlias *ptr = &instance1;\nptr->member1 = value;        /* Arrow operator for pointers */",
+  "syntaxBreakdown": [
+    "struct TagName: Defines a new tag namespace. The struct keyword must be present unless aliased.",
+    "dataType member: Individual variable declarations within the block. They cannot be initialized inside the declaration block.",
+    "instance1, instance2: Optional global/local variables of this struct type declared immediately during structure definition.",
+    "typedef struct { ... } TypeAlias;: Erases the requirement of typing the keyword 'struct' when declaring instances. You can write 'TypeAlias myVar;' instead of 'struct TagName myVar;'.",
+    "union UnionTag: Establishes a shared-memory block where the allocated size is equal to the size of the largest member, aligned to alignment requirements."
+  ],
+  "rulesAndKeyPoints": [
+    "A struct's total size is not always the sum of its member sizes. It is padded to match the alignment requirements of the largest member variable.",
+    "Members inside a structure are ordered sequentially in memory from lowest address to highest address in the order they are declared.",
+    "You cannot initialize members directly within the struct definition; a struct declaration acts as a blueprint, not an active instance.",
+    "If you pass a structure to a function by value, C creates a local copy. Any modification to the members inside the function will not affect the original variable.",
+    "A union holds only one active value at any given time. Writing to one member and reading from a different member produces implementation-dependent/undefined behavior, unless debugging physical raw bytes.",
+    "The arrow operator (->) is syntactic sugar for dereferencing followed by member access: ptr->member equivalent to (*ptr).member."
+  ],
+  "codeExample1": {
+    "title": "Advanced Structure, Nesting, Pointer Passing, and Alignment Demonstration",
+    "code": "#include <stdio.h>\n#include <string.h>\n\n/* Sub-structure for tracking addresses */\ntypedef struct {\n    char city[50];\n    int zipCode;\n} Address;\n\n/* Main user structure */\ntypedef struct {\n    char name[30];\n    int id;\n    double salary;\n    Address addr; /* Nested Structure */\n} Employee;\n\n/* Function prototype using read-only const pointer */\nvoid printEmployee(const Employee *emp);\nvoid giveRaise(Employee *emp, double bonus);\n\nint main(void) {\n    /* Initialization of nested structure */\n    Employee emp1 = {\n        \"Alice Vance\",\n        1023,\n        75000.00,\n        {\"New York\", 10001}\n    };\n\n    printf(\"--- Initial Profile ---\\n\");\n    printEmployee(&emp1);\n\n    /* Pass by pointer to modify value */\n    giveRaise(&emp1, 5250.50);\n\n    printf(\"\\n--- Updated Profile ---\\n\");\n    printEmployee(&emp1);\n\n    /* Demonstrating sizing and alignment padding */\n    printf(\"\\n--- Size Information ---\\n\");\n    printf(\"Size of Address struct: %zu bytes\\n\", sizeof(Address));\n    printf(\"Size of Employee struct: %zu bytes\\n\", sizeof(Employee));\n    \n    return 0;\n}\n\nvoid printEmployee(const Employee *emp) {\n    /* Accessing members using arrow (->) and nested dots (.) */\n    printf(\"Name   : %s\\n\", emp->name);\n    printf(\"ID     : %d\\n\", emp->id);\n    printf(\"Salary : $%.2f\\n\", emp->salary);\n    printf(\"City   : %s\\n\", emp->addr.city);\n    printf(\"ZIP    : %d\\n\", emp->addr.zipCode);\n}\n\nvoid giveRaise(Employee *emp, double bonus) {\n    if (emp != NULL) {\n        emp->salary += bonus; /* Modifies caller's data directly */\n    }\n}",
+    "explanation": "This program highlights the absolute best practices of structure architecture. It declares a nested struct (Address inside Employee) and initializes them in a clean nested initializer block. In the functions, instead of passing the entire Employee structure by value (which would copy 90+ bytes on every call), we pass constant pointers (const Employee *) for reading, and standard pointers (Employee *) for modification. The final print statements output the sizes of the structures, showing how memory alignment and padding affect the final byte sizes of compound variables."
+  },
+  "codeExample2": {
+    "title": "Unions for Memory Optimization and Raw Memory Inspections",
+    "code": "#include <stdio.h>\n\n/* A union representing an IPv4 Address */\nunion IPAddress {\n    unsigned int fullAddress; /* 4 bytes */\n    unsigned char octets[4];  /* 4 bytes (1 byte each) */\n};\n\nint main(void) {\n    union IPAddress myIP;\n\n    /* Initialize using the full raw 32-bit unsigned integer */\n    myIP.fullAddress = 0x0100007F; /* Hex representation of localhost 127.0.0.1 in little-endian order */\n\n    printf(\"--- Union Memory Share Demonstration ---\\n\");\n    printf(\"Full 32-bit value (hex) : 0x%08X\\n\", myIP.fullAddress);\n    \n    /* Access individual bytes of the integer directly using octets array */\n    printf(\"Octet 0: %d\\n\", myIP.octets[0]);\n    printf(\"Octet 1: %d\\n\", myIP.octets[1]);\n    printf(\"Octet 2: %d\\n\", myIP.octets[2]);\n    printf(\"Octet 3: %d\\n\", myIP.octets[3]);\n\n    /* Overwrite just one octet and see changes globally */\n    myIP.octets[0] = 192;\n    myIP.octets[1] = 168;\n    myIP.octets[2] = 1;\n    myIP.octets[3] = 50;\n\n    printf(\"\\nAfter modifying individual octets:\\n\");\n    printf(\"Full 32-bit integer (hex): 0x%08X\\n\", myIP.fullAddress);\n    printf(\"Size of entire union      : %zu bytes\\n\", sizeof(myIP));\n\n    return 0;\n}",
+    "explanation": "This program showcases how a union shares memory. The union IPAddress takes up exactly 4 bytes of memory, which is the size of its largest member (both the unsigned int and the character array are 4 bytes long). Modifying the individual byte octets changes the full 32-bit unsigned integer instantly. This approach is highly common in networking programs, hardware registers, and system driver layers.",
+    "expectedOutput": "--- Union Memory Share Demonstration ---\nFull 32-bit value (hex) : 0x0100007F\nOctet 0: 127\nOctet 1: 0\nOctet 2: 0\nOctet 3: 1\n\nAfter modifying individual octets:\nFull 32-bit integer (hex): 0x3201A8C0\nSize of entire union      : 4 bytes"
+  },
+  "stepByStepDryRun": [
+    "Step 1: The OS launches main() and allocates space on the call stack for the local union variable 'myIP'. Total size allocated is exactly 4 bytes, aligned to a 4-byte boundary.",
+    "Step 2: Execution assigns 'myIP.fullAddress = 0x0100007F'. The memory block from &myIP to &myIP+3 is loaded with the values: [7F, 00, 00, 01] due to Intel little-endian storage logic.",
+    "Step 3: The program prints the octets individually. C accesses 'myIP.octets[0]' (which looks at address offset 0: 0x7F or 127 decimal) up to 'myIP.octets[3]' (which looks at address offset 3: 0x01 or 1 decimal).",
+    "Step 4: The program overwrites 'myIP.octets' array one byte at a time with values 192 (0xC0), 168 (0xA8), 1 (0x01), and 50 (0x32).",
+    "Step 5: The active bits are altered globally. When the program reads 'myIP.fullAddress', it interprets the entire contiguous block of 4 bytes as a single 32-bit integer, reading '0x3201A8C0' in hex."
+  ],
+  "memoryVisualization": {
+    "type": "Stack and Compound Member Representation",
+    "description": "Visualizing struct padding and layout of an instantiated struct { char c; int i; double d; } in memory, showing where bytes are padded for proper alignment.",
+    "nodes": [
+      {
+        "label": "Member: char c (Offset 0)",
+        "value": "'A' (1 Byte)",
+        "address": "0x7FFEEA00",
+        "color": "emerald"
+      },
+      {
+        "label": "Structure Padding (Offsets 1-3)",
+        "value": "Unused / Garbage (3 Bytes for Int alignment)",
+        "address": "0x7FFEEA01",
+        "color": "rose"
+      },
+      {
+        "label": "Member: int i (Offset 4)",
+        "value": "42 (4 Bytes)",
+        "address": "0x7FFEEA04",
+        "color": "sky"
+      },
+      {
+        "label": "Member: double d (Offset 8)",
+        "value": "3.14159 (8 Bytes)",
+        "address": "0x7FFEEA08",
+        "color": "amber"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Embedded Systems: Mapping hardware control registers to exact physical addresses using structures combined with unions and bit-fields.",
+    "Network Packet Parsing: Wrapping protocol headers (TCP/IP packets) inside structures for elegant byte-level extraction.",
+    "Graphics Programming: Storing multi-dimensional points (X, Y, Z), vectors, and color blocks (R, G, B, A) as cohesive structures.",
+    "Database Record Cache: Constructing tables and file headers within local memory arrays before serialization."
+  ],
+  "commonMistakes": [
+    "Forgetting the trailing semicolon (;) after closing the structure's block. This causes syntax cascade errors throughout the whole source file.",
+    "Attempting to compare two structures using the comparison operator (e.g., if (emp1 == emp2)). C does not support direct struct comparisons; members must be compared individually, or by writing custom comparison functions.",
+    "Declaring structures that recursively contain an instance of themselves (struct Node { struct Node next; }). This results in an infinite recursion of sizing. You must use pointers instead (struct Node *next;).",
+    "Unintended value-copying: Passing structures directly to functions without a pointer, causing massive execution overhead and silent logic bugs when changes do not persist."
+  ],
+  "bestPractices": [
+    "Sort structures from largest member size to smallest member size to minimize structure padding bytes added by the compiler.",
+    "Always pass structures by pointer (preferably 'const Type *' if the function only reads the values) to save overhead on the call stack.",
+    "Always clear structure memory using memset() before sending structures over networks or writing them to disk files to avoid leaking unitialized stack/heap data embedded in structural padding.",
+    "Use typedef explicitly to increase code clarity, avoiding the redundant repeating of the word 'struct'."
+  ],
+  "faqs": [
+    {
+      "question": "Why does sizeof() return a larger value than the sum of its structural elements?",
+      "answer": "Compilers align variables to addresses divisible by their size (e.g., 4-byte integers on addresses divisible by 4) to ensure rapid CPU memory-fetch speeds. To accomplish this, empty 'padding bytes' are added between variables."
+    },
+    {
+      "question": "Can a structure contain a pointer to itself?",
+      "answer": "Yes. This is called a self-referential structure, and is the physical foundation for dynamic data structures like Linked Lists, Trees, and Graphs."
+    },
+    {
+      "question": "What is the difference between a structure and a class in C++ compared to C?",
+      "answer": "In C, structures only group raw variables and contain no methods. In C++, structures are identical to classes except their members are 'public' by default."
+    }
+  ],
+  "summary": "Structures and unions form the foundation of customized composite data tracking in C. While structures allocate separate, sequential memory offsets for all listed variables (with padding added for processor optimization), unions save space by packing all listed variables into the exact same memory coordinate. Knowing how to efficiently construct, align, access, and pass these complex frameworks is a crucial prerequisite to system-level and device driver developments.",
+  "keyTakeaways": [
+    "Structures let you group multiple data types; Unions let you share the same space.",
+    "Padding is added automatically by the compiler to fit memory alignment constraints.",
+    "Always prefer passing structures by pointer to avoid massive stack duplication.",
+    "Use typedef to create cleaner, more readable application interfaces."
+  ],
+  "nextTopicPreview": "Phase 10: Advanced File Input and Output (I/O) Operations.",
+  "questionsAndAnswers": [
+    {
+      "id": "Q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What is the primary difference in memory allocation between structures and unions?",
+      "answer": "A structure allocates individual, non-overlapping memory blocks sequentially for every member, which means all members can contain data simultaneously. A union allocates a single shared memory block sized to match only its largest member, allowing only one variable's data to be accurately read or written at a time.",
+      "explanation": "A struct's total size is the sum of its aligned members. A union's total size is simply the size of its largest member, with both starting at the same memory address offset."
+    },
+    {
+      "id": "Q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Why does compiler padding occur in structures, and how can it be minimized?",
+      "answer": "CPUs read memory in word blocks (e.g., 32-bit or 64-bit boundaries). Unaligned data requires the processor to make multiple memory access operations, degrading efficiency. Compilers solve this by inserting unused padding bytes so each variable aligns cleanly. Padding can be minimized by declaring struct members in descending order of size (e.g., putting doubles and pointers first, followed by ints, then shorts, and finally chars).",
+      "explanation": "Declaring structural members in decreasing size order helps prevent the compiler from having to inject empty buffer alignment bytes between variables of smaller sizes."
+    },
+    {
+      "id": "Q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a complete C function that takes an array of 'Student' structures and returns the average grade. The structure has 'name' and 'grade' members.",
+      "answer": "```c\ntypedef struct {\n    char name[50];\n    double grade;\n} Student;\n\ndouble getAverageGrade(const Student students[], int size) {\n    if (size <= 0) return 0.0;\n    double sum = 0.0;\n    for (int i = 0; i < size; i++) {\n        sum += students[i].grade;\n    }\n    return sum / size;\n}\n```",
+      "explanation": "The function receives the array as a pointer to the constant Student objects. It loops through the items, accesses individual grades using the dot notation, and divides the sum by the count."
+    },
+    {
+      "id": "Q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Demonstrate how to write a function that swaps the details of two structures by modifying pointers in the caller scope.",
+      "answer": "```c\n#include <stdio.h>\n\ntypedef struct {\n    int id;\n    double value;\n} DataNode;\n\nvoid swapNodes(DataNode *a, DataNode *b) {\n    if (a != NULL && b != NULL) {\n        DataNode temp = *a;  /* Entire structure copy */\n        *a = *b;\n        *b = temp;\n    }\n}\n```",
+      "explanation": "By dereferencing the pointers within the helper swap function, we can copy the whole structures directly. This alters the internal attributes of the calling scope instantly without manual member-by-member tracking."
+    },
+    {
+      "id": "Q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Identify and explain the bug in: `struct Node { int val; Node *next; } n1;`",
+      "answer": "The compiler does not recognize 'Node' as a valid type when declaring the pointer. Inside the struct definition block, the keyword 'struct' must accompany 'Node' when declaring self-referential members, unless a typedef has already been completed.",
+      "explanation": "The correct declaration should read: `struct Node { int val; struct Node *next; } n1;` because the alias is not finished rendering until the trailing declaration completes."
+    },
+    {
+      "id": "Q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Why does the expression `*ptr.member` fail to compile when 'ptr' is a pointer to a structure? Write the two correct alternatives.",
+      "answer": "The dot (.) operator has higher precedence than the dereference operator (*). Therefore, C tries to resolve the member of 'ptr' before dereferencing it, which fails because 'ptr' is a pointer, not a direct structure instance. The correct syntax is either `(*ptr).member` or using the arrow operator `ptr->member`.",
+      "explanation": "Wrapping dereferencing in parentheses overrides operator priority, while the arrow operator is the preferred industry standard."
+    },
+    {
+      "id": "Q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Implement a structure representation of a 3D coordinate Point, and write a function that calculates the Euclidean distance between two Points in space.",
+      "answer": "```c\n#include <stdio.h>\n#include <math.h>\n\ntypedef struct {\n    double x;\n    double y;\n    double z;\n} Point3D;\n\ndouble calculateDistance(const Point3D *p1, const Point3D *p2) {\n    double dx = p1->x - p2->x;\n    double dy = p1->y - p2->y;\n    double dz = p1->z - p2->z;\n    return sqrt(dx*dx + dy*dy + dz*dz);\n}\n```",
+      "explanation": "This structure clusters three coordinate floats. The computation logic leverages mathematical formulas and accesses coordinate coordinates using highly performant const pointer offsets."
+    },
+    {
+      "id": "Q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Write a program that uses an anonymous union nested inside a structure to represent a polymorphic data package that can contain either an integer error code or a float sensor reading.",
+      "answer": "```c\n#include <stdio.h>\n#include <stdbool.h>\n\ntypedef struct {\n    int sensorId;\n    bool isError;\n    union {\n        int errorCode;\n        float sensorReading;\n    } data;\n} SensorPacket;\n\nvoid inspectPacket(const SensorPacket *packet) {\n    printf(\"Sensor ID: %d\\n\", packet->sensorId);\n    if (packet->isError) {\n        printf(\"Status: Failure, Code: %d\\n\", packet->data.errorCode);\n    } else {\n        printf(\"Status: OK, Metric: %.2f\\n\", packet->data.sensorReading);\n    }\n}\n```",
+      "explanation": "Nesting unions within structures is a classic industry pattern. The boolean tag flag ('isError') is used to track the state, determining whether we read the error int or the reading float from the shared union space safely."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "M1",
+      "category": "Theory",
+      "question": "Which of the following is true about the size of a union?",
+      "options": {
+        "A": "It is equal to the sum of the sizes of all of its member variables.",
+        "B": "It is equal to the size of its largest member variable, subject to overall alignment adjustments.",
+        "C": "It is always 4 bytes on 32-bit architectures and 8 bytes on 64-bit systems.",
+        "D": "It must be determined at runtime based on the active member assignment."
+      },
+      "correctOption": "B",
+      "explanation": "The compiler allocates space for the largest member because all members share the same base memory address."
+    },
+    {
+      "id": "M2",
+      "category": "Theory",
+      "question": "What happens when a struct is passed to a function by value (e.g., function(myStruct))?",
+      "options": {
+        "A": "The compiler automatically generates a pointer to the original structure.",
+        "B": "Only the first member of the structure is copied onto the program stack.",
+        "C": "A complete byte-for-byte copy of the entire structure is pushed onto the stack.",
+        "D": "Compiling fails because structures can only be passed by reference."
+      },
+      "correctOption": "C",
+      "explanation": "Passing a structure by value copies the entire structural memory block, which can cause stack overhead issues for larger entities."
+    },
+    {
+      "id": "M3",
+      "category": "Output Prediction",
+      "question": "What is the output of the following C code?\n```c\n#include <stdio.h>\nstruct Simple {\n    char x;\n    int y;\n};\nint main() {\n    struct Simple s = {'A', 256};\n    struct Simple *p = &s;\n    printf(\"%d\", p->y);\n    return 0;\n}\n```",
+      "options": {
+        "A": "65",
+        "B": "256",
+        "C": "Compilation Error",
+        "D": "Undefined Behavior"
+      },
+      "correctOption": "B",
+      "explanation": "The arrow operator (->) correctly dereferences pointer 'p' and displays the value stored inside member variable 'y', which is 256."
+    },
+    {
+      "id": "M4",
+      "category": "Output Prediction",
+      "question": "What is the output of the following C code?\n```c\n#include <stdio.h>\nunion Data {\n    int val;\n    char ch;\n};\nint main() {\n    union Data d;\n    d.val = 65;\n    d.ch = 'B';\n    printf(\"%d\", d.val);\n    return 0;\n}\n```",
+      "options": {
+        "A": "65",
+        "B": "66",
+        "C": "131",
+        "D": "Undefined / Implementation-dependent output based on overlapping bytes"
+      },
+      "correctOption": "B",
+      "explanation": "Both variables share the exact same starting byte space. Writing 'B' (ASCII 66) to 'd.ch' overwrites the lowest byte of the int, modifying 'd.val' to 66 (since 66 fits in a single byte)."
+    },
+    {
+      "id": "M5",
+      "category": "Output Prediction",
+      "question": "What is the output of the following code snippet assuming 4-byte integers and 1-byte chars with standard structure alignment rules?\n```c\n#include <stdio.h>\nstruct S {\n    char a;\n    char b;\n    int c;\n};\nint main() {\n    printf(\"%zu\", sizeof(struct S));\n    return 0;\n}\n```",
+      "options": {
+        "A": "6 bytes",
+        "B": "8 bytes",
+        "C": "12 bytes",
+        "D": "5 bytes"
+      },
+      "correctOption": "B",
+      "explanation": "The two single-byte characters 'a' and 'b' take up 2 bytes. The compiler adds 2 alignment bytes of padding before the 4-byte integer 'c' to place it on a 4-byte boundary, resulting in a total of 8 bytes."
+    },
+    {
+      "id": "M6",
+      "category": "Find the Bug",
+      "question": "Identify the bug in the following snippet:\n```c\n#include <stdio.h>\ntypedef struct {\n    int roll;\n    char name[20];\n} Student\n\nint main() {\n    Student s1 = {1, \"John\"};\n    return 0;\n}\n```",
+      "options": {
+        "A": "Student should have been initialized using the 'struct' keyword inside main.",
+        "B": "Array values cannot be initialized in a nested declaration construct.",
+        "C": "A semicolon is missing at the end of the typedef structure definition.",
+        "D": "Typedef alias names cannot begin with capitalized letters."
+      },
+      "correctOption": "C",
+      "explanation": "A structure and typedef definition must always terminate with a semicolon. Forgetting it will break the compilation of subsequent lines."
+    },
+    {
+      "id": "M7",
+      "category": "Find the Bug",
+      "question": "Why does the following code generate a syntax failure during compilation?\n```c\n#include <stdio.h>\ntypedef struct {\n    int x;\n    int y;\n} Point;\nint main() {\n    Point p1 = {10, 20};\n    Point p2 = {10, 20};\n    if (p1 == p2) {\n        printf(\"Identical\");\n    }\n    return 0;\n}\n```",
+      "options": {
+        "A": "C does not support direct struct assignments during declaration.",
+        "B": "The equivalence operator (==) cannot be used to compare structures directly.",
+        "C": "Point variables must be dereferenced before comparison.",
+        "D": "Structures cannot contain multiple variables of matching types."
+      },
+      "correctOption": "B",
+      "explanation": "C does not natively define structural comparison logic. You must check members individually or write a helper function to compare them."
+    },
+    {
+      "id": "M8",
+      "category": "Complete the Code",
+      "question": "Complete the bracket to print the coordinate value of point through its pointer: `Point p = {5, 10}; Point *ptr = &p; printf(\"X coordinate: %d\", ___________);`",
+      "options": {
+        "A": "*ptr.x",
+        "B": "ptr.x",
+        "C": "ptr->x",
+        "D": "(*ptr)->x"
+      },
+      "correctOption": "C",
+      "explanation": "The arrow (->) operator accesses structural elements from a pointer variable directly."
+    },
+    {
+      "id": "M9",
+      "category": "Complete the Code",
+      "question": "Complete the blank to correctly initialize a nested Address struct inside a main student instance:\n```c\nstruct Addr { char city[20]; };\nstruct Stud { char name[20]; struct Addr home; };\nstruct Stud st = { \"Kim\", ____________ };\n```",
+      "options": {
+        "A": "\"Seoul\"",
+        "B": " Seoul ",
+        "C": "{\"Seoul\"}",
+        "D": "Seoul.city"
+      },
+      "correctOption": "C",
+      "explanation": "Nested structures require a nested set of curly braces to match their layout initialization sequence."
+    },
+    {
+      "id": "M10",
+      "category": "Best Approach",
+      "question": "What is the most execution-efficient and safe way to pass a 500-byte structural system state to a read-only monitoring function?",
+      "options": {
+        "A": "Pass by value: monitor(SystemState state) to ensure safety via a local copy.",
+        "B": "Pass by constant pointer: monitor(const SystemState *state) to avoid stack allocation while preventing modifications.",
+        "C": "Create a global instance of SystemState to bypass parameter scope interfaces entirely.",
+        "D": "Deconstruct the structure into separate scalar elements and pass them individually."
+      },
+      "correctOption": "B",
+      "explanation": "Passing a pointer avoids copying 500 bytes onto the stack, and using the const keyword prevents the monitoring function from altering the structural data."
+    }
+  ]
+}

@@ -1,0 +1,316 @@
+{
+  "metadata": {
+    "phaseNumber": 7,
+    "title": "Strings and String Manipulation",
+    "duration": "6 Hours",
+    "difficulty": "Intermediate"
+  },
+  "learningObjectives": [
+    "Understand how strings are represented in C as null-terminated character arrays",
+    "Distinguish between character arrays on the Stack and read-only string literals in the Text Segment",
+    "Differentiate safely between dangerous input functions like gets() and secure alternatives like fgets()",
+    "Master the standard <string.h> library functions: strlen, strcpy, strncpy, strcat, strcmp, strchr, strstr, and strtok",
+    "Perform manual string manipulations and pointer arithmetic without relying on library helper functions"
+  ],
+  "prerequisites": [
+    "Phase 5: Pointers and Memory Addresses",
+    "Phase 6: Arrays and Multi-dimensional Structures"
+  ],
+  "introduction": "Unlike higher-level programming languages, C does not have a native, built-in 'string' data type. Instead, strings in C are simply continuous sequences of characters stored in memory, marked by a terminating special byte called the null character ('\\0'). This design gives developers absolute control over memory and pointer operations, but it also demands a disciplined approach to manual memory bounds checking. In this phase, we will master how strings are stored in memory, how to read inputs safely, how to leverage standard library functions, and how to write custom memory-safe string manipulations.",
+  "conceptExplanation": "A C-string is an array of data type char terminated by a null character (ASCII code 0, written as '\\0'). When we allocate memory for a string, we must always reserve one extra byte for this terminator. For example, the string 'CProg' contains 5 characters but requires 6 bytes of memory storage: ['C', 'P', 'r', 'o', 'g', '\\0'].\n\nThere are two main ways to define a string in C:\n1. As a mutable character array: char str[] = \"Hello\";. This copies the characters into stack memory, allowing you to modify individual characters later (e.g., str[0] = 'M';).\n2. As an immutable pointer to a string literal: const char *str = \"Hello\";. This places the characters in the read-only data segment of the compiled binary. Attempting to write to or modify this memory causes a Segmentation Fault.\n\nBecause C relies on the '\\0' character to mark the absolute end of a string, standard functions like printf() or strlen() continue to scan memory addresses sequentially until they encounter a byte containing 0. If this null terminator is accidentally overwritten or missing, your program will continue reading into adjacent memory addresses containing garbage data, causing buffer overflows, leaks, or immediate system crashes.",
+  "syntax": "char arrayName[size] = \"Initial String\";\nconst char *pointerName = \"Literal String\";\nfgets(char *str, int num, FILE *stream);",
+  "syntaxBreakdown": [
+    "char arrayName[size]: Allocates a contiguous block of stack memory of the specified size, holding individual 'char' elements.",
+    "\"Initial String\": A string literal. If used to initialize an array, its values are copied to the array on the stack. If assigned to a pointer, it references the read-only address in the text segment.",
+    "\\0 (Implicit): C compilers automatically append a null byte at the end of double-quoted string literals.",
+    "fgets(): The safe standard function for string inputs. It reads a maximum of 'num - 1' characters, appending the terminating '\\0' automatically."
+  ],
+  "rulesAndKeyPoints": [
+    "Always allocate (length + 1) bytes when defining array boundaries to store the null terminator safely.",
+    "Never use the gets() function. It does not check bounds and is highly vulnerable to buffer overflow attacks.",
+    "Do not compare strings using the equality operator (==). This compares memory addresses, not content. Use strcmp() instead.",
+    "A string literal assigned directly to a pointer (char *p = \"text\") is read-only. Always use const char * to prevent accidental modification.",
+    "When using strncpy, be aware that it does not guarantee null-termination if the source string length matches or exceeds the specified limit. You must set the last index manually."
+  ],
+  "codeExample1": {
+    "title": "Safe User Input Parsing with fgets and Character Arrays",
+    "code": "#include <stdio.h>\n#include <string.h>\n\n#define MAX_LIMIT 50\n\nint main(void) {\n    // Allocate space for 49 characters plus 1 null terminator\n    char username[MAX_LIMIT];\n\n    printf(\"Enter your full name (max %d chars): \", MAX_LIMIT - 1);\n    \n    // fgets is safe; it reads until a newline or MAX_LIMIT-1 limit is met\n    if (fgets(username, sizeof(username), stdin) != NULL) {\n        \n        // fgets retains the newline character '\\n' if there is space. Let's strip it.\n        size_t len = strlen(username);\n        if (len > 0 && username[len - 1] == '\\n') {\n            username[len - 1] = '\\0';\n        }\n\n        printf(\"Successfully read name: \\\"%s\\\"\\n\", username);\n        printf(\"Length of string is: %zu bytes\\n\", strlen(username));\n    }\n    return 0;\n}",
+    "explanation": "This example shows the standard best-practice method for receiving string inputs in modern C. We use fgets() targeting standard input (stdin). By passing the sizeof(username) directly, we guarantee that user input cannot spill past the array bounds. Finally, we handle the common fgets() behavior where the terminating newline character '\\n' is included in the string; we search for it and safely swap it with a null terminator '\\0'."
+  },
+  "codeExample2": {
+    "title": "Manual String Processing and Library Operations",
+    "code": "#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\n// Manual implementation of a case-insensitive character finder\nconst char* find_char_ignore_case(const char *str, char target) {\n    if (str == NULL) return NULL;\n    \n    char target_lower = tolower((unsigned char)target);\n    \n    while (*str != '\\0') {\n        if (tolower((unsigned char)*str) == target_lower) {\n            return str; // Return pointer to matching char\n        }\n        str++; // Move pointer forward manually\n    }\n    return NULL;\n}\n\nint main(void) {\n    char phrase[] = \"Mastering C Strings!\";\n    char search_char = 'c';\n    \n    // Using modern strncpy securely\n    char destination[10];\n    strncpy(destination, phrase, sizeof(destination) - 1);\n    destination[sizeof(destination) - 1] = '\\0'; // Crucial manual safe termination\n\n    printf(\"Original: %s\\n\", phrase);\n    printf(\"Truncated copy: %s\\n\", destination);\n\n    // Manual lookup execution\n    const char *match = find_char_ignore_case(phrase, search_char);\n    if (match != NULL) {\n        printf(\"Found character '%c' at position (offset): %ld\\n\", search_char, match - phrase);\n    } else {\n        printf(\"Character '%c' not found.\\n\", search_char);\n    }\n\n    return 0;\n}",
+    "explanation": "This code demonstrates a balance of standard library operations and manual pointer-based traversal. First, strncpy is used to copy a segment safely; the last byte is hardcoded to '\\0' to prevent potential unterminated-string errors. Next, a custom pointer-based function manually traverses memory to execute a case-insensitive character lookup without altering or allocating memory.",
+    "expectedOutput": "Original: Mastering C Strings!\nTruncated copy: Mastering\nFound character 'c' at position (offset): 10"
+  },
+  "stepByStepDryRun": [
+    "Step 1: Memory is allocated on the Stack for 'phrase' with 21 bytes (20 for string + 1 for null terminator).",
+    "Step 2: Destination array 'destination' is allocated 10 bytes on the Stack, populated with garbage values.",
+    "Step 3: strncpy copies up to 9 characters ('M', 'a', 's', 't', 'e', 'r', 'i', 'n', 'g') to destination.",
+    "Step 4: Manual step sets destination[9] to '\\0', ensuring a properly formatted C-string.",
+    "Step 5: The lookup function find_char_ignore_case is called, passing the address of 'phrase' as a read-only const pointer.",
+    "Step 6: The internal loop dereferences the pointer check (*str). It compares 'M' to target 'c'. No match. Moves address pointer forward.",
+    "Step 7: The search continues until the 10th index is dereferenced. It detects 'C', converts to 'c', matches target, and returns the pointer to that specific memory offset."
+  ],
+  "memoryVisualization": {
+    "type": "Stack and Heap Pointer Layout",
+    "description": "Visualizing how character arrays (Stack) and pointer literals (Text segment) layout strings in system memory.",
+    "nodes": [
+      {
+        "label": "Stack Variable (char array): name[6]",
+        "value": "['H', 'e', 'l', 'l', 'o', '\\0']",
+        "address": "0x7ffee1ab4000",
+        "color": "emerald"
+      },
+      {
+        "label": "Stack Pointer: ptr_literal",
+        "value": "0x00401b30 (Points to text segment address)",
+        "address": "0x7ffee1ab4008",
+        "color": "sky"
+      },
+      {
+        "label": "Read-Only Text Segment (Literal Store)",
+        "value": "['W', 'o', 'r', 'l', 'd', '\\0']",
+        "address": "0x00401b30",
+        "color": "rose"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Parsing Command Line Arguments: Validating user parameters, config inputs, and flags passed to main().",
+    "Network Protocol Headers: Processing incoming raw byte packets and reading metadata payloads separated by custom delimiter tokens.",
+    "Configuration Parser: Reading keys and values from system or application config files (such as database credentials or hostnames) using string splitters like strtok."
+  ],
+  "commonMistakes": [
+    "Forgetting to allocate memory for the terminating '\\0' character, causing corruption or memory leaks.",
+    "Attempting to modify a read-only string literal assigned to a pointer (e.g., char *s = \"Test\"; s[0] = 't';).",
+    "Using gets() which reads arbitrary input sizes from standard-in, directly exposing application security to remote exploits.",
+    "Passing an uninitialized pointer as a target buffer for functions like strcpy() or sprintf().",
+    "Directly comparing C-strings using operators (str1 == str2) instead of using the strcmp() comparison helper."
+  ],
+  "bestPractices": [
+    "Always choose fgets() or safe custom scanning functions over unsafe alternatives like gets() and scanf(\"%s\").",
+    "Explicitly initialize character arrays with zeros or empty sequences (e.g., char str[100] = {0};) to avoid reading random uninitialized stack bytes.",
+    "Prefer strncpy() over strcpy() to guard against buffer overruns, and always explicitly write the terminating null byte immediately after calling it.",
+    "When traversing arrays or parsing using pointers, always verify that the pointer is not NULL before executing pointer arithmetic."
+  ],
+  "faqs": [
+    {
+      "question": "Why is the character '\\0' referred to as the null terminator?",
+      "answer": "It has an ASCII numerical code of 0. It serves as an indicator that the processing engine has reached the absolute boundary limits of that particular C-string, stopping loops and display functions."
+    },
+    {
+      "question": "What happens if I write to 'char *str = \"Hello\";'?",
+      "answer": "The compiler puts \"Hello\" in read-only memory. When your OS catches the code trying to write or mutate this protected segment, it immediately terminates the execution thread, throwing a Segmentation Fault."
+    },
+    {
+      "question": "Why does strcmp return a value instead of a simple boolean?",
+      "answer": "strcmp does lexicographical comparisons. It returns 0 if matches match; a negative integer if the first string ranks lower in the ASCII hierarchy; and a positive integer if it ranks higher."
+    }
+  ],
+  "summary": "This phase provided a foundational, complete guide to managing strings inside C. By treating strings as character arrays terminated by a null pointer byte, C hands memory control directly to the developer. We discovered that safe string management is built on keeping exact boundary constraints, using functions like fgets() and strncpy(), and safely traversing memories with explicit pointer operations.",
+  "keyTakeaways": [
+    "C-strings are not high-level primitives; they are contiguous character arrays marked by '\\0'.",
+    "String literals are read-only when assigned to pointers, whereas character arrays on the stack are fully mutable.",
+    "Safety is paramount: buffer-overflow protection requires safe constraints, checking sizes, and always replacing newlines safely."
+  ],
+  "nextTopicPreview": "Next, we will progress to Phase 8: Structures (structs) and Unions, where you will learn to construct complex custom data types containing various data primitives grouped together in single structured segments.",
+  "questionsAndAnswers": [
+    {
+      "id": "Q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "Explain what the null terminator is, what its ASCII value is, and why it is critical for operations like printf(\"%s\") in C.",
+      "answer": "The null terminator, written as '\\0', is a single byte representing zero (ASCII value 0). Since C has no metadata tracking string lengths natively within arrays, standard functions rely entirely on this terminator. When printf(\"%s\") is called, it starts outputting characters from the target memory address and increments step-by-step. Without a null terminator, the function would continue printing adjacent memory data indefinitely, printing garbage data until a random zero byte is met, or triggering a crash.",
+      "explanation": "Provides a comprehensive conceptual analysis of how string limits are tracked in low-level memory."
+    },
+    {
+      "id": "Q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Compare the memory allocation characteristics, storage regions, and mutability of: 'char str1[] = \"Hello\";' and 'char *str2 = \"Hello\";'.",
+      "answer": "char str1[] allocation: The characters 'H', 'e', 'l', 'l', 'o', and '\\0' are copied directly onto the thread Stack into a newly allocated array space. This memory is mutable, meaning individual elements can be changed (e.g. str1[0] = 'M').\n\nchar *str2 allocation: The literal \"Hello\" is placed in the read-only Text segment of the program's binary. The pointer 'str2' is created on the Stack and points directly to that immutable memory. Attempting to modify this data (e.g. str2[0] = 'M') results in undefined behavior (typically a crash).",
+      "explanation": "Deep-dives into Stack vs Text storage properties of string arrays and pointers."
+    },
+    {
+      "id": "Q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Implement a manual custom function 'size_t my_strlen(const char *s)' that returns the exact character count of a string without importing string.h.",
+      "answer": "#include <stddef.h>\n\nsize_t my_strlen(const char *s) {\n    if (s == NULL) return 0;\n    const char *ptr = s;\n    while (*ptr != '\\0') {\n        ptr++;\n    }\n    return (size_t)(ptr - s);\n}",
+      "explanation": "Calculates string length manually using efficient pointer subtraction to compute character counts."
+    },
+    {
+      "id": "Q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Write a robust, custom concatenate function 'int safe_strcat(char *dest, const char *src, size_t dest_capacity)' that prevents buffer overflows and always guarantees null termination.",
+      "answer": "#include <stddef.h>\n#include <string.h>\n\nint safe_strcat(char *dest, const char *src, size_t dest_capacity) {\n    if (dest == NULL || src == NULL || dest_capacity == 0) return 0;\n    \n    size_t dest_len = strlen(dest);\n    if (dest_len >= dest_capacity) return 0; // Pre-existing overflow check\n    \n    size_t available_space = dest_capacity - dest_len - 1;\n    \n    size_t i;\n    for (i = 0; i < available_space && src[i] != '\\0'; i++) {\n        dest[dest_len + i] = src[i];\n    }\n    \n    dest[dest_len + i] = '\\0'; // Always guarantee safe null-termination\n    \n    return (src[i] == '\\0') ? 1 : 0; // Return 1 if complete src was appended, 0 if truncated\n}",
+      "explanation": "Ensures that regardless of input size, concatenation never writes past the allocated array capacity."
+    },
+    {
+      "id": "Q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Explain what is wrong with this declaration: 'char greeting[5] = \"World\";' and what the consequence of utilizing it as a string is.",
+      "answer": "The string literal \"World\" consists of 5 alphabetic characters and 1 null-terminator. Declaring 'char greeting[5]' restricts memory allocation to exactly 5 bytes. The compiler will store 'W', 'o', 'r', 'l', 'd', but will discard the final '\\0' due to size limitations. Since 'greeting' lacks a null-terminator, treating it as a string in downstream operations like printf(\"%s\", greeting) or strlen(greeting) results in reading past array boundaries, causing undefined behavior.",
+      "explanation": "Warns about off-by-one compilation issues that leave strings unterminated."
+    },
+    {
+      "id": "Q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Spot and fix the bug in: 'if (strcmp(input, \"exit\") == 1) { printf(\"Goodbye!\\n\"); }' to verify if input string matches 'exit'.",
+      "answer": "The strcmp function returns 0 when two strings are identical. It returns values other than 0 (either negative or positive) when strings do not match. Comparing strcmp's result to 1 is incorrect because different system implementations can return any positive or negative values when comparisons fail. To test for string matching, check for equality with 0 instead:\n\nCorrect code:\nif (strcmp(input, \"exit\") == 0) {\n    printf(\"Goodbye!\\n\");\n}",
+      "explanation": "Corrects a common misunderstanding of strcmp's return values."
+    },
+    {
+      "id": "Q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write a function 'void reverse_string(char *str)' that reverses a string in-place without creating a secondary copy buffer.",
+      "answer": "#include <string.h>\n\nvoid reverse_string(char *str) {\n    if (str == NULL || *str == '\\0') return;\n    \n    char *start = str;\n    char *end = str + strlen(str) - 1;\n    char temp;\n    \n    while (start < end) {\n        // Swap characters in-place\n        temp = *start;\n        *start = *end;\n        *end = temp;\n        \n        // Move markers closer\n        start++;\n        end--;\n    }\n}",
+      "explanation": "Reverses the character sequence inside a string using a two-pointer approach, avoiding dynamic allocations."
+    },
+    {
+      "id": "Q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Write a tokenization program that parses an input string (e.g. \"apple; banana,, orange; lemon\") separated by semicolons and commas, prints each non-empty token, and details how strtok handles consecutive delimiters.",
+      "answer": "#include <stdio.h>\n#include <string.h>\n\nvoid parse_tokens(char *input) {\n    if (input == NULL) return;\n    \n    const char *delimiters = \";, \";\n    // Retrieve first token\n    char *token = strtok(input, delimiters);\n    \n    while (token != NULL) {\n        printf(\"Token: %s\\n\", token);\n        // Retrieve subsequent tokens\n        token = strtok(NULL, delimiters);\n    }\n}\n\nint main(void) {\n    char buffer[] = \"apple; banana,, orange; lemon\";\n    parse_tokens(buffer);\n    return 0;\n}",
+      "explanation": "Demonstrates string tokenization using strtok. Note that strtok treats consecutive delimiters as a single delimiter, skipping empty segments automatically."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "M1",
+      "category": "Theory",
+      "question": "Which of the following defines a string in C that can be safely modified at index 0?",
+      "options": {
+        "A": "const char *str = \"Hello\";",
+        "B": "char *str = \"Hello\";",
+        "C": "char str[] = \"Hello\";",
+        "D": "char str[5] = \"Hello\";"
+      },
+      "correctOption": "C",
+      "explanation": "Option C copies 'Hello' into mutable stack memory. Option A and B point to read-only memory, while Option D does not allocate enough space for the null terminator."
+    },
+    {
+      "id": "M2",
+      "category": "Theory",
+      "question": "Why is the standard library function 'gets()' completely removed from modern C standards?",
+      "options": {
+        "A": "It only accepts capital letters.",
+        "B": "It does not allow the user to limit the characters read, making it vulnerable to buffer overflows.",
+        "C": "It operates in a separate execution thread.",
+        "D": "It adds extra null characters to the center of the string."
+      },
+      "correctOption": "B",
+      "explanation": "Because gets() doesn't accept a buffer size parameter, it will continue writing input data past the array boundaries, risking memory corruption."
+    },
+    {
+      "id": "M3",
+      "category": "Output Prediction",
+      "question": "What will be the output of the following C code segment?\n\nchar str[20] = \"Good\";\nstrcat(str, \"\\0Morning\");\nprintf(\"%s\", str);",
+      "options": {
+        "A": "Good\\0Morning",
+        "B": "GoodMorning",
+        "C": "Good",
+        "D": "Good "
+      },
+      "correctOption": "C",
+      "explanation": "strcat will append the source starting at the target's original null terminator. However, since the source contains a null terminator at index 0 ('\\0'), strcat terminates early, leaving 'Good' unchanged."
+    },
+    {
+      "id": "M4",
+      "category": "Output Prediction",
+      "question": "What is printed by this code?\n\nchar arr[] = \"C-Program\";\nchar *p = arr;\np += 2;\nprintf(\"%s\", p);",
+      "options": {
+        "A": "C-Program",
+        "B": "-Program",
+        "C": "Program",
+        "D": "P"
+      },
+      "correctOption": "B",
+      "explanation": "By shifting pointer 'p' forward by 2 steps, it now points to index 2 ('-'). The print statement outputs from that index onward."
+    },
+    {
+      "id": "M5",
+      "category": "Output Prediction",
+      "question": "What is the return value of strlen(\"A\\0B\")?",
+      "options": {
+        "A": "1",
+        "B": "2",
+        "C": "3",
+        "D": "Undefined behavior"
+      },
+      "correctOption": "A",
+      "explanation": "strlen stops counting characters when it encounters the first '\\0' byte. It finds 'A' and then stops immediately, returning 1."
+    },
+    {
+      "id": "M6",
+      "category": "Find the Bug",
+      "question": "Identify the critical flaw in the following code block:\n\nchar dest[6];\nstrcpy(dest, \"Coding\");",
+      "options": {
+        "A": "strcpy needs const targets.",
+        "B": "The dest array cannot be declared statically.",
+        "C": "The dest buffer size is 6, but 'Coding' requires 7 bytes including the null terminator.",
+        "D": "strcpy does not copy characters."
+      },
+      "correctOption": "C",
+      "explanation": "\"Coding\" is 6 characters. To copy it safely with its null terminator, dest must have a minimum capacity of 7 bytes."
+    },
+    {
+      "id": "M7",
+      "category": "Find the Bug",
+      "question": "What is the problem when using 'scanf(\"%s\", buffer)' to read user inputs?",
+      "options": {
+        "A": "It automatically converts inputs to uppercase.",
+        "B": "It ignores numeric digits.",
+        "C": "It stops reading at the first whitespace character, preventing multi-word inputs.",
+        "D": "It throws an error during compilation."
+      },
+      "correctOption": "C",
+      "explanation": "The format specifier '%s' in scanf stops reading input at whitespace (spaces, tabs, newlines). This makes it unsuitable for reading multi-word lines."
+    },
+    {
+      "id": "M8",
+      "category": "Complete the Code",
+      "question": "Select the correct statement to replace '[PLACEHOLDER]' to safely replace a newline with a null terminator in a string read with fgets:\n\nsize_t len = strlen(str);\nif (len > 0 && str[len-1] == '\\n') {\n    [PLACEHOLDER]\n}",
+      "options": {
+        "A": "str[len] = '\\0';",
+        "B": "str[len - 1] = '\\0';",
+        "C": "str[len - 1] = ' ';",
+        "D": "free(str);"
+      },
+      "correctOption": "B",
+      "explanation": "To strip the newline, replace the character at index 'len-1' with the null terminator."
+    },
+    {
+      "id": "M9",
+      "category": "Complete the Code",
+      "question": "How should you correctly terminate a string after calling strncpy?\n\nchar dest[10];\nstrncpy(dest, src, sizeof(dest) - 1);\n[PLACEHOLDER]",
+      "options": {
+        "A": "dest[10] = '\\0';",
+        "B": "dest[sizeof(dest)] = '\\0';",
+        "C": "dest[sizeof(dest) - 1] = '\\0';",
+        "D": "dest = '\\0';"
+      },
+      "correctOption": "C",
+      "explanation": "Because strncpy does not guarantee null-termination if src matches or exceeds the limit, you must manually set the last available index (sizeof(dest) - 1) to '\\0'."
+    },
+    {
+      "id": "M10",
+      "category": "Best Approach",
+      "question": "Which of the following approaches is the most secure and robust way to process string input in C?",
+      "options": {
+        "A": "Using gets(buffer); and sanitizing content later.",
+        "B": "Using scanf(\"%s\", buffer); with a huge array.",
+        "C": "Using fgets(buffer, sizeof(buffer), stdin); and then parsing and stripping any trailing newline.",
+        "D": "Using dynamic pointers without allocation to avoid stack usage."
+      },
+      "correctOption": "C",
+      "explanation": "fgets protects against buffer overflows by enforcing a maximum size constraint, and stripping the trailing newline is the standard way to normalize input strings in C."
+    }
+  ]
+}

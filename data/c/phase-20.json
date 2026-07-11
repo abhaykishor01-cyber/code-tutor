@@ -1,0 +1,326 @@
+{
+  "metadata": {
+    "phaseNumber": 20,
+    "title": "Standard Libraries",
+    "duration": "6 Hours",
+    "difficulty": "Intermediate"
+  },
+  "learningObjectives": [
+    "Master high-level output formatting and stream management inside stdio.h",
+    "Understand secure conversion functions, memory management, and process control in stdlib.h",
+    "Utilize bounds-checked string processing and block memory mutations in string.h",
+    "Integrate math.h functions using correct linkages and float limits",
+    "Optimize character classifications via localized tables in ctype.h",
+    "Compute time differences, track calendar dates, and profile CPU execution using time.h",
+    "Enforce portable and size-exact data operations using limits.h, float.h, stdbool.h, and stdint.h"
+  ],
+  "prerequisites": [
+    "Pointers and Memory Addresses",
+    "Struct Declaration and Usage",
+    "Bitwise Operations"
+  ],
+  "introduction": "The C Standard Library provides an abstraction layer over operating system system calls and architecture-specific hardware interfaces. By defining a uniform API across platforms, standard library headers allow for platform-independent implementations of IO, file management, math, memory reallocation, time monitoring, and type bounds classification.",
+  "conceptExplanation": "Standard libraries in C are separated into headers targeting specific architectural and runtime areas. \n\n1. <stdio.h>: Controls input/output stream management. Buffered IO reduces costly system calls by batching writes to stdout or disk. Functions like snprintf protect against stack corruption by enforcing buffer limits.\n\n2. <stdlib.h>: Handles dynamic memory allocation (malloc, calloc, realloc, free), execution control (exit, abort), and numeric parsing (strtol, strtod) which provide robust error checking compared to legacy wrappers.\n\n3. <string.h>: Offers memory block operations (memcpy, memset, memmove) and null-terminated string operations (strncpy, strncat, strcmp). Correct handling of overlap conditions using memmove is essential.\n\n4. <math.h>: Exposes standard floating-point operations (sin, cos, sqrt, pow). Compiling typically requires linkage flags (e.g., -lm) due to separate math library binary modules.\n\n5. <ctype.h>: Implements localized character analysis (isalpha, isdigit, isspace) via lookup tables, offering single-cycle checks without branching.\n\n6. <time.h>: Exposes epoch time counters (time_t), detailed system timers (clock_t), calendar representations (struct tm), and high-resolution timer structs (timespec).\n\n7. <limits.h> & <float.h>: Define compile-time limits of hardware registers and architecture types (e.g., INT_MAX, FLT_MAX), preventing arithmetic overflows.\n\n8. <stdbool.h> & <stdint.h>: Standardize logical states (bool, true, false) and define fixed-width types (uint8_t, int32_t) to guarantee structural alignment and predictable sizing across compilers.",
+  "syntax": "long int strtol(const char *restrict str, char **restrict endptr, int base);\nint snprintf(char *restrict s, size_t n, const char *restrict format, ...);\nvoid *memset(void *s, int c, size_t n);\ndouble difftime(time_t time1, time_t time0);",
+  "syntaxBreakdown": [
+    "strtol: Safely parses strings to integers. 'str' is the source. 'endptr' updates to point to the first unparseable character. 'base' sets the radix (0 automatically detects octal/hex/decimal).",
+    "snprintf: Safely prints structured output to character buffer 's' up to maximum length 'n', guaranteeing null-termination.",
+    "memset: Sets 'n' bytes of block memory pointed by 's' to the value 'c' cast to unsigned char.",
+    "difftime: Computes the structural difference in seconds between two epoch time metrics."
+  ],
+  "rulesAndKeyPoints": [
+    "Avoid using unsafe functions like legacy atoi, gets, or strcpy. Use strtol, fgets, and snprintf instead.",
+    "Verify dynamic allocations directly. Always check if pointers returned by malloc or calloc are NULL prior to dereferencing.",
+    "Link math.h by appending -lm to the GCC/Clang command-line arguments to resolve symbol names properly.",
+    "Understand integer overflows. Use limits.h limits (like INT_MAX) to boundary-check arithmetic before evaluating operations.",
+    "Beware of off-by-one errors with string sizing. The terminating null byte '\\0' must fit within allocated buffer dimensions.",
+    "Use exact-width integers (int32_t, uint64_t) from stdint.h for data definitions serialized over networks or raw storage blocks."
+  ],
+  "codeExample1": {
+    "title": "Robust Input Validation and Parsing Using stdlib.h, limits.h, and ctype.h",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <limits.h>\n#include <ctype.h>\n#include <errno.h>\n#include <stdbool.h>\n\n/* Safely validates if a string contains a valid, in-range integer */\nbool parse_integer(const char *str, long *out_val) {\n    if (str == NULL || *str == '\\0') {\n        return false;\n    }\n\n    /* Skip leading whitespace using ctype.h */\n    while (isspace((unsigned char)*str)) {\n        str++;\n    }\n\n    char *endptr;\n    errno = 0; /* Reset global error indicator */\n    long val = strtol(str, &endptr, 10);\n\n    /* Check for overflow or underflow limits */\n    if ((val == LONG_MAX || val == LONG_MIN) && errno == ERANGE) {\n        return false;\n    }\n\n    /* Check if no conversion occurred */\n    if (str == endptr) {\n        return false;\n    }\n\n    /* Check for trailing garbage (excluding whitespace) */\n    while (*endptr != '\\0') {\n        if (!isspace((unsigned char)*endptr)) {\n            return false;\n        }\n        endptr++;\n    }\n\n    *out_val = val;\n    return true;\n}\n\nint main(void) {\n    const char *test_input = \"  42735abc\";\n    const char *valid_input = \" -1984 \";\n    long result = 0;\n\n    if (parse_integer(valid_input, &result)) {\n        printf(\"Successfully parsed integer: %ld\\n\", result);\n    } else {\n        printf(\"Failed to parse: '%s'\\n\", valid_input);\n    }\n\n    if (parse_integer(test_input, &result)) {\n        printf(\"Successfully parsed: %ld\\n\", result);\n    } else {\n        printf(\"Invalid entry rejected: '%s'\\n\", test_input);\n    }\n\n    return 0;\n}",
+    "explanation": "This code validates user inputs safely. It avoids unsafe legacy calls (like atoi) by wrapping strtol. It cleanses leading and trailing whitespaces using isspace from ctype.h. It checks for integer range boundaries against LONG_MAX/LONG_MIN defined inside limits.h, inspects the thread-safe errno global flag for overflows, and uses endptr to detect unparseable trailing data."
+  },
+  "codeExample2": {
+    "title": "Securing Dynamic String Operations and Timing Execution Using string.h and time.h",
+    "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <time.h>\n#include <stdint.h>\n\n#define BUFFER_SIZE 64\n#define ITERATIONS 1000000\n\ntypedef struct {\n    uint64_t id;\n    char log_message[BUFFER_SIZE];\n} LogEntry;\n\nint main(void) {\n    clock_t start_time = clock();\n\n    /* Dynamically allocate memory for standard struct alignment */\n    LogEntry *entry = malloc(sizeof(LogEntry));\n    if (entry == NULL) {\n        perror(\"Failed to allocate memory\");\n        return EXIT_FAILURE;\n    }\n\n    entry->id = 998877;\n\n    /* Safely clear structure payload using memset */\n    memset(entry->log_message, 0, BUFFER_SIZE);\n\n    /* Assemble structured buffer securely using snprintf */\n    int written = snprintf(entry->log_message, BUFFER_SIZE, \"SysStatus: ACTIVE, Code: %04X\", 1023);\n    if (written < 0 || written >= BUFFER_SIZE) {\n        fprintf(stderr, \"Buffer output was truncated!\\n\");\n    }\n\n    /* Perform dummy high-frequency operations */\n    uint64_t hash = 0;\n    for (uint32_t i = 0; i < ITERATIONS; i++) {\n        hash += entry->id ^ (uint64_t)entry->log_message[i % 8];\n    }\n\n    clock_t end_time = clock();\n    double cpu_seconds = (double)(end_time - start_time) / CLOCKS_PER_SEC;\n\n    printf(\"Log Message: %s\\n\", entry->log_message);\n    printf(\"Execution metrics: %.6f seconds total, hash value: %lx\\n\", cpu_seconds, (unsigned long)hash);\n\n    free(entry);\n    return EXIT_SUCCESS;\n}",
+    "explanation": "This example performs secure block manipulations. It reserves a heap-allocated memory structure of size LogEntry. It uses memset to null-initialize the structural memory space. It formats text using snprintf to prevent buffer overflow limits, and profile CPU execution using metrics tracked with clock() from time.h.",
+    "expectedOutput": "Log Message: SysStatus: ACTIVE, Code: 03FF\nExecution metrics: 0.003500 seconds total, hash value: f3da4bc000"
+  },
+  "stepByStepDryRun": [
+    "Step 1: clock() records the initial processor cycle execution metrics to start_time.",
+    "Step 2: malloc allocates memory block for LogEntry dynamically on the heap. Value checked for safety.",
+    "Step 3: memset resets 64 bytes inside LogEntry->log_message to zero ('\\0').",
+    "Step 4: snprintf generates bounded formatting output of Status payload, fitting well inside 64 bytes.",
+    "Step 5: A CPU loop simulates high load processing, computing dummy variable mutations using bitwise operations.",
+    "Step 6: clock() calculates ending clock metrics. Math calculates elapsed time relative to CLOCKS_PER_SEC.",
+    "Step 7: Structured values printed, dynamic memory freed via free(entry) to eliminate allocation memory leaks."
+  ],
+  "memoryVisualization": {
+    "type": "Stack and Heap Layout",
+    "description": "The heap stores the dynamically-allocated LogEntry struct, while stack variables point to it and track metrics.",
+    "nodes": [
+      {
+        "label": "Stack: entry (Pointer)",
+        "value": "0x5555555592A0 (Points to Heap)",
+        "address": "0x7FFFFFFFE1F0",
+        "color": "sky"
+      },
+      {
+        "label": "Stack: start_time",
+        "value": "12000 ticks",
+        "address": "0x7FFFFFFFE1E8",
+        "color": "slate"
+      },
+      {
+        "label": "Heap: entry->id",
+        "value": "998877 (uint64_t)",
+        "address": "0x5555555592A0",
+        "color": "emerald"
+      },
+      {
+        "label": "Heap: entry->log_message[0..63]",
+        "value": "'SysStatus: ACTIVE, Code: 03FF\\0\\0...'",
+        "address": "0x5555555592A8",
+        "color": "amber"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Embedded Hardware Programming: Utilizing stdint.h exact sizing definitions to control precise registers on microcontrollers without variation across platforms.",
+    "Log Engines: Using high-resolution timestamp trackers inside time.h paired with stdio.h formats to generate performance logs.",
+    "Cryptographical Applications: Utilizing string.h memory management functions (such as memset) to securely overwrite memory space buffers immediately after execution."
+  ],
+  "commonMistakes": [
+    "Using gets() which has no boundary limits, leading to potential buffer overflow vulnerabilities.",
+    "Using atoi() or atof() for string-to-numeric casting. These functions cannot report parsing errors or arithmetic underflow/overflow conditions.",
+    "Failing to link the math library properly on Unix-based compilers (forgetting to append '-lm' to the compiler command-line).",
+    "Assuming type sizes (like expecting 'long' to consistently measure 64 bits across systems; use standard 'uint64_t' from stdint.h instead)."
+  ],
+  "bestPractices": [
+    "Always use snprintf over sprintf to eliminate buffer write vulnerabilities.",
+    "Prefer memset to securely clean memory blocks containing passwords or key arrays prior to system release.",
+    "Check system variables like limits.h limits (e.g. INT_MAX) to prevent overflow vulnerabilities before starting an arithmetic expression.",
+    "Use calloc instead of malloc if memory block zero-initialization is required."
+  ],
+  "faqs": [
+    {
+      "question": "Why should I use strtol over atoi?",
+      "answer": "atoi is unable to detect parsing errors. If given an invalid input like 'abc', atoi returns 0, making it impossible to distinguish between a parse failure and a genuine 0 value. Additionally, atoi does not detect numeric overflow or underflow. strtol handles these scenarios by providing an end pointer (endptr) and modifying the standard errno flag when limits are exceeded."
+    },
+    {
+      "question": "What is the difference between memcpy and memmove?",
+      "answer": "memcpy assumes that the source and destination memory buffers do not overlap. If they do, the behavior is undefined. memmove supports overlapping regions safely by copying data to a temporary internal buffer before writing to the target memory region."
+    },
+    {
+      "question": "Why do I get 'undefined reference to sin' even though I included math.h?",
+      "answer": "The math library header <math.h> only provides function declarations. The actual compiled code resides in an external system library (libm.so/libm.a). You must explicitly link this library when compiling your program, typically by adding the '-lm' compiler flag."
+    }
+  ],
+  "summary": "The standard C libraries provide high-performance, platform-independent definitions, macros, and function blocks. These interfaces provide clean, optimized utilities for input validation, memory allocation, execution profiling, math calculations, and raw byte operations.",
+  "keyTakeaways": [
+    "Always prioritize safe alternatives: use strtol over atoi, and snprintf over sprintf.",
+    "Limits defined in limits.h and float.h prevent unexpected arithmetic wrap-around errors.",
+    "Exact-width integer definitions from stdint.h guarantee type size consistency across hardware architectures.",
+    "Link against physical systems library extensions (like math via -lm) during compilation."
+  ],
+  "nextTopicPreview": "Phase 21 covers Modular Programming and Multi-File Projects. You will learn to organize logical architectures, define header files, manage compilation units, and structure programs across multiple source files.",
+  "questionsAndAnswers": [
+    {
+      "id": "Q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What is the key functional difference between limits.h and float.h?",
+      "answer": "limits.h defines the limits of integer types (such as char, int, long) and their signed or unsigned variants (e.g., INT_MAX, UINT_MAX). float.h defines the physical properties, precision limits, and epsilon bounds of floating-point types (float, double, and long double), such as FLT_MAX and FLT_EPSILON.",
+      "explanation": "Integer overflow behaviors differ greatly from floating-point properties. limits.h provides integer limits, while float.h handles scientific notation constraints, precision limits, and epsilon definitions."
+    },
+    {
+      "id": "Q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Explain the role of errno during numeric conversions with strtol, and how to verify if a conversion succeeded.",
+      "answer": "To verify if strtol succeeded: \n1. Reset errno to 0 prior to calling strtol.\n2. Pass the address of a char pointer (endptr) to strtol.\n3. After execution, check if the endptr is equal to the input pointer. If it is, no digits were parsed.\n4. Check if errno equals ERANGE, which indicates the parsed number exceeded the limits of a long integer (overflow or underflow).\n5. Check if *endptr is not '\\0' to determine if there was trailing garbage in the input string.",
+      "explanation": "Because strtol returns extreme range limits (LONG_MAX or LONG_MIN) upon encountering an overflow, you must inspect the global thread-safe errno flag to distinguish real parsed limits from overflow errors."
+    },
+    {
+      "id": "Q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a code snippet to calculate the calendar date precisely 10 days in the future using standard time.h functions.",
+      "answer": "#include <stdio.h>\n#include <time.h>\n\nvoid print_future_date(void) {\n    time_t now = time(NULL);\n    if (now == (time_t)-1) return;\n    \n    struct tm *future = localtime(&now);\n    if (!future) return;\n    \n    future->tm_mday += 10; /* Temporarily overflow days field */\n    \n    /* mktime automatically normalizes tm_mday and updates other fields */\n    if (mktime(future) == (time_t)-1) {\n        printf(\"Normalization error\\n\");\n        return;\n    }\n    \n    char buffer[64];\n    strftime(buffer, sizeof(buffer), \"%Y-%m-%d %H:%M:%S\", future);\n    printf(\"Date 10 days from now: %s\\n\", buffer);\n}",
+      "explanation": "This approach uses mktime. Incrementing tm_mday by 10 may create an out-of-range value (e.g., day 38). When passed to mktime, the library automatically normalizes the day, month, and year fields, handling leap years and month transitions seamlessly."
+    },
+    {
+      "id": "Q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Design a memory-safe copy function that simulates secure block transfers, validating overlap constraints without incurring undefined behavior.",
+      "answer": "#include <stdint.h>\n#include <stddef.h>\n#include <stdbool.h>\n\nbool safe_memcpy(void *dest, size_t dest_size, const void *src, size_t count) {\n    if (dest == NULL || src == NULL || count == 0) {\n        return false;\n    }\n    if (count > dest_size) {\n        return false; /* Prevent buffer overflow */\n    }\n    \n    uintptr_t d_addr = (uintptr_t)dest;\n    uintptr_t s_addr = (uintptr_t)src;\n    \n    /* Check for overlapping memory regions */\n    if ((d_addr >= s_addr && d_addr < s_addr + count) || \n        (s_addr >= d_addr && s_addr < d_addr + count)) {\n        return false; /* Overlap detected: unsafe for memcpy */\n    }\n    \n    uint8_t *d = (uint8_t *)dest;\n    const uint8_t *s = (const uint8_t *)src;\n    for (size_t i = 0; i < count; i++) {\n        d[i] = s[i];\n    }\n    return true;\n}",
+      "explanation": "This custom wrapper validates memory regions before executing a byte-by-byte copy. It compares pointer addresses using uintptr_t to detect overlapping memory buffers, preventing the undefined behavior associated with standard memcpy when source and destination overlap."
+    },
+    {
+      "id": "Q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Explain the safety issue with the code below, and rewrite it using safe string operations:\nchar buffer[16];\nstrcpy(buffer, user_input);",
+      "answer": "The safety issue is that strcpy does not perform bounds checking. If user_input is longer than 15 characters, it will overflow buffer, corrupting the stack frame and potentially allowing arbitrary code execution.\n\nHere is the safe rewrite:\n#include <stdio.h>\n#include <string.h>\n\nvoid safe_copy(const char *user_input) {\n    char buffer[16];\n    /* snprintf guarantees null-termination and prevents overflows */\n    int written = snprintf(buffer, sizeof(buffer), \"%s\", user_input);\n    if (written >= (int)sizeof(buffer)) {\n        fprintf(stderr, \"Input truncated!\\n\");\n    }\n}",
+      "explanation": "snprintf is a secure alternative to strcpy and strncpy. Unlike strncpy, which may leave the destination string without a terminating null byte if the input is too long, snprintf always null-terminates the output buffer (provided size is greater than zero)."
+    },
+    {
+      "id": "Q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Identify the integer overflow/promotion bugs in this code, and explain how to fix them:\nuint16_t x = 60000;\nuint16_t y = 20000;\nuint32_t result = x * y;",
+      "answer": "The bugs are: \n1. Integer promotion: In C, integer types smaller than 'int' (like uint16_t) are promoted to signed 'int' before arithmetic operations are performed. \n2. Signed Overflow: On platforms with a 32-bit int, the multiplication '60000 * 20000' equals 1,200,000,000, which fits in a signed 32-bit int. However, if 'int' is 16-bit, this causes signed overflow (undefined behavior).\n3. If the compiler evaluates this using standard promotions, the multiplication is performed as signed integers. If we use larger values, the intermediate calculation can overflow before being assigned to the 32-bit result.\n\nTo fix this, cast one of the operands to the target width (uint32_t) to force the multiplication to be evaluated in 32-bit space:\n\nuint16_t x = 60000;\nuint16_t y = 20000;\nuint32_t result = (uint32_t)x * y;",
+      "explanation": "By casting 'x' to uint32_t, the compiler promotes 'y' to uint32_t as well. The multiplication is then performed as a 32-bit unsigned operation, preventing intermediate overflow."
+    },
+    {
+      "id": "Q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write an in-place whitespace-trimming function using ctype.h to remove leading and trailing spaces from a string.",
+      "answer": "#include <string.h>\n#include <ctype.h>\n\nvoid trim_string(char *str) {\n    if (str == NULL) return;\n    \n    /* Handle leading whitespaces */\n    char *start = str;\n    while (*start && isspace((unsigned char)*start)) {\n        start++;\n    }\n    \n    /* Shift string contents left if needed */\n    if (start != str) {\n        memmove(str, start, strlen(start) + 1);\n    }\n    \n    /* Handle trailing whitespaces */\n    size_t len = strlen(str);\n    while (len > 0 && isspace((unsigned char)str[len - 1])) {\n        str[len - 1] = '\\0';\n        len--;\n    }\n}",
+      "explanation": "This function uses isspace to detect whitespace characters. It uses memmove instead of memcpy to shift the string, as the source and destination memory regions overlap. It then trims trailing spaces by placing null-terminators from right to left."
+    },
+    {
+      "id": "Q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Implement a high-precision function to measure execution drift. The program must capture structural system clock parameters using clock_gettime and return the elapsed nanoseconds.",
+      "answer": "#define _POSIX_C_SOURCE 199309L\n#include <stdio.h>\n#include <time.h>\n#include <stdint.h>\n\nint64_t get_elapsed_nanoseconds(struct timespec start, struct timespec end) {\n    int64_t sec_diff = (int64_t)end.tv_sec - (int64_t)start.tv_sec;\n    int64_t nsec_diff = (int64_t)end.tv_nsec - (int64_t)start.tv_nsec;\n    \n    return (sec_diff * 1000000000LL) + nsec_diff;\n}\n\nint main(void) {\n    struct timespec start, end;\n    \n    if (clock_gettime(CLOCK_MONOTONIC, &start) != 0) {\n        return 1;\n    }\n    \n    /* Simulated workload */\n    volatile uint64_t sum = 0;\n    for (uint32_t i = 0; i < 5000000; i++) {\n        sum += i;\n    }\n    \n    if (clock_gettime(CLOCK_MONOTONIC, &end) != 0) {\n        return 1;\n    }\n    \n    int64_t total_ns = get_elapsed_nanoseconds(start, end);\n    printf(\"Elapsed processing duration: %lld ns\\n\", (long long)total_ns);\n    return 0;\n}",
+      "explanation": "We use clock_gettime with CLOCK_MONOTONIC to measure high-precision elapsed time. CLOCK_MONOTONIC measures raw execution time and is immune to system clock adjustments (like NTP changes). The nanoseconds calculation handles negative nanosecond differences by utilizing signed 64-bit integers."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "M1",
+      "category": "Theory",
+      "question": "Which of the following standard library headers defines exact-width integer types such as uint32_t and int16_t?",
+      "options": {
+        "A": "limits.h",
+        "B": "stdint.h",
+        "C": "stdlib.h",
+        "D": "stdbool.h"
+      },
+      "correctOption": "B",
+      "explanation": "stdint.h defines exact-width integer types (like uint32_t and int16_t) as well as minimum and fastest-width integer types across platform targets."
+    },
+    {
+      "id": "M2",
+      "category": "Theory",
+      "question": "What is the behavior of the standard memory function memmove when the source and destination buffers overlap?",
+      "options": {
+        "A": "It triggers a compiler compilation warning.",
+        "B": "The behavior is undefined.",
+        "C": "It handles the overlap safely by using a temporary buffer internally.",
+        "D": "It throws a runtime exception and terminates execution."
+      },
+      "correctOption": "C",
+      "explanation": "Unlike memcpy, memmove is guaranteed to work correctly even if the source and destination memory buffers overlap, making it the safer choice for shifting data within the same array."
+    },
+    {
+      "id": "M3",
+      "category": "Output Prediction",
+      "question": "What is the expected output of this code snippet?\ndouble v1 = 5.7;\nprintf(\"%.1f, %.1f\", floor(v1), ceil(v1));",
+      "options": {
+        "A": "5.0, 6.0",
+        "B": "5, 6",
+        "C": "6.0, 5.0",
+        "D": "5.7, 5.7"
+      },
+      "correctOption": "A",
+      "explanation": "floor(5.7) rounds down to 5.0, and ceil(5.7) rounds up to 6.0. Both functions return a double, which is printed with one decimal place using the %.1f format specifier."
+    },
+    {
+      "id": "M4",
+      "category": "Output Prediction",
+      "question": "Predict the output of the following block on a standard 64-bit architecture:\n#include <stdio.h>\n#include <stdbool.h>\n#include <stdint.h>\nprintf(\"%zu, %zu\", sizeof(bool), sizeof(int32_t));",
+      "options": {
+        "A": "4, 4",
+        "B": "1, 4",
+        "C": "1, 8",
+        "D": "2, 4"
+      },
+      "correctOption": "B",
+      "explanation": "In stdbool.h, the bool type is typically 1 byte. int32_t from stdint.h is guaranteed to be exactly 32 bits (4 bytes) on all architectures."
+    },
+    {
+      "id": "M5",
+      "category": "Output Prediction",
+      "question": "What is printed by this code?\nchar buffer[] = \"abcdef\";\nmemset(buffer + 2, 'X', 2);\nprintf(\"%s\", buffer);",
+      "options": {
+        "A": "abXXef",
+        "B": "abXXdef",
+        "C": "XXXXef",
+        "D": "abXdef"
+      },
+      "correctOption": "A",
+      "explanation": "buffer + 2 points to the third character ('c'). memset replaces 2 bytes starting at that pointer with 'X', transforming 'c' and 'd' to 'X'. The resulting string is 'abXXef'."
+    },
+    {
+      "id": "M6",
+      "category": "Find the Bug",
+      "question": "Identify the bug in the following safe string conversion attempt:\nchar buf[8];\nint val = 12345678;\nsprintf(buf, \"%d\", val);",
+      "options": {
+        "A": "sprintf cannot handle standard formatted integer parameters.",
+        "B": "The buffer size is too small, causing a buffer overflow as '12345678' requires 9 bytes including the null terminator.",
+        "C": "The output buffer needs to be initialized to spaces first.",
+        "D": "The %d format specifier is invalid for integer formatting."
+      },
+      "correctOption": "B",
+      "explanation": "The string '12345678' contains 8 characters. It requires 9 bytes of space to store the trailing null-terminator. Writing this value with sprintf causes a buffer overflow because 'buf' is only 8 bytes. snprintf should be used instead."
+    },
+    {
+      "id": "M7",
+      "category": "Find the Bug",
+      "question": "Identify the bug in this dynamic memory allocation code:\nint *ptr = malloc(sizeof(int) * 10);\nif (ptr != NULL) {\n    ptr = realloc(ptr, sizeof(int) * 20);\n}",
+      "options": {
+        "A": "malloc should be cast to (int*).",
+        "B": "realloc arguments are reversed.",
+        "C": "If realloc fails, it returns NULL, overwriting the original address stored in 'ptr' and causing a memory leak.",
+        "D": "realloc cannot be used to grow memory, only to shrink it."
+      },
+      "correctOption": "C",
+      "explanation": "If realloc fails, it returns NULL, but the original memory block remains allocated. Assigning the result directly to 'ptr' overwrites the only reference to that memory, causing a memory leak. You should always assign the return value of realloc to a temporary pointer first."
+    },
+    {
+      "id": "M8",
+      "category": "Complete the Code",
+      "question": "Complete the statement below to parse a string delimited by commas using strtok_r safely and reentrantly:\nchar *token = strtok_r(str, \",\", &____);",
+      "options": {
+        "A": "token",
+        "B": "saveptr",
+        "C": "str",
+        "D": "NULL"
+      },
+      "correctOption": "B",
+      "explanation": "strtok_r requires a pointer to a char pointer (often named saveptr) to store the parsing context between consecutive calls, making it thread-safe and reentrant."
+    },
+    {
+      "id": "M9",
+      "category": "Complete the Code",
+      "question": "Choose the correct parameter set to calculate the execution delta in seconds using difftime:\ntime_t start = time(NULL);\n// ... processing ...\ntime_t end = time(NULL);\ndouble diff = difftime(____, ____);",
+      "options": {
+        "A": "start, end",
+        "B": "end, start",
+        "C": "&end, &start",
+        "D": "end - start, 0"
+      },
+      "correctOption": "B",
+      "explanation": "difftime calculates the difference in seconds between two times (time1 - time0). Its signature is double difftime(time_t time1, time_t time0), so passing 'end, start' calculates the correct elapsed duration."
+    },
+    {
+      "id": "M10",
+      "category": "Best Approach",
+      "question": "When clearing cryptographic keys or sensitive passwords from memory, which approach is best to ensure the data is overwritten?",
+      "options": {
+        "A": "Use standard memset and allow the compiler to optimize the loop.",
+        "B": "Assign NULL to the pointer variable pointing to the memory.",
+        "C": "Call free() directly on the pointer.",
+        "D": "Use volatile-qualified loops or a secure zeroing function (like memset_s or secure_getenv) to prevent the compiler from optimizing away the write."
+      },
+      "correctOption": "D",
+      "explanation": "Standard compilers may optimize away a traditional memset call if the buffer is not accessed again before the end of its lifetime. To ensure sensitive data is actually cleared, you must use a compiler-resistant function like memset_s, or a volatile-qualified write sequence."
+    }
+  ]
+}

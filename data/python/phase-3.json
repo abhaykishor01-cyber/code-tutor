@@ -1,0 +1,487 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 3,
+    "phaseName": "Strings & Manipulation Methods",
+    "duration": "10 hours"
+  },
+  "learningObjectives": [
+    "Master advanced string slicing and indexing techniques.",
+    "Utilize built-in string methods to perform cleaning, normalization, and search operations.",
+    "Implement production-grade formatting using f-strings and format().",
+    "Understand the impact of string immutability on memory management.",
+    "Apply escape sequences and multiline strings for complex data parsing."
+  ],
+  "prerequisites": [
+    "Basic variable assignment",
+    "Understanding of standard print function behavior",
+    "Foundational logical operator knowledge"
+  ],
+  "introduction": "In professional Python development, strings are more than just text—they are the primary data transport format. From parsing API JSON responses and cleaning CSV inputs to constructing logs for observability, mastering string manipulation is a core skill for any backend engineer or data scientist.",
+  "conceptExplanation": "Strings in Python are immutable sequences of Unicode characters. Being 'immutable' means that once a string object is created, it cannot be modified in place. Operations that seem to change a string actually construct an entirely new string object in memory. Efficient manipulation relies on leveraging Python's highly optimized built-in methods like .split(), .join(), and .strip().",
+  "syntax": "s = 'data_processing_v1'\nsub = s[0:4]  # Slicing\nformatted = f'Version: {s.upper()}'  # f-strings",
+  "syntaxBreakdown": [
+    "indexing: [index] allows access to a specific character.",
+    "slicing: [start:stop:step] extracts a substring.",
+    "methods: .upper(), .lower(), .replace() provide transformation.",
+    "interpolation: f-strings provide performant, readable string embedding."
+  ],
+  "rulesAndKeyPoints": [
+    "Strings are sequences and support indexing starting from 0.",
+    "Negative indexing starts from -1 at the end of the string.",
+    "Slicing [start:stop] is inclusive of start and exclusive of stop.",
+    "String objects cannot be mutated; modification returns a new object.",
+    "f-strings (f'{}') are evaluated at runtime and are faster than format().",
+    "Use '\\n' for newlines and '\\t' for tab indentation in strings.",
+    "The .split() method returns a list of substrings based on a delimiter.",
+    "The .join() method is the standard for concatenating lists of strings efficiently.",
+    "Empty strings are falsy in Python conditional expressions.",
+    "Unicode support is native; emojis and special characters work seamlessly."
+  ],
+  "codeExample1": {
+    "title": "Basic String Slicing and Transformation",
+    "code": "filename = 'report_2023_oct.pdf'\nname_part = filename.split('_')[0].capitalize()\nextension = filename[-3:]\nprint(f'File: {name_part}, Type: {extension}')",
+    "explanation": "Demonstrates splitting a string by a delimiter and using negative indexing to extract file extensions.",
+    "output": "File: Report, Type: pdf"
+  },
+  "codeExample2": {
+    "title": "Data Normalization Workflow",
+    "code": "raw_input = '  user_id: 88421; status: active  '\nclean = raw_input.strip().split(';')\nrecord = {k.strip(): v.strip() for k, v in (item.split(':') for item in clean)}\nprint(record['status'])",
+    "explanation": "A professional approach to cleaning a semi-structured log string using chaining and list comprehensions.",
+    "output": "active"
+  },
+  "dryRunSteps": [
+    {
+      "stepNumber": 1,
+      "lineOfCode": "raw_input = '  user_id: 88421; status: active  '",
+      "lineNumber": 1,
+      "explanation": "Initializes the string with leading/trailing whitespace.",
+      "variablesState": {
+        "raw_input": "'  user_id: 88421; status: active  '"
+      }
+    },
+    {
+      "stepNumber": 2,
+      "lineOfCode": "clean = raw_input.strip().split(';')",
+      "lineNumber": 2,
+      "explanation": "Removes whitespace and splits into a list at the semicolon.",
+      "variablesState": {
+        "clean": "['user_id: 88421', ' status: active']"
+      }
+    },
+    {
+      "stepNumber": 3,
+      "lineOfCode": "record = {k.strip(): v.strip() for k, v in ...}",
+      "lineNumber": 3,
+      "explanation": "Iterates, splits by colon, and strips remaining space from keys/values.",
+      "variablesState": {
+        "record": "{'user_id': '88421', 'status': 'active'}"
+      }
+    }
+  ],
+  "memoryVisualization": {
+    "description": "Visualizing string immutability: Re-assignment changes the pointer, not the data.",
+    "elements": [
+      {
+        "id": "v1",
+        "label": "str_obj",
+        "type": "heap",
+        "value": "'python'"
+      },
+      {
+        "id": "p1",
+        "label": "my_str",
+        "type": "pointer",
+        "pointsTo": "v1"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "URL slug generation from blog titles.",
+    "Log file parsing for monitoring systems.",
+    "Sanitizing user input to prevent injection attacks.",
+    "Data extraction from fixed-width text formats."
+  ],
+  "commonMistakes": [
+    "Attempting item assignment (e.g., s[0] = 'a') which raises a TypeError.",
+    "Ignoring the exclusive nature of the stop index in slicing.",
+    "Using concatenation (+) in a loop instead of .join() for performance.",
+    "Forgetting to handle whitespace with .strip() when comparing input."
+  ],
+  "bestPractices": [
+    "Always use f-strings for readability and performance.",
+    "Prefer .splitlines() when dealing with multi-line system logs.",
+    "Use .join() for building large strings in a loop to optimize memory.",
+    "Use .startswith() and .endswith() for cleaner logic than manual slicing."
+  ],
+  "faqs": [
+    {
+      "question": "Why are strings immutable?",
+      "answer": "Immutability allows Python to cache strings (interning) and ensures that hash-based data structures like dictionaries work correctly."
+    },
+    {
+      "question": "What is the difference between split() and split(' ')?",
+      "answer": "split() without arguments splits on any whitespace and discards empty strings, while split(' ') splits on every single space character."
+    }
+  ],
+  "summary": "Phase 3 covered the foundational and intermediate techniques for string manipulation. We moved from simple indexing to powerful methods like strip, split, and f-strings, emphasizing the critical role of immutability in Python memory management.",
+  "keyTakeaways": [
+    "Strings are immutable sequences.",
+    "Methods return new strings.",
+    "Slicing syntax [::] allows powerful parsing.",
+    "f-strings are the industry standard for interpolation."
+  ],
+  "previewOfNextTopic": "Phase 4: Control Flow, where we use our logic to build complex decision trees and repeating tasks.",
+  "mcqs": [
+    {
+      "id": "m1",
+      "type": "theory",
+      "question": "What happens when you perform 'string'[0] = 'S'?",
+      "options": [
+        {
+          "key": "A",
+          "text": "It becomes 'String'"
+        },
+        {
+          "key": "B",
+          "text": "It raises TypeError"
+        },
+        {
+          "key": "C",
+          "text": "It silently fails"
+        },
+        {
+          "key": "D",
+          "text": "It returns a new string"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Strings are immutable; you cannot modify them in place."
+    },
+    {
+      "id": "m2",
+      "type": "theory",
+      "question": "Which of these is the most efficient way to concatenate a list of 1000 strings?",
+      "options": [
+        {
+          "key": "A",
+          "text": "Using + operator in a loop"
+        },
+        {
+          "key": "B",
+          "text": "Using f-strings"
+        },
+        {
+          "key": "C",
+          "text": "Using ''.join(list)"
+        },
+        {
+          "key": "D",
+          "text": "Using += in a loop"
+        }
+      ],
+      "correctAnswer": "C",
+      "explanation": ".join() is O(n), while repeatedly adding strings creates thousands of intermediate objects."
+    },
+    {
+      "id": "m3",
+      "type": "output_prediction",
+      "question": "What is the output of 'Python'[::-1]?",
+      "options": [
+        {
+          "key": "A",
+          "text": "nohtyP"
+        },
+        {
+          "key": "B",
+          "text": "Python"
+        },
+        {
+          "key": "C",
+          "text": "P"
+        },
+        {
+          "key": "D",
+          "text": "n"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "Negative step slice reverses the string."
+    },
+    {
+      "id": "m4",
+      "type": "output_prediction",
+      "question": "What is the output of 'a,b,c'.split(',')[-1]?",
+      "options": [
+        {
+          "key": "A",
+          "text": "a"
+        },
+        {
+          "key": "B",
+          "text": "b"
+        },
+        {
+          "key": "C",
+          "text": "c"
+        },
+        {
+          "key": "D",
+          "text": "None"
+        }
+      ],
+      "correctAnswer": "C",
+      "explanation": "Split creates a list and index -1 retrieves the last element."
+    },
+    {
+      "id": "m5",
+      "type": "output_prediction",
+      "question": "What is the output of f'{10+5}'?",
+      "options": [
+        {
+          "key": "A",
+          "text": "10+5"
+        },
+        {
+          "key": "B",
+          "text": "15"
+        },
+        {
+          "key": "C",
+          "text": "105"
+        },
+        {
+          "key": "D",
+          "text": "Error"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "f-strings evaluate expressions inside {}."
+    },
+    {
+      "id": "m6",
+      "type": "find_the_bug",
+      "question": "Identify the error: s = 'data'; print(s.upper(s))",
+      "options": [
+        {
+          "key": "A",
+          "text": "upper() takes no arguments"
+        },
+        {
+          "key": "B",
+          "text": "upper() returns a list"
+        },
+        {
+          "key": "C",
+          "text": "s is already uppercase"
+        },
+        {
+          "key": "D",
+          "text": "No error"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": ".upper() does not accept arguments."
+    },
+    {
+      "id": "m7",
+      "type": "find_the_bug",
+      "question": "Fix: s = ' hello '; s.strip(); print(s)",
+      "options": [
+        {
+          "key": "A",
+          "text": "Use s = s.strip()"
+        },
+        {
+          "key": "B",
+          "text": "Use print(strip(s))"
+        },
+        {
+          "key": "C",
+          "text": "s is mutated automatically"
+        },
+        {
+          "key": "D",
+          "text": "strip() is not a method"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "Strings are immutable, methods return new values; original s remains unchanged."
+    },
+    {
+      "id": "m8",
+      "type": "complete_the_code",
+      "question": "Complete to print the last 3 chars: s = 'Python3'; print(s[____])",
+      "options": [
+        {
+          "key": "A",
+          "text": "-3:"
+        },
+        {
+          "key": "B",
+          "text": ":-3"
+        },
+        {
+          "key": "C",
+          "text": "3:"
+        },
+        {
+          "key": "D",
+          "text": "1:3"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "-3: slices from the 3rd to last character until the end."
+    },
+    {
+      "id": "m9",
+      "type": "complete_the_code",
+      "question": "Replace 'bad' with 'good': s = 'This is bad'.____",
+      "options": [
+        {
+          "key": "A",
+          "text": "replace('bad', 'good')"
+        },
+        {
+          "key": "B",
+          "text": "swap('bad', 'good')"
+        },
+        {
+          "key": "C",
+          "text": "sub('bad', 'good')"
+        },
+        {
+          "key": "D",
+          "text": "switch('bad', 'good')"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "The correct method is .replace(old, new)."
+    },
+    {
+      "id": "m10",
+      "type": "best_approach",
+      "question": "How to check if a string ends with '.py'?",
+      "options": [
+        {
+          "key": "A",
+          "text": "if s[-3:] == '.py'"
+        },
+        {
+          "key": "B",
+          "text": "if s.endswith('.py')"
+        },
+        {
+          "key": "C",
+          "text": "if '.py' in s"
+        },
+        {
+          "key": "D",
+          "text": "if s.find('.py') == len(s)-3"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": ".endswith() is the most readable and intention-revealing method."
+    }
+  ],
+  "codeQuestions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "Write a program",
+      "title": "Name Formatter",
+      "question": "Take a string input 'john doe' and convert it to 'John Doe'.",
+      "solutionCode": "name = 'john doe'\nprint(name.title())",
+      "hints": [
+        "Check the .title() method."
+      ],
+      "explanation": "The title() method is perfect for capitalizing first letters."
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "Complete missing code",
+      "title": "Extract Domain",
+      "question": "Extract the domain from an email: 'user@gmail.com'.",
+      "codeTemplate": "email = 'user@gmail.com'\n# Split at @ and get the second part\nprint(email.split('@')[1])",
+      "solutionCode": "print(email.split('@')[1])",
+      "hints": [
+        "Use split()"
+      ],
+      "explanation": "split('@') creates a list of two items; index 1 is the domain."
+    },
+    {
+      "id": "q3",
+      "difficulty": "Easy-Medium",
+      "type": "Modify existing code",
+      "title": "Clean Logs",
+      "question": "Modify this to remove 'DEBUG:' prefix: 'DEBUG: connection lost'.",
+      "buggyCode": "s = 'DEBUG: connection lost'\nprint(s.strip('DEBUG:'))",
+      "solutionCode": "s = 'DEBUG: connection lost'\nprint(s.replace('DEBUG: ', ''))",
+      "hints": [
+        "strip() removes characters from the set, not whole strings."
+      ],
+      "explanation": "replace() is necessary when removing specific substrings."
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "Small implementation",
+      "title": "CSV Parser",
+      "question": "Parse 'apple,banana,orange' and join them with a hyphen.",
+      "solutionCode": "data = 'apple,banana,orange'\nresult = '-'.join(data.split(','))\nprint(result)",
+      "hints": [
+        "Use split() then join()"
+      ],
+      "explanation": "Chain split and join to transform delimiters."
+    },
+    {
+      "id": "q5",
+      "difficulty": "Medium",
+      "type": "Write a program",
+      "title": "Palindrome Checker",
+      "question": "Write code to check if 'racecar' is a palindrome.",
+      "solutionCode": "s = 'racecar'\nprint(s == s[::-1])",
+      "hints": [
+        "Slice with -1"
+      ],
+      "explanation": "Comparing a string to its reversed slice is an idiomatic way to check palindromes."
+    },
+    {
+      "id": "q6",
+      "difficulty": "Medium-Hard",
+      "type": "Debug existing code",
+      "title": "Fixing the Loop",
+      "question": "Debug this: intent is to print 'A-B-C'.",
+      "buggyCode": "lst = ['A', 'B', 'C']\nres = ''\nfor i in lst: res += i + '-'\nprint(res)",
+      "solutionCode": "lst = ['A', 'B', 'C']\nprint('-'.join(lst))",
+      "hints": [
+        "Avoid trailing hyphens with join."
+      ],
+      "explanation": "join handles separators elegantly without extra characters."
+    },
+    {
+      "id": "q7",
+      "difficulty": "Hard",
+      "type": "Optimize code",
+      "title": "Text Sanitizer",
+      "question": "Remove all non-alphanumeric characters from 'Hello, World! 123'.",
+      "solutionCode": "s = 'Hello, World! 123'\nclean = ''.join(char for char in s if char.isalnum() or char == ' ')\nprint(clean)",
+      "hints": [
+        "Use isalnum() and generator expression"
+      ],
+      "explanation": "Generator expressions with join are highly memory-efficient."
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "Write a program",
+      "title": "Log Timestamp Extractor",
+      "question": "Extract the time from '[2023-10-12 14:30:05] Server started'.",
+      "solutionCode": "log = '[2023-10-12 14:30:05] Server started'\nprint(log[12:20])",
+      "hints": [
+        "Use fixed indexing slicing."
+      ],
+      "explanation": "When the format is guaranteed, fixed slicing is the fastest method."
+    }
+  ]
+}

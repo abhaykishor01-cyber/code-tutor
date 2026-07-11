@@ -1,14 +1,319 @@
 {
-  "phaseMetadata": { "phaseNumber": 1, "phaseTitle": "Introduction to JavaScript" },
-  "learningObjectives": ["Understand JS's role in the browser"],
-  "prerequisites": [],
-  "introduction": "JavaScript brings interactivity to web pages.",
-  "syntax": "console.log('Hello, World!');",
-  "rulesAndKeyPoints": ["JS is dynamically typed"],
-  "codeExample1": { "title": "Hello World", "code": "console.log('Hello, JS!');", "output": "Hello, JS!" },
-  "commonMistakes": ["Forgetting semicolons in ambiguous cases"],
-  "bestPractices": ["Use const/let, avoid var"],
-  "keyTakeaways": ["JS runs in the browser and in Node.js"],
-  "frequentlyAskedQuestions": [{ "question": "Is JavaScript the same as Java?", "answer": "No, they are unrelated languages despite the similar name." }],
-  "mcqs": [{ "question": "Which keyword declares a constant?", "options": {"A":"var","B":"let","C":"const","D":"static"}, "answer": "C" }]
+  "phaseNumber": 1,
+  "phaseName": "Introduction to JavaScript",
+  "description": "Learn what JavaScript is, where it runs, and master console logs, variables, and primitive data types.",
+  "learningObjectives": [
+    "Understand the role of JavaScript in web development",
+    "Differentiate between Browser environment and Node.js runtime",
+    "Insert JavaScript into HTML using script tags",
+    "Use console.log to print output and debug code",
+    "Master the differences between var, let, and const",
+    "Identify core primitive and object data types"
+  ],
+  "prerequisites": [
+    "Basic HTML structure (tags, head, body)",
+    "Understanding of how to open a browser console"
+  ],
+  "introduction": "JavaScript is the programming language of the Web. While HTML defines the content and CSS defines the styling, JavaScript adds behavior, interactivity, and complex logic. Initially created in 1995 to make web pages alive, JavaScript has evolved into a powerhouse running on clients, servers, and even IoT devices.",
+  "conceptExplanation": "To understand JavaScript, we must understand its execution environments. In the Browser, JS has access to the Document Object Model (DOM) to modify web pages. In Node.js, JS is a standalone runtime with filesystem and networking access. Under the hood, JS engines (like Chrome's V8) compile code on-the-fly to machine code. When coding, we store values in variables. In modern JS, we use let (re-assignable, block-scoped) and const (read-only, block-scoped) instead of the obsolete var (function-scoped, hoisted). JS is dynamically typed, meaning variables can change data types.",
+  "syntax": "// Declaring variables\nconst userName = \"Alice\"; // Cannot be re-assigned\nlet userAge = 25;       // Re-assignable\nvar deprecated = true;  // Old style, avoid using!\n\n// Logging to the developer console\nconsole.log(\"Hello, World!\");\nconsole.log(\"User:\", userName, \"Age:\", userAge);",
+  "syntaxBreakdown": "1. 'const' declares a block-scoped, read-only reference.\n2. 'let' declares a block-scoped, re-assignable variable.\n3. 'userName' and 'userAge' are custom variable names (identifiers).\n4. 'console' is a global browser/Node object containing development utility methods.\n5. '.log(...)' is a method that outputs arguments to the standard output console.",
+  "rulesAndKeyPoints": [
+    "JavaScript is case-sensitive (let age and let Age are completely different).",
+    "Use camelCase for naming variables and functions (e.g., userAge, calculateTotal).",
+    "Use const by default. Only use let when you explicitly know the value needs to change.",
+    "Never use var to avoid hoisted variable bugs and scope leaking.",
+    "Semi-colons are optional in modern JS but highly recommended for styling consistency.",
+    "JS has 7 primitive data types: string, number, boolean, null, undefined, symbol, and bigint.",
+    "Undefined means a variable was declared but has no value assigned yet.",
+    "Null is an intentional assignment representing 'no value' or 'empty'.",
+    "The typeof operator returns a string indicating the data type of a value (e.g., typeof 'hello' is 'string').",
+    "typeof null returns 'object' - this is a famous, historic bug in JS that cannot be fixed without breaking the web!"
+  ],
+  "codeExample1": {
+    "title": "Variables and Re-assignment",
+    "code": "// 1. Declare variables\nconst country = \"United States\";\nlet score = 100;\n\nconsole.log(\"Starting score in \" + country + \":\", score);\n\n// 2. Perform reassignment\nscore = 150; \nconsole.log(\"Updated score:\", score);\n\n// 3. Trying to reassign a const throws an error\ntry {\n  country = \"Canada\"; \n} catch (error) {\n  console.log(\"Error caught safely:\", error.message);\n}",
+    "description": "Demonstrates how 'let' allows re-assigning values whereas 'const' strictly prevents variable re-assignment.",
+    "expectedOutput": "Starting score in United States: 100\nUpdated score: 150\nError caught safely: Assignment to constant variable."
+  },
+  "codeExample2": {
+    "title": "Type Checking and Dynamic Typing",
+    "code": "let container = \"Book\";\nconsole.log(\"Initial type:\", typeof container);\n\ncontainer = 42;\nconsole.log(\"Type after number assign:\", typeof container);\n\ncontainer = { title: \"JS Guide\", pages: 200 };\nconsole.log(\"Type after object assign:\", typeof container);\n\nconsole.log(\"Checking null:\", typeof null);\nconsole.log(\"Checking undefined:\", typeof undefined);",
+    "description": "Illustrates dynamic typing in JavaScript where a variable can shift from holding a string, to a number, to an object. Also showcases unique outputs of the 'typeof' operator.",
+    "expectedOutput": "Initial type: string\nType after number assign: number\nType after object assign: object\nChecking null: object\nChecking undefined: undefined"
+  },
+  "dryRun": [
+    {
+      "step": 1,
+      "explanation": "The variable 'score' is initialized with the number 100. It is stored in memory.",
+      "state": "Memory Heap: { score: 100 }"
+    },
+    {
+      "step": 2,
+      "explanation": "The constant 'country' is initialized with 'United States' and marked as read-only.",
+      "state": "Memory Heap: { score: 100, country: 'United States' (constant) }"
+    },
+    {
+      "step": 3,
+      "explanation": "'score' is incremented or updated to 150. Memory updates directly.",
+      "state": "Memory Heap: { score: 150, country: 'United States' (constant) }"
+    },
+    {
+      "step": 4,
+      "explanation": "Attempt to assign 'Canada' to 'country' is intercepted, throwing TypeError.",
+      "state": "Memory Heap: [Throws TypeError] - country remains 'United States'"
+    }
+  ],
+  "memoryVisualization": "```\nStack Memory (Primitive Storage / References)\n+-----------------------+-----------------------+\n| Identifier            | Value                 |\n+-----------------------+-----------------------+\n| country               | 'United States'       |\n| score                 | 150                   |\n| container (reference) | Pointer to Heap #001  |\n+-----------------------+-----------------------+\n\nHeap Memory (Complex Objects Storage)\n+-----------------------+-----------------------+\n| Reference Address     | Object Data           |\n+-----------------------+-----------------------+\n| #001                  | { title: 'JS Guide' } |\n+-----------------------+-----------------------+\n```",
+  "realWorldUseCases": [
+    "Storing user profile information (name, age, login status) in client-side state.",
+    "Logging incoming request headers and diagnostic details in an Express backend.",
+    "Storing static application configurations (like API timeouts, endpoint paths) using const."
+  ],
+  "commonMistakes": [
+    {
+      "title": "Confusing null vs undefined",
+      "badCode": "let user; // Declared but empty\nif (user === null) {\n  console.log(\"User is null\"); // This will NEVER run!\n}",
+      "goodCode": "let user; \nif (user === undefined) {\n  console.log(\"User is undefined (not set yet)\");\n}\n// Or to check both:\nif (user == null) {\n  console.log(\"User is either null or undefined\");\n}",
+      "explanation": "A newly declared variable with no value is 'undefined'. 'Null' is an empty state that must be explicitly assigned by the developer."
+    },
+    {
+      "title": "Reassigning Const Objects",
+      "badCode": "const user = { name: \"John\" };\nuser = { name: \"Bob\" }; // Throws TypeError!",
+      "goodCode": "const user = { name: \"John\" };\nuser.name = \"Bob\"; // Works perfectly! The properties inside can still change.",
+      "explanation": "'const' creates a read-only reference, not a immutable value. You can change properties of a const object or elements of a const array; you just cannot re-assign the reference variable itself."
+    }
+  ],
+  "bestPractices": [
+    "Always use const for declaring variables unless you are certain the value must be reassigned.",
+    "Name variables descriptively: let timeInSeconds is better than let t.",
+    "Avoid declaring global variables; keep variables scoped inside their functions or blocks.",
+    "Initialize variables immediately when declaring them to avoid undefined reference bugs."
+  ],
+  "faqs": [
+    {
+      "question": "Why does typeof null return 'object'?",
+      "answer": "This is a historical bug from the first version of JavaScript. Values were stored in 32-bit units with a type tag in the first few bits. The object tag was 000, and null was represented as the null pointer (all zeros), so null mistakenly was read as an object. This cannot be changed because fixing it would break backward compatibility of millions of legacy websites."
+    },
+    {
+      "question": "What is hoisting?",
+      "answer": "Hoisting is JavaScript's default behavior of moving declarations to the top of the current scope before execution. 'var' variables are hoisted and initialized as 'undefined'. 'let' and 'const' declarations are also hoisted but not initialized, leaving them in a 'Temporal Dead Zone' (TDZ) until execution reaches their declaration."
+    }
+  ],
+  "summary": "Phase 1 covers the absolute foundations of JavaScript. You learned how to run your first scripts, how the browser engine processes code, and how let and const store primitive variables in memory cleanly.",
+  "keyTakeaways": [
+    "JavaScript runs in browsers (web pages) and Node.js (servers).",
+    "const guarantees a reference won't change; let is for variables that can be reassigned.",
+    "JS has dynamic typing, but utilizing typeof helps verify current variable states."
+  ],
+  "previewOfNextTopic": "In Phase 2, we dive into Operators and Expressions! We will learn how to calculate totals, compare values, write clean ternary operations, and unlock powerful techniques like Optional Chaining and Nullish Coalescing.",
+  "questions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "concept",
+      "format": "write_program",
+      "questionText": "Write a short script that declares three variables: name (const), score (let), and isActive (let). Log all of them together to the console.",
+      "solutionCode": "const name = \"Alex\";\nlet score = 95;\nlet isActive = true;\nconsole.log(\"Player:\", name, \"Score:\", score, \"Active:\", isActive);",
+      "explanation": "This tests the basic declaration of variables with appropriate const and let keywords and logs them to console."
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "concept",
+      "format": "predict_output",
+      "questionText": "What will this script print? Explain why:\nlet x;\nconsole.log(typeof x);\nx = null;\nconsole.log(typeof x);",
+      "explanation": "It prints 'undefined' followed by 'object'. A declared variable with no assigned value is always undefined. Due to a historic JS bug, typeof null returns 'object'."
+    },
+    {
+      "id": "q3",
+      "difficulty": "Easy-Medium",
+      "type": "practical",
+      "format": "complete_code",
+      "questionText": "Complete the following code to safely check if 'userAccount' is fully undefined before assigning a default placeholder string, and log the final state.",
+      "codeContext": "let userAccount;\n// Complete code here to check if undefined:\n\n",
+      "solutionCode": "let userAccount;\nif (userAccount === undefined) {\n  userAccount = \"Guest User\";\n}\nconsole.log(\"Account is:\", userAccount);",
+      "explanation": "By comparing strictly with undefined, we ensure we only populate it if it lacks any value."
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "mistake",
+      "format": "debug_code",
+      "questionText": "Find the bugs in this script and fix them:\nconst points = 50;\npoints = points + 10;\nconsole.log(points);",
+      "codeContext": "const points = 50;\npoints = points + 10;\nconsole.log(points);",
+      "solutionCode": "let points = 50;\npoints = points + 10;\nconsole.log(points);",
+      "explanation": "'points' was declared as a const, which makes it read-only. We must declare it with 'let' to allow re-assignment."
+    },
+    {
+      "id": "q5",
+      "difficulty": "Medium",
+      "type": "practical",
+      "format": "optimize_code",
+      "questionText": "Optimize the following code to use template literals instead of plus signs (+) for concatenation, making it cleaner.",
+      "codeContext": "const name = \"Sarah\";\nconst role = \"Developer\";\nconst status = \"Active\";\nconst message = \"User \" + name + \" who holds the \" + role + \" role is currently \" + status + \".\";\nconsole.log(message);",
+      "solutionCode": "const name = \"Sarah\";\nconst role = \"Developer\";\nconst status = \"Active\";\nconst message = `User ${name} who holds the ${role} role is currently ${status}.`;\nconsole.log(message);",
+      "explanation": "Template literals with backticks and ${} interpolation are cleaner, less prone to spacing bugs, and performant."
+    },
+    {
+      "id": "q6",
+      "difficulty": "Medium-Hard",
+      "type": "mistake",
+      "format": "modify_code",
+      "questionText": "Modify the constant object 'profile' to change the city to 'Tokyo' and add a new property 'joined' set to true, without triggering a re-assignment error.",
+      "codeContext": "const profile = {\n  username: \"koder\",\n  city: \"Kyoto\"\n};\n// Add code below:\n",
+      "solutionCode": "const profile = {\n  username: \"koder\",\n  city: \"Kyoto\"\n};\nprofile.city = \"Tokyo\";\nprofile.joined = true;\nconsole.log(profile);",
+      "explanation": "Even though 'profile' is a const reference, we can freely add or edit properties of the object."
+    },
+    {
+      "id": "q7",
+      "difficulty": "Hard",
+      "type": "application",
+      "format": "small_implementation",
+      "questionText": "Write a small utility script that takes a variable of unknown type, prints its type, and logs a specific warning if it is 'object' but is actually null.",
+      "solutionCode": "function checkVariable(val) {\n  const type = typeof val;\n  console.log(\"Type reported:\", type);\n  if (type === \"object\" && val === null) {\n    console.log(\"Warning: This is actually null (the historic JS typeof bug)!\");\n  }\n}\ncheckVariable(null);\ncheckVariable({ name: \"Alice\" });",
+      "explanation": "Combines typeof checks with deep comparison (val === null) to handle the classic JS null-typeof caveat."
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "application",
+      "format": "write_program",
+      "questionText": "Demonstrate Temporal Dead Zone (TDZ) in code by safely showing what happens when let or const variables are accessed before declaration inside a try/catch block.",
+      "solutionCode": "try {\n  // Accessing 'futureVar' here will throw a ReferenceError due to TDZ\n  console.log(futureVar);\n} catch (error) {\n  console.log(\"Safely caught TDZ error:\", error.name, \"-\", error.message);\n}\n\nlet futureVar = \"I am declared now!\";\nconsole.log(\"Success:\", futureVar);",
+      "explanation": "Demonstrates that let and const cannot be accessed prior to declaration, illustrating the TDZ safety feature."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "type": "theory",
+      "questionText": "Which variable keyword is function-scoped rather than block-scoped?",
+      "options": {
+        "A": "let",
+        "B": "const",
+        "C": "var",
+        "D": "None of the above"
+      },
+      "correctOption": "C",
+      "explanation": "'var' is function-scoped. If declared outside any function, it is globally scoped. 'let' and 'const' are strictly block-scoped (scoped to curly braces {})."
+    },
+    {
+      "id": "m2",
+      "type": "theory",
+      "questionText": "Which of the following is NOT a primitive data type in JavaScript?",
+      "options": {
+        "A": "Boolean",
+        "B": "Array",
+        "C": "Symbol",
+        "D": "Undefined"
+      },
+      "correctOption": "B",
+      "explanation": "Arrays are complex objects under the hood. Booleans, Symbols, and Undefined are primitive types."
+    },
+    {
+      "id": "m3",
+      "type": "output_prediction",
+      "questionText": "What is the output of: console.log(typeof typeof 42);",
+      "options": {
+        "A": "\"number\"",
+        "B": "\"string\"",
+        "C": "\"typeof\"",
+        "D": "TypeError"
+      },
+      "correctOption": "B",
+      "explanation": "typeof 42 evaluates to the string \"number\". Then, typeof \"number\" evaluates to \"string\"."
+    },
+    {
+      "id": "m4",
+      "type": "output_prediction",
+      "questionText": "What does the following code print?\nconst user = { name: 'Bob' };\nuser.name = 'Ted';\nconsole.log(user.name);",
+      "options": {
+        "A": "Bob",
+        "B": "Ted",
+        "C": "TypeError",
+        "D": "undefined"
+      },
+      "correctOption": "B",
+      "explanation": "Properties of constant objects can be modified. Only re-assigning the 'user' variable itself (e.g., user = {}) throws a TypeError."
+    },
+    {
+      "id": "m5",
+      "type": "output_prediction",
+      "questionText": "What is printed by: let a; console.log(a === undefined);",
+      "options": {
+        "A": "true",
+        "B": "false",
+        "C": "undefined",
+        "D": "ReferenceError"
+      },
+      "correctOption": "A",
+      "explanation": "Uninitialized variables automatically receive the value 'undefined', so the strict comparison yields true."
+    },
+    {
+      "id": "m6",
+      "type": "find_bug",
+      "questionText": "Identify the line containing a bug in this block:\n1: const items = ['Pen', 'Pencil'];\n2: items.push('Eraser');\n3: items = ['Notebook'];\n4: console.log(items);",
+      "options": {
+        "A": "Line 1",
+        "B": "Line 2",
+        "C": "Line 3",
+        "D": "Line 4"
+      },
+      "correctOption": "C",
+      "explanation": "Line 3 attempts to reassign 'items' to a new array reference. Since 'items' is a constant reference, this triggers a TypeError."
+    },
+    {
+      "id": "m7",
+      "type": "find_bug",
+      "questionText": "Why is using 'var' generally discouraged in modern JavaScript?",
+      "options": {
+        "A": "It doesn't support hoisting",
+        "B": "It is block-scoped, causing variable name conflicts",
+        "C": "It is function-scoped and hoists variables with undefined, risking subtle state leaks",
+        "D": "It is slower to compile by the JS engine"
+      },
+      "correctOption": "C",
+      "explanation": "var allows variables to leak out of blocks (like if/for loops) and initializes as undefined before line execution, making debugging difficult."
+    },
+    {
+      "id": "m8",
+      "type": "complete_code",
+      "questionText": "Fill in the blank to safely handle potential errors when reassigning 'score':\n____ (score = 20) { ... } catch (err) { ... }",
+      "options": {
+        "A": "try",
+        "B": "attempt",
+        "C": "guard",
+        "D": "catch"
+      },
+      "correctOption": "A",
+      "explanation": "The 'try' block wraps code that may throw exceptions, letting a corresponding 'catch' handler intercept them."
+    },
+    {
+      "id": "m9",
+      "type": "complete_code",
+      "questionText": "Which keyword should replace the blank to declare an unchanging, block-scoped URL config?\n____ API_URL = 'https://api.github.com';",
+      "options": {
+        "A": "let",
+        "B": "static",
+        "C": "var",
+        "D": "const"
+      },
+      "correctOption": "D",
+      "explanation": "'const' is the standard way to declare block-scoped, immutable bindings in modern JS."
+    },
+    {
+      "id": "m10",
+      "type": "best_approach",
+      "questionText": "What is the best approach to logging an object for debugging so it renders interactively in the developer console?",
+      "options": {
+        "A": "console.log('User is ' + user);",
+        "B": "console.log('User is', user);",
+        "C": "console.log('User is ' + JSON.stringify(user));",
+        "D": "console.write(user);"
+      },
+      "correctOption": "B",
+      "explanation": "Passing the object as a separate argument to console.log keeps the object structure intact, allowing interactive expandable inspection."
+    }
+  ]
 }

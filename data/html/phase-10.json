@@ -1,0 +1,170 @@
+{ "phase_metadata": { "phase_number": 10, "title": "CSS Grid: Powerful
+Two-Dimensional Layouts", "description": "Mastering the most powerful layout
+system in CSS to create complex, responsive, and rigid grid structures with
+ease.", "estimated_time": "5 Hours" }, "learning_objectives": [ "Understand the
+difference between 1D (Flexbox) and 2D (Grid) layouts", "Define grid structures
+using grid-template-columns and rows", "Utilize the 'fr' (fractional) unit for
+fluid grid tracks", "Master cell spanning using grid-column and grid-row",
+"Implement named layout sections with grid-template-areas", "Create
+ultra-responsive layouts using auto-fit, auto-fill, and minmax()" ],
+"prerequisites": [ "Completion of Phase 9 (Flexbox)", "Understanding of the CSS
+Box Model" ], "introduction": "While Flexbox is designed for layouts in a single
+direction (row OR column), CSS Grid is designed for the big picture. It is a
+two-dimensional layout system, meaning it handles both rows AND columns at the
+same time. With Grid, you can align elements into a perfectly structured matrix,
+making complex magazine-style layouts or dashboard interfaces simple to build.",
+"concept_explanation": { "grid_container_and_items": "Like Flexbox, Grid starts
+with a parent container (display: grid). The immediate children become grid
+items that occupy specific cells within the grid.", "grid_tracks_and_fr_unit":
+"Tracks are the columns and rows of your grid. The 'fr' unit represents a
+fraction of the available space in the grid container, allowing tracks to grow
+and shrink fluidly.", "grid_lines": "The browser draws invisible numbered lines
+between tracks. To span multiple cells, you tell an item to start at one line
+and end at another.", "grid_template_areas": "This is a visual way of defining a
+layout. You give grid items names and then 'draw' the layout using text strings
+in the container CSS.", "auto_fit_vs_auto_fill": "These are 'magic' keywords
+used with the repeat() function. They allow the grid to automatically create as
+many columns as will fit in the container, making layouts responsive without
+media queries." }, "syntax": { "container_setup": ".container {\n display:
+grid;\n grid-template-columns: 200px 1fr 1fr;\n gap: 20px;\n}",
+"spanning_syntax": ".item-wide {\n grid-column: 1 / 3; /* Starts at line 1, ends
+at line 3 /\n}", "template_areas": ".container {\n grid-template-areas:\n
+"header header"\n "sidebar content"\n "footer footer";\n}" },
+"breakdown_of_syntax": { "display_grid": "Activates the grid context for the
+element.", "grid_template_columns": "Defines the number and width of columns.",
+"fr": "Fractional unit; 1fr is one part of the free space.", "repeat_function":
+"repeat(3, 1fr) is shorthand for 1fr 1fr 1fr.", "grid_column_row": "Shorthand
+for start and end lines (e.g., 1 / span 2).", "grid_area": "Assigns a name to a
+grid item to be used in template-areas." }, "rules_and_key_points": { "rule_1":
+"Grid is for 2D layouts (rows and columns); Flexbox is for 1D (rows or
+columns).", "rule_2": "Grid lines start at 1, not 0.", "rule_3": "The 'gap'
+property handles both 'row-gap' and 'column-gap'.", "rule_4": "Use 'minmax(min,
+max)' to prevent tracks from becoming too small.", "rule_5": "Grid items can
+overlap if they are assigned to the same cell.", "rule_6": "The 'repeat()'
+function saves time when creating many identical tracks.", "rule_7": "Explicit
+grids are defined by you; Implicit grids are created by the browser when content
+exceeds your definition.", "rule_8": "Grid-template-areas must form a perfect
+rectangle; you cannot have 'L' shaped areas.", "rule_9": "Use a period (.) in
+grid-template-areas to leave a cell empty.", "rule_10": "Negative grid line
+numbers (e.g., -1) can be used to reference the end of the grid." },
+"code_example_1": { "title": "Basic 3-Column Layout", "description": "A simple
+grid with three equal columns and a gap.", "code": "/ CSS /\n.grid-wrapper {\n
+display: grid;\n grid-template-columns: repeat(3, 1fr);\n gap: 15px;\n}\n\n.box
+{\n background: #3498db;\n padding: 20px;\n color: white;\n}\n\n/ HTML /\n<div
+class="grid-wrapper">\n <div class="box">1\n <div class="box">2\n <div
+class="box">3\n" }, "code_example_2": { "title": "Holy Grail Layout with Areas",
+"description": "Using grid-template-areas to build a full page structure.",
+"code": "/ CSS */\n.container {\n display: grid;\n
+grid-template-columns: 200px 1fr;\n grid-template-areas:\n "header header"\n
+"sidebar main"\n "footer footer";\n height: 100vh;\n}\n\nheader { grid-area:
+header; background: coral; }\nnav { grid-area: sidebar; background: lightblue;
+}\nmain { grid-area: main; background: white; }\nfooter { grid-area: footer;
+background: gray; }" }, "output": "Example 1 produces three blue boxes
+side-by-side that resize equally. Example 2 produces a full-page layout where
+the header and footer span the full width, while the sidebar and main content
+sit side-by-side in the middle.", "step_by_step_dry_run": [ "Browser finds
+'display: grid' and creates a grid container.", "It reads
+'grid-template-columns: 200px 1fr'—the first column is fixed, the second takes
+all remaining space.", "It maps the 'grid-area' names of the children to the
+'grid-template-areas' map.", "It sees 'header header' in the first row and spans
+the header across both columns.", "It sees 'sidebar main' in the second row and
+places them in column 1 and 2 respectively.", "The footer is stretched across
+the bottom row just like the header." ], "memory_visualization": "Visualize the
+Grid as a Graph Paper:\nLine 1 | Cell 1 | Line 2 | Cell 2 | Line 3\n[ Row 1
+]\nLine 2 | Cell 3 | Line 3 | Cell 4 | Line 4", "real_world_use_cases": [
+"Creating complex news/magazine homepages with varying article sizes.",
+"Building administrative dashboards with sidebars and data widgets.", "Creating
+a 'Photo Gallery' where some images are larger than others.", "Designing
+responsive forms where labels and inputs align perfectly.", "Building full-page
+application shells (Header/Sidebar/Main/Footer)." ], "common_mistakes": [
+"Forgetting that grid-template-areas require every cell in the grid to be
+accounted for.", "Confusing grid lines with grid tracks (Lines are the dividers,
+tracks are the spaces).", "Using 'grid-column: 1 / 2' and expecting it to span 2
+columns (it only spans 1).", "Not providing a height to the grid container when
+using 1fr for rows.", "Trying to use Flexbox properties like 'flex-direction'
+inside a Grid container." ], "best_practices": [ "Use 'fr' units instead of
+percentages to avoid calculation issues with 'gap'.", "Use 'repeat(auto-fit,
+minmax(...))' for responsive grids without media queries.", "Name your grid
+lines if the grid is very complex.", "Use 'grid-template-areas' for high-level
+page layouts as it's easier to read.", "Keep 'gap' consistent across your UI for
+a professional look." ], "faqs": [ { "question": "What is the difference between
+auto-fit and auto-fill?", "answer": "auto-fill creates empty tracks even if
+there is no content to fill them. auto-fit collapses empty tracks and stretches
+the filled ones to take up the space." }, { "question": "Can an item be both a
+flex item and a grid container?", "answer": "Yes! You can nest a grid inside a
+flexbox or vice versa to achieve specific layout goals." } ], "summary":
+"Phase 10 mastered CSS Grid. We learned how to define 2D structures using
+columns and rows, how to use the fluid 'fr' unit, how to span items across
+multiple cells, and how to use 'areas' to visually map out a webpage's design.",
+"key_takeaways": [ "Grid is 2-Dimensional; Flexbox is 1-Dimensional.", "The 'fr'
+unit is a 'flexible length' unit.", "Grid lines are numbered starting from 1.",
+"Gap property creates space between items without affecting margins.",
+"grid-column: 1 / -1 spans the entire width.", "repeat() makes track definition
+concise.", "minmax() defines a size range for tracks.", "Grid-template-areas
+provide a visual layout map.", "Auto-fit/fill create powerful responsive
+behavior.", "Grid items can span both multiple rows and multiple columns." ],
+"preview_next_topic": "In Phase 11, we will learn 'Responsive Design'—combining
+Flexbox, Grid, and Media Queries to make your sites look perfect on phones,
+tablets, and desktops.", "questions_and_answers": [ { "question": "When should
+you choose CSS Grid over Flexbox?", "answer": "You should choose CSS Grid when
+you need to align items in two dimensions (both rows and columns) or when you
+want to define the layout structure from the parent container. Flexbox is better
+for content-driven alignment in a single direction.", "difficulty": "Easy
+Concept" }, { "question": "What does 'grid-column: 1 / 4' mean?", "answer": "It
+means the grid item will start at vertical grid line 1 and end at vertical grid
+line 4, effectively spanning across 3 columns.", "difficulty": "Moderate
+Concept" }, { "question": "Write the CSS to create a grid with 4 equal columns
+using the repeat function and a 20px gap.", "answer": ".grid {\n display:
+grid;\n grid-template-columns: repeat(4, 1fr);\n gap: 20px;\n}", "difficulty":
+"Moderate Practical" }, { "question": "How do you make a grid item span exactly
+two rows and start from the second row line?", "answer": ".item {\n grid-row: 2
+/ span 2;\n}", "difficulty": "Hard Practical" }, { "question": "Identify the
+bug: grid-template-areas: "header header" "sidebar footer"; (with a 3-column
+setup defined in grid-template-columns).", "answer": "The bug is that the areas
+defined only cover 2 columns ("header header"), but the grid has 3 columns
+defined. Every cell in the grid matrix must be named or marked with a dot in
+template-areas.", "difficulty": "Moderate Mistake" }, { "question": "Why is
+'grid-template-columns: repeat(3, 33.33%)' usually worse than
+'repeat(3, 1fr)'?", "answer": "Using percentages does not account for the 'gap'
+property. 33.33% * 3 + gap will exceed 100%, causing an overflow. The 'fr' unit
+automatically calculates space after gaps are subtracted.", "difficulty": "Hard
+Mistake" }, { "question": "Write a grid container that automatically creates
+columns that are at least 200px wide and fill the available space.", "answer":
+".container {\n display: grid;\n grid-template-columns: repeat(auto-fit,
+minmax(200px, 1fr));\n}", "difficulty": "Moderate Coding" }, { "question":
+"Create a layout where a 'sidebar' takes 1/4 of the width and 'content'
+takes 3/4, but they both have a minimum height of 500px.", "answer": ".container
+{\n display: grid;\n grid-template-columns: 1fr 3fr;\n grid-auto-rows:
+minmax(500px, auto);\n}", "difficulty": "Hard Coding" } ],
+"multiple_choice_questions": [ { "question": "Which property is used to define
+the vertical gaps between grid rows?", "options": { "A": "column-gap", "B":
+"grid-row-spacing", "C": "row-gap", "D": "gap-y" }, "answer": "C", "type":
+"Theory" }, { "question": "What does '1fr' represent in CSS Grid?", "options": {
+"A": "1 Fixed Resolution", "B": "1 Fraction of the available space", "C": "1
+Frame rate", "D": "1 Front-row" }, "answer": "B", "type": "Theory" }, {
+"question": "Predict the output of: grid-template-columns: 100px 1fr 2fr; in
+a 700px container with no gaps.", "options": { "A": "100px, 200px, 400px", "B":
+"100px, 300px, 300px", "C": "100px, 1fr, 2fr", "D": "700px, 0px, 0px" },
+"answer": "A", "type": "Output Prediction" }, { "question": "What does
+'grid-column: 1 / -1' do?", "options": { "A": "Moves the item to the first
+column", "B": "Hides the item", "C": "Makes the item span from the first line to
+the very last line", "D": "Throws an error" }, "answer": "C", "type": "Output
+Prediction" }, { "question": "If you have 5 items in a 3-column grid, how many
+rows will be created?", "options": { "A": "1", "B": "2", "C": "3", "D": "5" },
+"answer": "B", "type": "Output Prediction" }, { "question": "Find the bug: .item
+{ grid-column: 2-4; }", "options": { "A": "Should be grid-column: 2 / 4;", "B":
+"Hyphens are not allowed", "C": "2-4 is a math operation", "D": "Grid lines must
+be names" }, "answer": "A", "type": "Find the Bug" }, { "question": "Find the
+bug: grid-template-areas: "a b" "c";", "options": { "A": "Missing quotes", "B":
+"Areas must have the same number of cells in every row", "C": "Names cannot be
+single letters", "D": "Commas are missing" }, "answer": "B", "type": "Find the
+Bug" }, { "question": "Complete the code for 3 equal columns:
+grid-template-columns: ____(3, 1fr);", "options": { "A": "copy", "B": "multi",
+"C": "repeat", "D": "group" }, "answer": "C", "type": "Complete the Code" }, {
+"question": "Complete the code for a flexible range: grid-template-columns:
+____(200px, 1fr);", "options": { "A": "limit", "B": "minmax", "C": "size", "D":
+"between" }, "answer": "B", "type": "Complete the Code" }, { "question": "What
+is the best approach for a responsive card gallery?", "options": { "A":
+"grid-template-columns: 1fr 1fr 1fr 1fr;", "B": "grid-template-columns:
+repeat(auto-fit, minmax(250px, 1fr));", "C": "float: left;", "D": "display:
+inline-block;" }, "answer": "B", "type": "Best Approach" } ] }

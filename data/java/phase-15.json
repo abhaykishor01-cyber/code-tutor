@@ -1,0 +1,210 @@
+{ "phase_metadata": { "phase_number": 15, "phase_name": "Mini Projects",
+"description": "Synthesize all previous concepts—OOP, Collections, Exceptions,
+and File I/O—to build functional, real-world terminal applications.",
+"java_version": "21 LTS" }, "learning_objectives": [ "Design and implement a
+menu-driven terminal interface", "Apply CRUD (Create, Read, Update, Delete)
+operations on data collections", "Implement data persistence using File I/O and
+Serialization", "Practice modular programming by separating data, logic, and
+presentation", "Handle user input errors gracefully to prevent system crashes",
+"Model real-world entities using Java Records and Classes" ], "prerequisites": [
+"Phase 1-14: Fundamental Java knowledge", "Phase 10: Collections Framework
+(ArrayList/HashMap)", "Phase 14: File I/O and Serialization" ], "introduction":
+"Programming is a craft best learned through building. In this phase, we move
+beyond isolated exercises to build small, complete systems. We will focus on how
+different Java features work together: using Classes to model objects,
+Collections to store them, File I/O to save them, and Exception Handling to keep
+the system stable. This is where you transition from a student writing code to
+an engineer building software.", "concept_explanation": { "what_is_it": "Mini
+Projects are integrated applications that solve a specific problem. They
+typically involve a user interface (Console), business logic
+(Calculations/Rules), and a data layer (Storage).", "why_do_we_need_it": "In
+isolation, concepts like 'Interfaces' or 'File I/O' might feel abstract.
+Projects force you to decide which tool is right for the job, helping you
+understand the architecture of a software application.", "how_it_works": "1.
+Define the Entity (e.g., Student, Account). 2. Choose a Collection (e.g.,
+ArrayList for list-based data). 3. Create a Service/Manager class to handle
+logic. 4. Implement a Main class with a 'while-loop' and 'switch' for the
+menu.", "system_architecture": "We follow a simplified 'Model-Service' pattern.
+The 'Model' (Record/Class) holds data. The 'Service' (Manager) contains the
+methods to manipulate that data. The 'Main' class handles User Interaction.",
+"java_21_features": "We utilize 'Records' for concise data modeling and 'Switch
+Expressions' for clean menu logic, making the code modern and readable." },
+"syntax": { "menu_loop": "while (true) {\n System.out.println("1. Add\n2.
+Exit");\n int choice = scanner.nextInt();\n if (choice == 2) break;\n}",
+"record_model": "record Student(int id, String name) implements Serializable {}
+", "switch_expression": "int result = switch (choice) {\n case 1 -> addData();\n
+case 2 -> deleteData();\n default -> 0;\n};" }, "syntax_breakdown": {
+"while_true": "Creates an infinite loop that keeps the application running until
+the user explicitly chooses to 'Exit'.", "scanner_buffer": "Using
+'scanner.nextLine()' after 'nextInt()' is crucial to clear the newline character
+from the input buffer.", "persistence_layer": "Using ObjectOutputStream to save
+the entire list of objects to a file in one operation.", "crud": "Short for
+Create, Read, Update, and Delete—the four basic functions of persistent
+storage.", "record": "A special type of class in Java used to hold immutable
+data with less boilerplate code." }, "rules_and_key_points": [ "Always validate
+user input (e.g., check for negative amounts in banking).", "Use a List or Map
+to store objects in memory while the app is running.", "Save data to a file
+whenever an update occurs to prevent data loss.", "Keep the 'Main' method lean;
+delegate logic to helper classes.", "Use 'try-catch' blocks around Scanner
+inputs to handle 'InputMismatchException'.", "Initialize collections from a file
+at startup (load data).", "Provide a clear 'Exit' option that saves data and
+closes resources.", "Use meaningful IDs (like Roll Number or Account ID) as keys
+for searching.", "Implement the 'toString()' method for easy printing of object
+details.", "Follow the 'Single Responsibility Principle'—one class should do one
+thing." ], "code_example_1": { "title": "Minimal Student Entity & Logic",
+"description": "A basic structure showing how a Record and a Manager class
+interact.", "code": "import java.util.;\nimport java.io.;\n\n// Data
+Model\nrecord Student(int id, String name) implements Serializable {}\n\nclass
+StudentManager {\n private List students = new ArrayList<>();\n\n public void
+addStudent(Student s) {\n students.add(s);\n System.out.println("Student
+added!");\n }\n\n public void listStudents() {\n if (students.isEmpty())
+System.out.println("No students found.");\n else
+students.forEach(System.out::println);\n }\n}\n\npublic class ProjectOne {\n
+public static void main(String[] args) {\n StudentManager manager = new
+StudentManager();\n Scanner sc = new Scanner(System.in);\n\n // Simplified
+menu\n manager.addStudent(new Student(101, "Alice"));\n
+manager.listStudents();\n }\n}" }, "code_example_2": { "title": "Integrated
+Banking Logic with Exception Handling", "description": "Demonstrates a robust
+method for processing transactions within a mini project.", "code": "import
+java.util.*;\n\nclass InsufficientFundsException extends Exception {\n public
+InsufficientFundsException(String msg) { super(msg); }\n}\n\nclass BankService
+{\n private double balance = 500.0;\n\n public void withdraw(double amount)
+throws InsufficientFundsException {\n if (amount > balance) {\n throw new
+InsufficientFundsException("Error: Balance is only $" + balance);\n }\n balance
+-= amount;\n System.out.println("Withdrawal successful! New balance: $" +
+balance);\n }\n}\n\npublic class BankingApp {\n public static void main(String[]
+args) {\n BankService bank = new BankService();\n Scanner sc = new
+Scanner(System.in);\n\n try {\n System.out.print("Enter withdrawal amount: ");\n
+double amt = sc.nextDouble();\n bank.withdraw(amt);\n } catch
+(InsufficientFundsException e) {\n System.err.println(e.getMessage());\n } catch
+(InputMismatchException e) {\n System.err.println("Error: Please enter a valid
+numeric amount.");\n }\n }\n}" }, "output": "Student added!\nStudent[id=101,
+name=Alice]\nEnter withdrawal amount: 600\nError: Balance is only $500.0",
+"step_by_step_dry_run": "1. In BankingApp, a BankService instance is created
+with 500.0 balance.\n2. The user enters '600' in the console.\n3. The withdraw()
+method is called with 600.\n4. Inside withdraw(), the 'if (600 > 500)' condition
+is true.\n5. An InsufficientFundsException is 'thrown'.\n6. The control jumps to
+the 'catch (InsufficientFundsException e)' block in main.\n7. The custom error
+message is printed via System.err.", "memory_visualization": "Memory State
+during a project run: \n1. Stack: Main frame contains the 'manager' reference.
+\n2. Heap: StudentManager object exists, which contains a reference to an
+ArrayList object. \n3. Heap: The ArrayList contains multiple references to
+'Student' records. \n4. Persistent Storage (Disk): When 'Save' is called, the
+ArrayList and its Student objects are converted to bytes and written to
+'data.ser'.", "real_world_use_cases": [ "Inventory Management: Keeping track of
+stock levels in a small shop.", "Library Systems: Tracking which books are
+borrowed and by whom.", "Personal Finance Trackers: Logging daily expenses and
+categorizing them.", "Employee Payroll: Calculating salaries based on hours
+worked and tax brackets.", "Electronic Medical Records: A small-scale app to
+manage patient appointments." ], "common_mistakes": [ "Not handling
+InputMismatchException: If a user types 'abc' instead of '1', the app crashes.",
+"Infinite Loops: Forgetting to put a 'break' or 'return' in the exit case of a
+while loop.", "File paths: Using hardcoded C:\ paths that don't work on other
+computers (use relative paths).", "Scanner Bug: Not calling 'scanner.nextLine()'
+after 'scanner.nextInt()', causing the next string input to be skipped.",
+"Static Lists: Making the data list 'static' when it should be an instance
+variable of a Manager class." ], "best_practices": [ "Use 'switch' expressions
+for clean menu navigation.", "Create a 'Save' method and call it after every
+'Add' or 'Delete' operation.", "Implement a 'Search' feature by ID for better
+user experience.", "Keep data private and use Getters/Setters or Records.", "Add
+a 'Confirm' step before deleting data.", "Use System.err for error messages to
+distinguish them from normal output.", "Comment each module clearly for better
+maintenance." ], "faq": [ { "question": "Which Collection is best for a
+Project?", "answer": "ArrayList is best for simple lists. HashMap is better if
+you need to look up items quickly using a unique ID like a Roll Number or SKU."
+}, { "question": "How do I make my data stay even after closing the program?",
+"answer": "Use Serialization to save your List of objects to a file (.ser) when
+exiting, and load it back into the List when the program starts." }, {
+"question": "Why is my String input being skipped after an Integer input?",
+"answer": "The 'nextInt()' method does not consume the 'newline' character. You
+must call 'scanner.nextLine()' immediately after 'nextInt()' to clear the
+buffer." } ], "summary": "Phase 15 focused on practical application. We learned
+how to structure a terminal application using menu loops, how to model entities
+with Records, and how to combine Collections with File I/O to create a
+persistent system. This phase acts as a capstone for the fundamental pillars of
+Java.", "key_takeaways": [ "Projects combine OOP, Collections, and File I/O.",
+"Menu loops keep an application interactive.", "Input validation is critical for
+software reliability.", "Persistence allows data to survive program restarts.",
+"Separating logic from presentation makes code cleaner.", "Records are the
+modern way to define data models.", "CRUD is the foundation of most software
+systems.", "Exception handling prevents unexpected crashes during user
+interaction.", "Buffer management in Scanners is a common but easy-to-fix
+pitfall.", "Small projects build the confidence needed for large-scale
+enterprise apps." ], "preview_of_the_next_topic": "In Phase 16, we will explore
+advanced Java topics, starting with the Reflection API and Annotations to
+understand how frameworks like Spring work under the hood.", "questions": [ {
+"difficulty": "Easy", "topic": "Concept", "question": "Why is it important to
+have a menu loop in a terminal-based project?", "answer": "A menu loop allows
+the user to perform multiple operations (like adding and then viewing data) in a
+single session without having to restart the program for every single action."
+}, { "difficulty": "Moderate", "topic": "Concept", "question": "Explain the
+difference between 'In-Memory storage' and 'Persistent storage' in a Java
+project.", "answer": "In-Memory storage (like an ArrayList) is fast but
+volatile; the data is lost when the program closes. Persistent storage (like a
+.txt or .ser file) stores data on the hard drive, allowing it to be loaded back
+the next time the program runs." }, { "difficulty": "Moderate", "topic":
+"Practical Usage", "question": "Write a Java 'record' named 'Book' that stores
+an ISBN (String) and a title (String). Ensure it is ready for Serialization.",
+"answer": "public record Book(String isbn, String title) implements
+java.io.Serializable {}" }, { "difficulty": "Hard", "topic": "Practical Usage",
+"question": "Write a method 'saveData(List list)' that saves a list to a file
+named 'students.dat' using ObjectOutputStream.", "answer": "public void
+saveData(List list) { try (var oos = new ObjectOutputStream(new
+FileOutputStream("students.dat"))) { oos.writeObject(list); } catch (IOException
+e) { e.printStackTrace(); } }" }, { "difficulty": "Moderate", "topic": "Common
+Mistake", "question": "A student uses 'sc.nextInt()' then 'sc.nextLine()' to
+read a name, but the name is always blank. What is the fix?", "answer": "The
+student must call 'sc.nextLine()' twice: once immediately after 'nextInt()' to
+consume the leftover newline, and a second time to actually capture the name
+input." }, { "difficulty": "Hard", "topic": "Common Mistake", "question": "In a
+Library system, a student uses 'List.remove(book)' but it doesn't work even
+though the data is the same. What is missing in the Book class?", "answer": "The
+Book class (if not a record) must override 'equals()' and 'hashCode()'. If it's
+a standard class, 'remove' compares memory addresses by default. Records handle
+this automatically." }, { "difficulty": "Moderate", "topic": "Coding",
+"question": "Implement a simple 'Search' method for an ArrayList of Students
+that returns a Student object based on an 'id'.", "answer": "public Student
+search(int id, List list) { for(Student s : list) { if(s.id() == id) return s; }
+return null; }" }, { "difficulty": "Hard", "topic": "Coding", "question": "Write
+a code snippet using Java 21 Switch Expressions to handle menu choices 1
+(Add), 2 (View), 3 (Exit).", "answer": "switch (choice) { case 1 -> add();
+case 2 -> view(); case 3 -> System.exit(0); default ->
+System.out.println("Invalid"); }" } ], "mcqs": [ { "question": "Which
+functionality does 'CRUD' represent in software projects?", "options": { "A":
+"Compile, Run, Update, Debug", "B": "Create, Read, Update, Delete", "C": "Copy,
+Remove, Undo, Do", "D": "Create, Restore, Use, Deploy" }, "answer": "B" }, {
+"question": "What happens if you don't implement Serializable in your model
+class but try to save it using ObjectOutputStream?", "options": { "A": "The file
+is created empty", "B": "The program throws NotSerializableException", "C":
+"Java saves it automatically anyway", "D": "The program crashes with a
+NullPointerException" }, "answer": "B" }, { "question": "Predict output: Scanner
+sc = new Scanner("1\nHello"); int i = sc.nextInt(); String s = sc.nextLine();
+System.out.print(i + ":" + s);", "options": { "A": "1:Hello", "B": "1:", "C":
+"Hello:1", "D": "Error" }, "answer": "B" }, { "question": "In a project, where
+should you ideally place the 'Scanner' object?", "options": { "A": "Inside every
+single method", "B": "In the Main class to handle user interaction", "C":
+"Inside the data record", "D": "Scanner is not used in projects" }, "answer":
+"B" }, { "question": "Which collection is best for looking up a 'Contact' using
+a 'PhoneNumber' as a key?", "options": { "A": "ArrayList", "B": "LinkedList",
+"C": "HashMap", "D": "TreeSet" }, "answer": "C" }, { "question": "Find the bug:
+\nwhile(true) { \n System.out.println("1. Exit"); \n int c = sc.nextInt(); \n
+if(c==1) System.out.println("Bye"); \n}", "options": { "A": "Missing while loop
+braces", "B": "The loop never terminates because there is no break statement",
+"C": "sc.nextInt() is invalid", "D": "c should be a String" }, "answer": "B" },
+{ "question": "Find the bug: \nrecord Item(String name, double price) { \n
+public void setPrice(double p) { this.price = p; } \n}", "options": { "A":
+"Records cannot have methods", "B": "Record fields are final and cannot be
+changed (no setters)", "C": "Price must be an int", "D": "Records cannot have
+names" }, "answer": "B" }, { "question": "Complete the code for saving data:
+\ntry (var oos = new ObjectOutputStream()) { oos.writeObject(list); }",
+"options": { "A": "new File("data.ser")", "B": "new
+FileOutputStream("data.ser")", "C": "new FileWriter("data.ser")", "D":
+"System.out" }, "answer": "B" }, { "question": "Complete the code: \nif
+(students.) { System.out.println("List is empty"); }", "options": { "A": "size()
+== null", "B": "isEmpty()", "C": "isClear()", "D": "exists()" }, "answer": "B"
+}, { "question": "Best Approach: You need to store 10,000 Employees and
+frequently search for them by ID. Which approach is best?", "options": { "A":
+"Store in an ArrayList and use a for-loop to search", "B": "Store in a
+HashMap<Integer, Employee> for O(1) search time", "C": "Store in a text file and
+read the whole file for every search", "D": "Use an array and sort it manually"
+}, "answer": "B" } ] }

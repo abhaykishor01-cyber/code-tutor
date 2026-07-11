@@ -1,0 +1,323 @@
+{
+  "metadata": {
+    "phaseNumber": 18,
+    "title": "Algorithms",
+    "duration": "4 weeks",
+    "difficulty": "Advanced"
+  },
+  "learningObjectives": [
+    "Implement and analyze linear and binary search algorithms in C.",
+    "Master comparison-based sorting algorithms: Bubble, Selection, and Insertion Sort.",
+    "Understand and implement divide-and-conquer sorting algorithms: Merge Sort and Quick Sort.",
+    "Represent graphs in C using Adjacency Matrices and Adjacency Lists.",
+    "Implement Depth-First Search (DFS) and Breadth-First Search (BFS) graph traversal algorithms.",
+    "Evaluate the time and space complexity of fundamental algorithms using Big-O notation."
+  ],
+  "prerequisites": [
+    "Phase 9: Pointers and Memory Management",
+    "Phase 12: Recursion",
+    "Phase 16: Basic Data Structures (Stacks, Queues, Graphs)"
+  ],
+  "introduction": "Algorithms form the foundation of efficient software. An algorithm is a step-by-step procedure designed to solve a specific problem or perform a computation. In C, implementing algorithms requires direct memory manipulation, pointer operations, and manual resource management. This phase explores essential search, sort, and traversal algorithms, mapping their theoretical behavior directly to machine representation.",
+  "conceptExplanation": "Algorithms can be broadly categorized into Search, Sort, and Graph Traversal strategies. \n\n1. Search Algorithms: Linear Search processes elements sequentially ($O(N)$), making it ideal for unsorted datasets. Binary Search uses a divide-and-conquer approach on sorted arrays, repeatedly halving the search space to find elements in logarithmic time ($O(\\log N)$). \n\n2. Sorting Algorithms: Sorting rearranges elements into a monotonic order. Simple algorithms like Bubble Sort (adjacent swaps), Selection Sort (finding the minimum), and Insertion Sort (inserting into a sorted subarray) have $O(N^2)$ time complexity but run in-place ($O(1)$ auxiliary space). Divide-and-conquer algorithms like Merge Sort (stable, $O(N \\log N)$ time, $O(N)$ space) and Quick Sort (unstable, $O(N \\log N)$ average time, $O(\\log N)$ recursive space) scale efficiently to large datasets.\n\n3. Graph Algorithms: Graph traversal involves visiting every node in a network. Depth-First Search (DFS) uses a Stack structure (often via recursion) to explore paths deep before backtracking. Breadth-First Search (BFS) uses a Queue to traverse graphs level-by-level, making it the algorithm of choice for finding the shortest path in unweighted networks.",
+  "syntax": "void quickSort(int arr[], int low, int high);\nint binarySearch(const int arr[], int low, int high, int target);\nvoid bfsTraversal(int startVertex, int numVertices, int adjMatrix[][numVertices]);",
+  "syntaxBreakdown": [
+    "quickSort: Implements recursive in-place array partitioning. Takes array bounds 'low' and 'high' to define active subarrays.",
+    "binarySearch: Accepts a constant sorted array. Returns index of 'target' or -1 if not found. Requires bounds 'low' and 'high'.",
+    "bfsTraversal: Traversing graphs requires passing the start node, node count, and graph representation (e.g., Variable Length Array for the Adjacency Matrix)."
+  ],
+  "rulesAndKeyPoints": [
+    "Binary Search requires a sorted array; passing an unsorted array results in unpredictable, incorrect search behavior.",
+    "To prevent integer overflow when calculating mid-points, use 'mid = low + (high - low) / 2' instead of '(low + high) / 2'.",
+    "Quick Sort is unstable (may reorder equal elements) but runs faster in practice than Merge Sort due to cache locality and minimal memory overhead.",
+    "Merge Sort guarantees $O(N \\log N)$ worst-case performance but requires $O(N)$ auxiliary memory for temp arrays.",
+    "Graph traversals require tracking visited nodes using a boolean or state array to avoid infinite loops in cyclic graphs."
+  ],
+  "codeExample1": {
+    "title": "Quick Sort and Binary Search Implementation",
+    "code": "#include <stdio.h>\n#include <stdbool.h>\n\n// Swap helper function using pointers\nvoid swap(int *a, int *b) {\n    int temp = *a;\n    *a = *b;\n    *b = temp;\n}\n\n// Quick Sort partition: uses last element as pivot\nint partition(int arr[], int low, int high) {\n    int pivot = arr[high];\n    int i = (low - 1);\n\n    for (int j = low; j < high; j++) {\n        if (arr[j] <= pivot) {\n            i++;\n            swap(&arr[i], &arr[j]);\n        }\n    }\n    swap(&arr[i + 1], &arr[high]);\n    return (i + 1);\n}\n\n// Recursive Quick Sort\nvoid quickSort(int arr[], int low, int high) {\n    if (low < high) {\n        int pi = partition(arr, low, high);\n        quickSort(arr, low, pi - 1);\n        quickSort(arr, pi + 1, high);\n    }\n}\n\n// Iterative Binary Search\nint binarySearch(const int arr[], int size, int target) {\n    int low = 0;\n    int high = size - 1;\n\n    while (low <= high) {\n        int mid = low + (high - low) / 2; // Avoids integer overflow\n        if (arr[mid] == target) {\n            return mid;\n        } else if (arr[mid] < target) {\n            low = mid + 1;\n        } else {\n            high = mid - 1;\n        }\n    }\n    return -1;\n}\n\nint main(void) {\n    int arr[] = {64, 34, 25, 12, 22, 11, 90};\n    int n = sizeof(arr) / sizeof(arr[0]);\n\n    printf(\"Original array: \");\n    for (int i = 0; i < n; i++) printf(\"%d \", arr[i]);\n    printf(\"\\n\");\n\n    quickSort(arr, 0, n - 1);\n\n    printf(\"Sorted array:   \");\n    for (int i = 0; i < n; i++) printf(\"%d \", arr[i]);\n    printf(\"\\n\");\n\n    int target = 22;\n    int index = binarySearch(arr, n, target);\n    if (index != -1) {\n        printf(\"Element %d found at index %d\\n\", target, index);\n    } else {\n        printf(\"Element %d not found\\n\", target);\n    }\n    return 0;\n}",
+    "explanation": "This code demonstrates Quick Sort combined with Binary Search. The Quick Sort partition algorithm rearranges values around a pivot element. Recursive calls then partition smaller divisions of the array. Once sorted, binarySearch is executed. It calculates the mid-point and discards half of the remaining array elements on each iteration, achieving $O(\\log N)$ search speed."
+  },
+  "codeExample2": {
+    "title": "Breadth-First Search (BFS) Traversal of a Graph",
+    "code": "#include <stdio.h>\n#include <stdbool.h>\n\n#define MAX_VERTICES 5\n\n// Simple Queue structure for BFS\ntypedef struct {\n    int items[MAX_VERTICES];\n    int front;\n    int rear;\n} Queue;\n\nvoid initQueue(Queue *q) {\n    q->front = -1;\n    q->rear = -1;\n}\n\nbool isEmpty(Queue *q) {\n    return q->front == -1;\n}\n\nvoid enqueue(Queue *q, int value) {\n    if (q->rear == MAX_VERTICES - 1) return;\n    if (q->front == -1) q->front = 0;\n    q->rear++;\n    q->items[q->rear] = value;\n}\n\nint dequeue(Queue *q) {\n    if (isEmpty(q)) return -1;\n    int item = q->items[q->front];\n    if (q->front >= q->rear) {\n        q->front = -1;\n        q->rear = -1;\n    } else {\n        q->front++;\n    }\n    return item;\n}\n\n// Breadth-First Search Traversal\nvoid bfs(int adjMatrix[MAX_VERTICES][MAX_VERTICES], int startVertex) {\n    bool visited[MAX_VERTICES] = {false};\n    Queue q;\n    initQueue(&q);\n\n    visited[startVertex] = true;\n    enqueue(&q, startVertex);\n\n    printf(\"BFS Traversal starting from vertex %d: \", startVertex);\n\n    while (!isEmpty(&q)) {\n        int currentVertex = dequeue(&q);\n        printf(\"%d \", currentVertex);\n\n        for (int i = 0; i < MAX_VERTICES; i++) {\n            if (adjMatrix[currentVertex][i] == 1 && !visited[i]) {\n                visited[i] = true;\n                enqueue(&q, i);\n            }\n        }\n    }\n    printf(\"\\n\");\n}\n\nint main(void) {\n    // Adjacency Matrix representation of a simple undirected graph\n    int adjMatrix[MAX_VERTICES][MAX_VERTICES] = {\n        {0, 1, 1, 0, 0},\n        {1, 0, 0, 1, 1},\n        {1, 0, 0, 0, 0},\n        {0, 1, 0, 0, 0},\n        {0, 1, 0, 0, 0}\n    };\n\n    bfs(adjMatrix, 0);\n    return 0;\n}",
+    "explanation": "This C program implements Breadth-First Search using an Adjacency Matrix representation and a queue. A boolean tracking array is populated during traversal to prevent cycles. On each iteration, the program dequeues a node, evaluates its adjacent unvisited neighbors, and enqueues them in order.",
+    "expectedOutput": "BFS Traversal starting from vertex 0: 0 1 2 3 4"
+  },
+  "stepByStepDryRun": [
+    "Step 1: quickSort is called on array {64, 34, 25, 12, 22, 11, 90} with low = 0, high = 6.",
+    "Step 2: partition selects pivot = 90. The elements smaller than 90 are moved to its left, which in this case is the entire remaining array since 90 is the maximum.",
+    "Step 3: After partitioning, the array splits around pivot 90, calling partition on left subarray {64, 34, 25, 12, 22, 11} (low = 0, high = 5).",
+    "Step 4: Now pivot is 11. Loop elements from low to high-1. No element is smaller than 11. Element 11 is swapped to index 0, dividing the partition into empty left and {64, 34, 25, 12, 22} on the right.",
+    "Step 5: Subarray sorting recursively completes, resulting in sorted state: {11, 12, 22, 25, 34, 64, 90}.",
+    "Step 6: binarySearch(arr, 7, 22) initiates with low = 0, high = 6.",
+    "Step 7: First iteration: mid = 3, value = arr[3] (25). Since 25 > 22, high is updated to mid - 1 = 2.",
+    "Step 8: Second iteration: mid = 1, value = arr[1] (12). Since 12 < 22, low is updated to mid + 1 = 2.",
+    "Step 9: Third iteration: mid = 2, value = arr[2] (22). Match found; index 2 is returned."
+  ],
+  "memoryVisualization": {
+    "type": "Stack and Array Layout",
+    "description": "Visualizing mid-point extraction in Binary Search to prevent integer overflow.",
+    "nodes": [
+      {
+        "label": "Array low index",
+        "value": "low = 4",
+        "address": "0x7ffee3bf5740",
+        "color": "sky"
+      },
+      {
+        "label": "Array high index",
+        "value": "high = 7",
+        "address": "0x7ffee3bf5744",
+        "color": "rose"
+      },
+      {
+        "label": "Calculated mid (safe)",
+        "value": "mid = low + (high-low)/2 => 4 + 1 = 5",
+        "address": "0x7ffee3bf5748",
+        "color": "emerald"
+      },
+      {
+        "label": "Array mid element",
+        "value": "arr[5] = 42",
+        "address": "0x7ffee3bf577c",
+        "color": "amber"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Network Routing Protocol: Breadth-First Search (BFS) serves as the core routine for computing short route hops (e.g., in unweighted routing hops or peer-to-peer discoveries).",
+    "Relational Database Query Optimizer: Selection sort vs Quick Sort are dynamically evaluated based on index structure availability and row-count limits.",
+    "Compiler Code Optimization: Depth-First Search (DFS) resolves internal dependency trees and generates build execution plans via topological sort.",
+    "Web Search Index Lookup: Fast Binary search variations identify block locations for index directories, accelerating term query evaluation."
+  ],
+  "commonMistakes": [
+    "Using binary search on an unsorted array, returning random indexes or missing elements completely.",
+    "Failing to track visited vertices in graph algorithms (DFS/BFS), causing infinite loops and stack overflows.",
+    "Calculating mid-point using (low + high)/2, causing index out-of-bounds crashes when operating on large datasets due to integer overflow."
+  ],
+  "bestPractices": [
+    "Always pass size constraints or bounds pointers with arrays, as arrays decay to raw pointers when passed to C functions.",
+    "Optimize Recursive functions with tail call optimizations or transform them to loop constructs when memory consumption must remain bounded.",
+    "Use Quick Sort for general sorting workloads, but fall back to Merge Sort when stability is required."
+  ],
+  "faqs": [
+    {
+      "question": "Why is Quick Sort preferred over Merge Sort despite its O(n^2) worst-case complexity?",
+      "answer": "Quick Sort performs sorting in-place without the O(N) memory allocation overhead of Merge Sort. It also exhibits high spatial cache locality, making it faster on real-world memory architectures."
+    },
+    {
+      "question": "What happens if DFS is used without tracking visited nodes?",
+      "answer": "If there is any cycle in the graph, the program will visit the same nodes repeatedly, exhausting call stack memory and crashing with a stack overflow."
+    },
+    {
+      "question": "When is Linear Search preferred over Binary Search?",
+      "answer": "Linear search is preferred for small unsorted arrays where the overhead of sorting the array outweighs the benefit of Binary Search, or when using sequential stream devices like file streams."
+    }
+  ],
+  "summary": "This phase detailed essential computational patterns, covering fundamental Search (Linear, Binary), Sort (Bubble, Selection, Insertion, Merge, Quick), and Graph Traversal (DFS, BFS) algorithms. We investigated how array pointers decay, safe mid-point evaluations, recursive dividing procedures, and structured graph traversal components inside the C language.",
+  "keyTakeaways": [
+    "Divide-and-conquer divides complexity logarithmic-wise but requires structural alignment (sorting for binary search).",
+    "Bubble and Insertion Sort have poor time limits but operate in-place with zero extra memory footprint.",
+    "BFS utilizes explicit Queue structures, while DFS operates via recursive application memory frames or stacks."
+  ],
+  "nextTopicPreview": "Next, we will cover Phase 19: Design Patterns in C, exploring structural and creational architectural styles such as Abstract Interfaces, Object-Oriented Polymorphism in C, and Callback delegates.",
+  "questionsAndAnswers": [
+    {
+      "id": "Q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What is the key difference between stable and unstable sorting algorithms?",
+      "answer": "A stable sorting algorithm preserves the original relative order of elements that have equal keys. For example, if two items both have a key of '5', the one that appeared first in the unsorted input will still appear first in the output. Unstable sorting algorithms make no such guarantee, which can reorder identical keys arbitrarily during partition or swap operations.",
+      "explanation": "Bubble, Insertion, and Merge Sort are naturally stable. Quick Sort and Selection Sort are unstable because their partition or swap procedures can bypass adjacent duplicates."
+    },
+    {
+      "id": "Q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Why does Quick Sort have an O(N^2) worst-case time complexity, and how can we mitigate it?",
+      "answer": "The worst-case complexity occurs when the pivot chosen always happens to be the smallest or largest element in the partition. This leads to highly unbalanced partitions, reducing the divide-and-conquer strategy to a linear evaluation of N recursive levels. To mitigate this, developers use randomized pivot selection, median-of-three pivot strategies, or shuffle the array before sorting.",
+      "explanation": "If the array is already sorted and we pick the last element as pivot, partitioning divides N elements into N-1 elements instead of two balanced halves of N/2."
+    },
+    {
+      "id": "Q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write an iterative binary search function that avoids integer overflow when calculating the mid-point.",
+      "answer": "An iterative implementation utilizes a while loop with low <= high condition. The mid index is calculated safely using: mid = low + (high - low) / 2;\n\nCode snippet:\nint binarySearch(int arr[], int size, int target) {\n    int low = 0, high = size - 1;\n    while(low <= high) {\n        int mid = low + (high - low)/2;\n        if(arr[mid] == target) return mid;\n        if(arr[mid] < target) low = mid + 1;\n        else high = mid - 1;\n    }\n    return -1;\n}",
+      "explanation": "If low and high are very large integers near INT_MAX, calculating (low + high) will overflow, resulting in a negative index and causing undefined memory behavior."
+    },
+    {
+      "id": "Q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Implement a C function to detect cycles in an undirected graph representation using Depth-First Search (DFS).",
+      "answer": "We can identify cycles in an undirected graph by tracking visited vertices. During DFS traversal, if an adjacent vertex is visited and is not the parent of the current vertex, a cycle is present.\n\nCode snippet:\n#include <stdbool.h>\n#define V 5\nbool isCyclicUtil(int v, bool visited[], int parent, int adj[V][V]) {\n    visited[v] = true;\n    for (int i = 0; i < V; i++) {\n        if (adj[v][i]) {\n            if (!visited[i]) {\n                if (isCyclicUtil(i, visited, v, adj)) return true;\n            } else if (i != parent) {\n                return true;\n            }\n        }\n    }\n    return false;\n}\nbool isCyclic(int adj[V][V]) {\n    bool visited[V] = {false};\n    for (int i = 0; i < V; i++) {\n        if (!visited[i]) {\n            if (isCyclicUtil(i, visited, -1, adj)) return true;\n        }\n    }\n    return false;\n}",
+      "explanation": "The DFS recursive function tracks the node that called it ('parent'). If we encounter a visited node that is not our direct parent, there is an alternate path, which confirms the existence of a cycle."
+    },
+    {
+      "id": "Q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Identify and correct the bug in this Selection Sort implementation which is intended to sort in ascending order:\n\nvoid selectionSort(int arr[], int n) {\n    for (int i = 0; i < n - 1; i++) {\n        int min_idx = i;\n        for (int j = i + 1; j < n; j++) {\n            if (arr[j] > arr[min_idx])\n                min_idx = j;\n        }\n        int temp = arr[i];\n        arr[i] = arr[min_idx];\n        arr[min_idx] = temp;\n    }\n}",
+      "answer": "The condition inside the inner loop is checking 'arr[j] > arr[min_idx]'. This condition finds the maximum element in each pass rather than the minimum, causing the array to be sorted in descending order instead of ascending order.\n\nTo fix the code, change the comparison to 'arr[j] < arr[min_idx]'.",
+      "explanation": "The comparison operator determines the sorting direction. In Selection Sort, 'less than' finds the minimum element for ascending order."
+    },
+    {
+      "id": "Q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Why does the following recursive implementation of Quick Sort lead to a Stack Overflow crash on sorted arrays of size 100,000, and how can it be resolved without changing the pivot choice?",
+      "answer": "When the array is already sorted and we pick the boundary element as pivot, the call stack depth reaches O(N) since each partition splits the array into sizes of 1 and N-1. If N is 100,000, the system cannot allocate 100,000 recursive stack frames, resulting in stack overflow.\n\nTo resolve this without altering pivot logic, you can convert the recursion into an iterative implementation using an explicit Stack structure, or use Tail-Call Elimination to restrict recursive depth to O(log N).",
+      "explanation": "With tail-call elimination, we always recurse on the smaller partition first and process the larger partition using an iterative loop, preventing deep recursive stack execution."
+    },
+    {
+      "id": "Q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write an O(N + M) merge function in C that takes two sorted arrays and merges them into a single sorted destination array.",
+      "answer": "This can be accomplished using three index trackers. We compare elements from both arrays and insert the smaller value into the destination array.\n\nCode:\nvoid mergeSorted(int arr1[], int n1, int arr2[], int n2, int dest[]) {\n    int i = 0, j = 0, k = 0;\n    while (i < n1 && j < n2) {\n        if (arr1[i] <= arr2[j]) {\n            dest[k++] = arr1[i++];\n        } else {\n            dest[k++] = arr2[j++];\n        }\n    }\n    while (i < n1) dest[k++] = arr1[i++];\n    while (j < n2) dest[k++] = arr2[j++];\n}",
+      "explanation": "This linear-time merging technique avoids resorting the combined array and forms the core of the Merge Sort divide-and-conquer algorithm."
+    },
+    {
+      "id": "Q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Implement a Depth-First Search (DFS) algorithm recursively using an Adjacency Matrix representation in C.",
+      "answer": "A recursive DFS uses a boolean tracking array to prevent infinite cycles. When a node is visited, the function prints its identifier and recursively visits all its unvisited adjacent neighbors.\n\nCode:\n#include <stdio.h>\n#include <stdbool.h>\n#define VERTICES 4\n\nvoid dfsHelper(int vertex, int matrix[VERTICES][VERTICES], bool visited[VERTICES]) {\n    visited[vertex] = true;\n    printf(\"%d \", vertex);\n    for (int i = 0; i < VERTICES; i++) {\n        if (matrix[vertex][i] == 1 && !visited[i]) {\n            dfsHelper(i, matrix, visited);\n        }\n    }\n}\n\nvoid runDFS(int matrix[VERTICES][VERTICES], int startVertex) {\n    bool visited[VERTICES] = {false};\n    printf(\"DFS Traversal starting from vertex %d: \", startVertex);\n    dfsHelper(startVertex, matrix, visited);\n    printf(\"\\n\");\n}",
+      "explanation": "This DFS helper uses recursive call frames to backtrack naturally when it reaches a node with no unvisited neighbors."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "M1",
+      "category": "Theory",
+      "question": "What is the worst-case time complexity of Binary Search, and what requirement must the input array meet?",
+      "options": {
+        "A": "O(N), array can be in any order",
+        "B": "O(log N), array must be sorted",
+        "C": "O(N log N), array must be sorted",
+        "D": "O(log N), array can be in any order"
+      },
+      "correctOption": "B",
+      "explanation": "Binary Search continuously discards half of the search space, achieving O(log N) worst-case time complexity. This logic depends on the array being sorted so it can correctly discard the larger or smaller half of the remaining elements."
+    },
+    {
+      "id": "M2",
+      "category": "Theory",
+      "question": "Which data structures are typically used to implement Breadth-First Search (BFS) and Depth-First Search (DFS) respectively?",
+      "options": {
+        "A": "Queue and Stack",
+        "B": "Stack and Queue",
+        "C": "Linked List and Binary Tree",
+        "D": "Array and Hash Map"
+      },
+      "correctOption": "A",
+      "explanation": "BFS uses a Queue to traverse vertices level-by-level (FIFO). DFS uses a Stack (either the recursive call stack or an explicit Stack structure) to explore paths deep before backtracking (LIFO)."
+    },
+    {
+      "id": "M3",
+      "category": "Output Prediction",
+      "question": "What is the order of elements in the array {15, 3, 9, 8} after the first full pass of standard Bubble Sort (ascending order)?",
+      "options": {
+        "A": "{3, 9, 8, 15}",
+        "B": "{3, 8, 9, 15}",
+        "C": "{15, 3, 8, 9}",
+        "D": "{3, 15, 9, 8}"
+      },
+      "correctOption": "A",
+      "explanation": "In standard Bubble Sort, adjacent elements are compared and swapped. Step 1: 15 > 3 -> {3, 15, 9, 8}. Step 2: 15 > 9 -> {3, 9, 15, 8}. Step 3: 15 > 8 -> {3, 9, 8, 15}. The largest element (15) bubbles up to the end of the array."
+    },
+    {
+      "id": "M4",
+      "category": "Output Prediction",
+      "question": "Given the array {20, 12, 10, 15, 2}, what is its state after the first outer loop execution (finding the minimum) of Selection Sort?",
+      "options": {
+        "A": "{2, 12, 10, 15, 20}",
+        "B": "{12, 20, 10, 15, 2}",
+        "C": "{2, 20, 12, 10, 15}",
+        "D": "{2, 10, 12, 15, 20}"
+      },
+      "correctOption": "A",
+      "explanation": "Selection Sort scans the entire array to find the minimum element (which is 2) and swaps it with the element at index 0 (20). This results in {2, 12, 10, 15, 20}."
+    },
+    {
+      "id": "M5",
+      "category": "Output Prediction",
+      "question": "Predict the output of searching for 50 in sorted array {10, 20, 30, 40, 50} using a binary search function that returns the index.",
+      "options": {
+        "A": "4",
+        "B": "5",
+        "C": "-1",
+        "D": "3"
+      },
+      "correctOption": "A",
+      "explanation": "The array is 0-indexed. 50 is located at index 4. The binary search function will divide the search space and successfully find the element, returning its index: 4."
+    },
+    {
+      "id": "M6",
+      "category": "Find the Bug",
+      "question": "Identify the bug in this recursive Binary Search function:\n\nint recBS(int arr[], int l, int r, int x) {\n    if (r >= l) {\n        int mid = l + (r - l) / 2;\n        if (arr[mid] == x) return mid;\n        if (arr[mid] > x) return recBS(arr, l, mid, x);\n        return recBS(arr, mid, r, x);\n    }\n    return -1;\n}",
+      "options": {
+        "A": "The recursive calls pass mid instead of (mid - 1) and (mid + 1), causing infinite loops.",
+        "B": "The base condition 'if (r >= l)' should be 'if (l > r)'.",
+        "C": "The mid calculation is incorrect.",
+        "D": "The function returns -1 when target is found."
+      },
+      "correctOption": "A",
+      "explanation": "Passing mid instead of mid - 1 or mid + 1 prevents the search window from shrinking when there are only 2 elements remaining, leading to infinite recursive loops."
+    },
+    {
+      "id": "M7",
+      "category": "Find the Bug",
+      "question": "Identify the bug in this Breadth-First Search (BFS) snippet:\n\nvoid bfs(int start, int adj[V][V]) {\n    bool visited[V] = {false};\n    Queue q;\n    initQueue(&q);\n    enqueue(&q, start);\n    while(!isEmpty(&q)) {\n        int u = dequeue(&q);\n        printf(\"%d \", u);\n        visited[u] = true;\n        for(int v=0; v<V; v++) {\n            if(adj[u][v] && !visited[v]) {\n                enqueue(&q, v);\n            }\n        }\n    }\n}",
+      "options": {
+        "A": "Nodes are marked as visited only after dequeuing them, causing duplicate nodes to be enqueued.",
+        "B": "The Queue should be initialized inside the loop.",
+        "C": "The adj array is not declared correctly.",
+        "D": "The while loop should use an 'if' condition instead."
+      },
+      "correctOption": "A",
+      "explanation": "If a node is marked visited only after dequeuing, its unvisited neighbors will enqueue multiple duplicate instances of it before it is processed. Nodes must be marked visited immediately when they are enqueued."
+    },
+    {
+      "id": "M8",
+      "category": "Complete the Code",
+      "question": "Complete the missing line in this Insertion Sort implementation:\n\nvoid insertionSort(int arr[], int n) {\n    for (int i = 1; i < n; i++) {\n        int key = arr[i];\n        int j = i - 1;\n        while (j >= 0 && arr[j] > key) {\n            arr[j + 1] = arr[j];\n            j = j - 1;\n        }\n        // MISSING LINE\n    }\n}",
+      "options": {
+        "A": "arr[j] = key;",
+        "B": "arr[j + 1] = key;",
+        "C": "arr[i] = key;",
+        "D": "arr[j - 1] = key;"
+      },
+      "correctOption": "B",
+      "explanation": "When the while loop terminates, index j has decremented one position past the correct insertion index. To place the 'key' in its correct sorted position, it must be assigned to arr[j + 1]."
+    },
+    {
+      "id": "M9",
+      "category": "Complete the Code",
+      "question": "Complete the missing swap logic in this standard Quick Sort partition function:\n\nint partition(int arr[], int low, int high) {\n    int pivot = arr[high];\n    int i = (low - 1);\n    for (int j = low; j < high; j++) {\n        if (arr[j] <= pivot) {\n            i++;\n            swap(&arr[i], &arr[j]);\n        }\n    }\n    // MISSING LINE\n    return (i + 1);\n}",
+      "options": {
+        "A": "swap(&arr[i + 1], &arr[high]);",
+        "B": "swap(&arr[i], &arr[high]);",
+        "C": "swap(&arr[low], &arr[high]);",
+        "D": "swap(&arr[i + 1], &arr[low]);"
+      },
+      "correctOption": "A",
+      "explanation": "After processing elements smaller than or equal to the pivot, the pivot (stored at index 'high') must be swapped with the element at index 'i + 1'. This places the pivot in its final sorted position."
+    },
+    {
+      "id": "M10",
+      "category": "Best Approach",
+      "question": "Which algorithm is the best choice for finding the shortest path (minimum number of hops) in an unweighted social network graph?",
+      "options": {
+        "A": "DFS (Depth-First Search)",
+        "B": "BFS (Breadth-First Search)",
+        "C": "Binary Search",
+        "D": "Quick Sort"
+      },
+      "correctOption": "B",
+      "explanation": "BFS explores nodes in order of their distance from the source. In an unweighted graph, the first time BFS encounters a node, it has found the shortest path to it. DFS does not guarantee finding the shortest path first."
+    }
+  ]
+}

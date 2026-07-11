@@ -1,0 +1,322 @@
+{
+  "metadata": {
+    "phaseNumber": 3,
+    "title": "Decision Making in C",
+    "duration": "4 Hours",
+    "difficulty": "Beginner"
+  },
+  "learningObjectives": [
+    "Understand how relational and logical expressions govern execution flow in memory.",
+    "Master the implementation of if, if-else, and else-if ladders.",
+    "Solve the dangling-else problem through precise block scoping.",
+    "Construct efficient multi-way branch structures using switch-case, matching compiler-optimized jump tables.",
+    "Critically analyze the trade-offs of using unconditional jumps (goto) and why structured programming discourages them."
+  ],
+  "prerequisites": [
+    "Phase 1: Basic execution flow, main function, and C tokens.",
+    "Phase 2: Relational, logical, and equality operators."
+  ],
+  "introduction": "By default, execution of a C program is sequential, flowing line-by-line. Decision-making statements alter this default execution path based on runtime conditions. This phase teaches you how to design dynamic, branching logic inside your programs, mimicking real-world logic patterns.",
+  "conceptExplanation": "At the hardware level, decision-making is executed via comparison instructions and jump flags within the CPU Status Register. When a condition is evaluated, the CPU calculates a value: if the result is non-zero, it is treated as true, and a conditional jump instruction alters the Program Counter to the target block. If the result is zero, the CPU bypasses the block. Using if-else structures, developers design logical forks. For multi-way branching, switch-case constructs are translated by compilers into jump tables, avoiding consecutive evaluation and matching specific addresses in memory for high-performance indexing.",
+  "syntax": "if (condition_expression) { \\n    /* Executed if condition is non-zero */ \\n} else if (alternative_condition) { \\n    /* Executed if first condition is zero and this is non-zero */ \\n} else { \\n    /* Executed if all above conditions are zero */ \\n}\\n\\nswitch (integer_or_char_expression) {\\n    case constant_value_1:\\n        /* Statements */\\n        break;\\n    default:\\n        /* Statements executed if no cases match */\\n}",
+  "syntaxBreakdown": [
+    "condition_expression: Must evaluate to a scalar (integer, character, or pointer). If the evaluation yields a non-zero value, the condition is true.",
+    "else-if Ladder: Cascaded conditions executed sequentially. Once a condition evaluates to true, the corresponding block executes, and the rest of the chain is skipped.",
+    "switch-case Expression: Must evaluate to an integer or character type (not floating-point or string). Cases must use compile-time constants.",
+    "break Statement: Terminates the execution of a switch-case. Without it, execution 'falls through' to subsequent cases regardless of their conditional values.",
+    "goto label: Transits control unconditionally to the defined label within the bounds of the current function."
+  ],
+  "rulesAndKeyPoints": [
+    "Non-Zero is True: Any non-zero numeric value (even negative numbers like -1) is evaluated as logical true in C.",
+    "Single-Statement Scope: If braces '{}' are omitted, only the single immediate following statement is bound to the conditional branch.",
+    "Switch Key Types: Floating-point values (float, double) cannot be used as switch selectors because exact binary comparisons are unstable.",
+    "No Duplicate Cases: Duplicate constant case values within a single switch construct cause a compile-time error.",
+    "Goto Scope Restriction: The goto statement cannot leap across different function boundaries; its labels are scoped exclusively to the local function stack."
+  ],
+  "codeExample1": {
+    "title": "Grade Calculator and Multi-level Score Checking",
+    "code": "#include <stdio.h>\\n\\nint main() {\\n    int score = 85;\\n    char grade;\\n\\n    if (score < 0 || score > 100) {\\n        printf(\"Invalid score entered.\\\\n\");\\n        return 1;\\n    }\\n\\n    if (score >= 90) {\\n        grade = 'A';\\n    } else if (score >= 80) {\\n        grade = 'B';\\n    } else if (score >= 70) {\\n        grade = 'C';\\n    } else if (score >= 60) {\\n        grade = 'D';\\n    } else {\\n        grade = 'F';\\n    }\\n\\n    printf(\"Score: %d, Assigned Grade: %c\\\\n\", score, grade);\\n    return 0;\\n}",
+    "explanation": "This code validates user inputs using logical OR. Once validated, it traverses the else-if ladder top-to-bottom. Because score is 85, score >= 90 is evaluated and yields 0 (false). The engine proceeds to score >= 80, which yields 1 (true). It assigns 'B' to grade and exits the remaining ladder entirely."
+  },
+  "codeExample2": {
+    "title": "Menu-Driven Math Operator System using Switch-Case",
+    "code": "#include <stdio.h>\\n\\nint main() {\\n    char operator = '*';\\n    double num1 = 12.0;\\n    double num2 = 4.0;\\n    double result;\\n\\n    switch (operator) {\\n        case '+':\\n            result = num1 + num2;\\n            break;\\n        case '-':\\n            result = num1 - num2;\\n            break;\\n        case '*':\\n            result = num1 * num2;\\n            break;\\n        case '/':\\n            if (num2 != 0.0) {\\n                result = num1 / num2;\\n            } else {\\n                printf(\"Error: Division by zero is undefined.\\\\n\");\\n                return 1;\\n            }\\n            break;\\n        default:\\n            printf(\"Error: Unsupported mathematical operator '%c'.\\\\n\", operator);\\n            return 1;\\n    }\\n\\n    printf(\"Result: %.2f %c %.2f = %.2f\\\\n\", num1, operator, num2, result);\\n    return 0;\\n}",
+    "explanation": "The switch expression evaluates the character variable 'operator'. Since character types are integral, the compiler matches the ASCII value directly. It finds a match on case '*', assigns result = 12.0 * 4.0 (48.0), and breaks out of the switch. A fallback handling mechanism (default case) processes unrecognized inputs, and nested logic inside case '/' prevents runtime errors.",
+    "expectedOutput": "Result: 12.00 * 4.00 = 48.00"
+  },
+  "stepByStepDryRun": [
+    "Step 1: The program allocates variables score=85 and grade (uninitialized) in the stack frame.",
+    "Step 2: Condition check 1: (score < 0 || score > 100) => (85 < 0 || 85 > 100) => (0 || 0) => False. The boundary checks are safely bypassed.",
+    "Step 3: Condition check 2: (score >= 90) => (85 >= 90) => False. Branch bypassed.",
+    "Step 4: Condition check 3: (score >= 80) => (85 >= 80) => True. The block matches; the program assigns 'B' to the variable grade.",
+    "Step 5: The subsequent branches (>=70, >=60, and else) are skipped entirely by jumping over their machine instructions.",
+    "Step 6: The printf function reads 'score' and 'grade' values from stack memory and prints the results."
+  ],
+  "memoryVisualization": {
+    "type": "Stack Frame Representation",
+    "description": "Visualizing memory states inside the stack frame of the active main function scope during evaluation of a conditional switch variable.",
+    "nodes": [
+      {
+        "label": "Stack Frame Base Pointer [EBP/RBP]",
+        "value": "0x7FFEE34A9110",
+        "address": "0x7FFEE34A9110",
+        "color": "slate"
+      },
+      {
+        "label": "Variable: score",
+        "value": "85 (0x00000055)",
+        "address": "0x7FFEE34A910C",
+        "color": "emerald"
+      },
+      {
+        "label": "Variable: grade",
+        "value": "'B' (0x42)",
+        "address": "0x7FFEE34A910B",
+        "color": "sky"
+      },
+      {
+        "label": "CPU Flag Register: Zero Flag (ZF)",
+        "value": "0 (Conditional jump path taken)",
+        "address": "ALU Status",
+        "color": "rose"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Network Packet Routing: Filtering incoming packets by parsing headers and branching logic depending on the protocol type.",
+    "Device Drivers: Implementing a hardware state machine inside chip initialization where state variables trigger different actions in a switch-case statement.",
+    "Interactive System Shells: Checking input options and flag structures to handle custom actions via an if-else ladder."
+  ],
+  "commonMistakes": [
+    "Using Assignment instead of Equality: Writing 'if (x = 5)' which sets x to 5 and always evaluates to True, instead of 'if (x == 5)'.",
+    "Dangling Else Problem: Misinterpreting matching indentation to guess block logic. An else always pairs with the closest nested unmatched if unless bounded by curly braces.",
+    "Missing Break in Switch Cases: Forgetting 'break' statement causes execution flow to slide into subsequent code segments, leading to silent bugs.",
+    "Using Floating Point Types in Switch: Attempting 'switch (floatVar)' causes compilation failures as floating point cannot match discrete constants cleanly."
+  ],
+  "bestPractices": [
+    "Embrace Yoda Conditions: Use constants on the left side of comparisons, like 'if (5 == x)', to generate compile-time errors if you accidentally write '='.",
+    "Always Use Braces: Write curly braces '{}' even for single-line statements to protect code against logical errors during maintenance.",
+    "Minimize Nested Depth: Refactor deep conditional structures to avoid cognitive overload and improve maintainability.",
+    "Utilize a Default Switch Case: Always provide a default branch in switch structures to capture unexpected input anomalies safely."
+  ],
+  "faqs": [
+    {
+      "question": "Can I have multiple cases share the same block of code in a switch statement?",
+      "answer": "Yes. This is called 'case fall-through.' By omitting the break statement between cases, you can group them. For example: case 'A': case 'a': printf(\"Excellent\"); break; will execute the same code block for both character variants."
+    },
+    {
+      "question": "Why is the use of the goto statement heavily discouraged?",
+      "answer": "The goto statement creates an unconstrained jump across lines of code, violating structure patterns. It makes tracing code logic difficult (often called 'spaghetti code') and bypasses normal variable scope initialization rules, introducing unexpected safety vulnerabilities."
+    },
+    {
+      "question": "What is the difference in execution speed between an else-if ladder and a switch-case statement?",
+      "answer": "An else-if ladder must execute conditions sequentially until one returns true (O(N) time complexity). A switch-case with more than 4 or 5 options is typically optimized by compilers using a 'jump table' or a binary search branch, which executes comparisons in constant time (O(1))."
+    }
+  ],
+  "summary": "Phase 3 establishes dynamic path execution in C. You studied conditional processing via if-else statements, nested scopes, multi-way branch matching using switch-case, and why structured coding rules discourage unconditional goto jumps.",
+  "keyTakeaways": [
+    "C translates any non-zero numeric value directly into Boolean true.",
+    "An else-if ladder processes options sequentially, whereas a switch statement leverages jump tables for faster execution.",
+    "Missing break statements inside a switch leads to case fall-through.",
+    "Strictly avoid the use of goto statements to maintain structured, reliable code logic."
+  ],
+  "nextTopicPreview": "Next, we will cover Phase 4: Loop Control and Iterative Structures (for, while, do-while loops). We will explore how to repeat blocks of instructions safely and efficiently.",
+  "questionsAndAnswers": [
+    {
+      "id": "Q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What happens if a floating-point value is evaluated inside an if condition in C?",
+      "answer": "Floating-point values are evaluated based on their numerical value. If the value is equal to 0.0, the statement is interpreted as false. Any non-zero value is treated as true.",
+      "explanation": "Because logical true is determined by whether a scalar evaluates to non-zero, floats follow standard integer evaluation rules."
+    },
+    {
+      "id": "Q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Describe the compiler compilation differences between an else-if ladder and a switch statement.",
+      "answer": "Compilers parse an else-if ladder as sequential branch evaluations. Conversely, for a switch statement, compilers create a direct jump table if there are enough contiguous keys.",
+      "explanation": "This allows the program to lookup and jump directly to the matched case, bypasses redundant branches, and optimizes CPU instruction pipelining."
+    },
+    {
+      "id": "Q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a program snippet that maps system error codes (1 for 'Read Error', 2 for 'Write Error') to descriptive labels using a switch-case statement.",
+      "answer": "switch (errorCode) {\\n    case 1:\\n        printf(\"Read Error\\\\n\");\\n        break;\\n    case 2:\\n        printf(\"Write Error\\\\n\");\\n        break;\\n    default:\\n        printf(\"Unknown Error\\\\n\");\\n}",
+      "explanation": "This structure provides an optimized, clean design for routing error diagnostic outputs."
+    },
+    {
+      "id": "Q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "How do you handle a scenario where multiple input parameters must trigger a specific combined branch logic cleanly without creating nested structures?",
+      "answer": "You can consolidate logical combinations using boolean logic operators (&&, ||) into single if-else condition checks, or pre-compute state values.",
+      "explanation": "By consolidating conditions into high-level logical flags, you reduce nested indentations, make code easier to test, and improve safety."
+    },
+    {
+      "id": "Q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Identify the bug in the statement: if (x = 0) { printf(\"X is zero\"); } else { printf(\"X is not zero\"); }",
+      "answer": "The condition expression uses the assignment operator '=' instead of '=='. It sets x to 0, which evaluates to false.",
+      "explanation": "Therefore, the code prints 'X is not zero' even though the assignment value was zero. This is a common syntax slip."
+    },
+    {
+      "id": "Q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Explain the scope resolution conflict if you declare a variable inside a switch block before the first case label.",
+      "answer": "Declaring a variable inside a switch block but before the first case label results in uninitialized variable execution. The compiler bypasses local initialization because the program counter jumps past it directly to the matching case label.",
+      "explanation": "Any attempt to refer to this variable within case scopes causes undefined behavior or compilation errors."
+    },
+    {
+      "id": "Q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write a code snippet implementing an input validation step that accepts only positive even integers.",
+      "answer": "if (num > 0 && num % 2 == 0) {\\n    printf(\"Valid Input\\\\n\");\\n} else {\\n    printf(\"Invalid Input\\\\n\");\\n}",
+      "explanation": "This combines relational checks and modulo operations inside a single, efficient branch statement."
+    },
+    {
+      "id": "Q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Demonstrate how a switch-case statement can handle grade letters (both upper and lowercase) to assign pass/fail statuses.",
+      "answer": "switch (grade) {\\n    case 'A':\\n    case 'a':\\n    case 'B':\\n    case 'b':\\n        printf(\"Pass\\\\n\");\\n        break;\\n    case 'F':\\n    case 'f':\\n        printf(\"Fail\\\\n\");\\n        break;\\n    default:\\n        printf(\"Invalid Grade\\\\n\");\\n}",
+      "explanation": "By leveraging deliberate fall-through, both lowercase and uppercase variants execute the same operations without duplicating code blocks."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "MCQ1",
+      "category": "Theory",
+      "question": "Which of the following expression evaluation types is NOT valid as a control condition within a switch statement?",
+      "options": {
+        "A": "int",
+        "B": "char",
+        "C": "double",
+        "D": "short"
+      },
+      "correctOption": "C",
+      "explanation": "Double (floating-point) types cannot be compared exactly using direct memory matching. As a result, switch case statements only allow integer or character types."
+    },
+    {
+      "id": "MCQ2",
+      "category": "Theory",
+      "question": "In structured C programming, which statement is true about the goto statement?",
+      "options": {
+        "A": "It can jump between two different source files.",
+        "B": "It is restricted to jumping to labels defined within the current function.",
+        "C": "It allocates a new stack frame when invoked.",
+        "D": "It can bypass structural compilation checks across different functions."
+      },
+      "correctOption": "B",
+      "explanation": "Goto labels are scoped locally. The program counter cannot jump across different functions because this would corrupt the call stack frame pointer."
+    },
+    {
+      "id": "MCQ3",
+      "category": "Output Prediction",
+      "question": "What is printed by the following code? \\nint x = 10;\\nif (x == 10) {\\n    int x = 20;\\n    printf(\"%d \", x);\\n}\\nprintf(\"%d\", x);",
+      "options": {
+        "A": "10 10",
+        "B": "20 20",
+        "C": "20 10",
+        "D": "10 20"
+      },
+      "correctOption": "C",
+      "explanation": "The inner block declares a new local variable named 'x' that shadows the outer variable. Once control exits the block, the inner x is removed from stack scope, and the outer x is accessed."
+    },
+    {
+      "id": "MCQ4",
+      "category": "Output Prediction",
+      "question": "What will be the output of the following block? \\nint val = 2;\\nswitch(val) {\\n    case 1: printf(\"One \");\\n    case 2: printf(\"Two \");\\n    case 3: printf(\"Three \");\\n    default: printf(\"Default\");\\n}",
+      "options": {
+        "A": "Two",
+        "B": "Two Three",
+        "C": "Two Three Default",
+        "D": "Default"
+      },
+      "correctOption": "C",
+      "explanation": "Because there are no break statements in any case, control falls through and executes all subsequent blocks sequentially after case 2 matches."
+    },
+    {
+      "id": "MCQ5",
+      "category": "Output Prediction",
+      "question": "Predict the output of: \\nint a = -5;\\nif (a) {\\n    printf(\"True\");\\n} else {\\n    printf(\"False\");\\n}",
+      "options": {
+        "A": "True",
+        "B": "False",
+        "C": "Compilation Error",
+        "D": "No Output"
+      },
+      "correctOption": "A",
+      "explanation": "In C, any value that is not exactly zero is treated as true. Since -5 is non-zero, the condition is evaluated as true."
+    },
+    {
+      "id": "MCQ6",
+      "category": "Find the Bug",
+      "question": "Identify the logical error in the following snippet: \\nint x = 5;\\nif (x > 3);\\n{\\n    printf(\"Pass\");\\n}",
+      "options": {
+        "A": "Curly braces are illegal after an if condition.",
+        "B": "The semicolon immediately after the if condition ends the branch statement, making the printf block run unconditionally.",
+        "C": "Variable x cannot be initialized outside the block.",
+        "D": "The condition evaluates to an invalid floating-point value."
+      },
+      "correctOption": "B",
+      "explanation": "A semicolon right after 'if(condition)' represents an empty statement. This separates the conditional check from the block that follows, causing the block inside the braces to run unconditionally."
+    },
+    {
+      "id": "MCQ7",
+      "category": "Find the Bug",
+      "question": "Why will the following switch-case statement fail to compile?\\nint value = 3;\\nswitch (value) {\\n    case 1:\\n        printf(\"1\");\\n        break;\\n    case 1+2:\\n        printf(\"3\");\\n        break;\\n    case value:\\n        printf(\"Variable\");\\n        break;\\n}",
+      "options": {
+        "A": "Expressions like '1+2' are not allowed in switch-case.",
+        "B": "Using a variable ('value') as a case label is illegal because case labels must be compile-time constants.",
+        "C": "The break statement inside case 1 is missing a target.",
+        "D": "Multiple cases evaluate to the same value."
+      },
+      "correctOption": "B",
+      "explanation": "Case labels must evaluate to compile-time constants. Using the variable 'value' as a case identifier causes a compile-time error."
+    },
+    {
+      "id": "MCQ8",
+      "category": "Complete the Code",
+      "question": "Select the correct expression to validate if age is between 18 and 65 inclusive: \\nif (__________) { printf(\"Eligible\"); }",
+      "options": {
+        "A": "age >= 18 || age <= 65",
+        "B": "18 <= age <= 65",
+        "C": "age >= 18 && age <= 65",
+        "D": "age >= 18 & age <= 65"
+      },
+      "correctOption": "C",
+      "explanation": "In C, range evaluations must be written as two distinct relational comparisons combined with the logical AND (&&) operator."
+    },
+    {
+      "id": "MCQ9",
+      "category": "Complete the Code",
+      "question": "Complete the code to jump to code block cleanup in case of a processing failure: \\nif (status == -1) { __________; }",
+      "options": {
+        "A": "break cleanup",
+        "B": "goto cleanup",
+        "C": "continue cleanup",
+        "D": "exit(cleanup)"
+      },
+      "correctOption": "B",
+      "explanation": "'goto cleanup;' transfers execution to the label named 'cleanup:' within the scope of the current function."
+    },
+    {
+      "id": "MCQ10",
+      "category": "Best Approach",
+      "question": "When designing a multi-way branch with over 15 distinct integral options, which construct is most efficient?",
+      "options": {
+        "A": "An if-else ladder",
+        "B": "A nested if-else structure",
+        "C": "A switch-case statement",
+        "D": "A series of sequential if statements"
+      },
+      "correctOption": "C",
+      "explanation": "For large sets of constant values, compilers translate switch statements into highly optimized jump tables. This lets the program jump directly to the correct case, bypassing sequential comparisons."
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{ "phase_metadata": { "phase_number": 10, "phase_name": "Collections Framework",
+"description": "Master the architecture for storing and manipulating groups of
+objects using Lists, Sets, and Maps.", "java_version": "21 LTS" },
+"learning_objectives": [ "Distinguish between List, Set, and Map interfaces",
+"Select appropriate implementations like ArrayList, HashSet, and HashMap",
+"Iterate through collections using Iterator and Enhanced For-loops", "Utilize
+the Collections utility class for sorting and searching", "Implement Comparable
+and Comparator for custom sorting logic", "Understand the memory and performance
+implications of different collection types" ], "prerequisites": [ "Phase 4:
+Arrays", "Phase 7: Polymorphism (Interfaces)", "Phase 9: Exception Handling" ],
+"introduction": "In Java, an array has a fixed size which cannot be changed
+after creation. In real-world applications, we often need data structures that
+can grow and shrink dynamically. The Java Collections Framework provides a set
+of high-performance interfaces and classes that implement commonly used data
+structures like dynamic arrays, linked lists, hash tables, and trees, allowing
+you to manage groups of objects with ease.", "concept_explanation": {
+"what_is_it": "The Collections Framework is a unified architecture for
+representing and manipulating collections. It contains interfaces (like List,
+Set, Map), implementations (classes like ArrayList, HashSet), and algorithms
+(methods like sort, binarySearch).", "why_do_we_need_it": "1. Dynamic Sizing:
+Collections grow as needed. 2. Performance: High-performance implementations of
+data structures. 3. Interoperability: Standardized way to pass groups of objects
+between APIs.", "how_it_works": "Collections store only object references.
+Primitives are automatically converted to their Wrapper classes (e.g., int to
+Integer) via Autoboxing. The hierarchy starts with the 'Collection' interface,
+which is extended by List and Set, while Map follows its own structure.",
+"core_interfaces": "1. List: Ordered collection, allows duplicates (ArrayList,
+LinkedList). 2. Set: Unordered collection, forbids duplicates (HashSet,
+TreeSet). 3. Map: Key-Value pairs, unique keys (HashMap, TreeMap).",
+"memory_behavior": "Collections live on the Heap. An ArrayList uses a dynamic
+array that resizes by creating a new larger array and copying elements when
+full. A HashMap uses an array of 'buckets' (nodes) where elements are stored
+based on their hash code." }, "syntax": { "list_creation": "List names = new
+ArrayList<>();", "set_creation": "Set uniqueIds = new HashSet<>();",
+"map_creation": "Map<Integer, String> userMap = new HashMap<>();",
+"iterator_usage": "Iterator it = list.iterator();\nwhile(it.hasNext()) { String
+s = it.next(); }" }, "syntax_breakdown": { "generics_angle_brackets": " ensures
+type safety, preventing non-specified objects from being added.",
+"list_add_method": "Adds an element to the end of the collection.",
+"map_put_method": "Stores a value associated with a specific key; if the key
+exists, the value is updated.", "iterator": "An object that allows sequential
+traversal of a collection and safe removal of elements during iteration.",
+"comparable_interface": "Used to define the 'natural ordering' of an object
+(implemented inside the class).", "comparator_interface": "Used to define
+'external' or multiple sorting logic (implemented as a separate class or
+lambda)." }, "rules_and_key_points": [ "Collections only store objects, not
+primitives.", "ArrayList is better for random access (get/set), while LinkedList
+is better for frequent insertions/deletions.", "HashSet does not guarantee any
+iteration order.", "TreeSet and TreeMap store elements in a sorted order.",
+"HashMap allows one null key and multiple null values.", "The Collections class
+(plural) contains static utility methods, not to be confused with the Collection
+interface (singular).", "Elements in a Set or Keys in a Map must correctly
+implement equals() and hashCode().", "List indexes start at 0, just like
+arrays.", "The 'final' keyword on a collection variable prevents reassignment
+but allows modification of contents.", "Iterator's remove() method is the only
+safe way to remove elements while looping." ], "code_example_1": { "title":
+"Working with Lists and Sets", "description": "Demonstrating dynamic growth in
+ArrayList and duplicate prevention in HashSet.", "code": "import
+java.util.;\n\npublic class ListSetDemo {\n public static void main(String[]
+args) {\n // List: Maintains order, allows duplicates\n List list = new
+ArrayList<>();\n list.add("Java");\n list.add("Python");\n list.add("Java"); //
+Duplicate\n \n System.out.println("List Content: " + list);\n
+System.out.println("Second Element: " + list.get(1));\n\n // Set: Unique
+elements only\n Set set = new HashSet<>(list);\n set.add("C++");\n \n
+System.out.println("Set Content (No Duplicates): " + set);\n
+System.out.println("Contains 'Java'? " + set.contains("Java"));\n }\n}" },
+"code_example_2": { "title": "HashMap and Custom Sorting", "description": "Using
+a Map for key-value pairs and sorting a list using a Comparator.", "code":
+"import java.util.;\n\nclass Product {\n String name;\n double price;\n\n
+Product(String name, double price) {\n this.name = name;\n this.price = price;\n
+}\n\n @Override\n public String toString() { return name + ": $" + price;
+}\n}\n\npublic class MapSortDemo {\n public static void main(String[] args) {\n
+// Map: Key-Value storage\n Map<Integer, String> inventory = new HashMap<>();\n
+inventory.put(101, "Laptop");\n inventory.put(102, "Mouse");\n \n
+System.out.println("Product 101: " + inventory.get(101));\n\n // Sorting with
+Comparator\n List products = new ArrayList<>();\n products.add(new
+Product("Keyboard", 50.0));\n products.add(new Product("Monitor", 200.0));\n
+products.add(new Product("Cable", 10.0));\n\n // Sort by price ascending using a
+Lambda\n products.sort((p1, p2) -> Double.compare(p1.price, p2.price));\n\n
+System.out.println("Sorted Products: " + products);\n }\n}" },
+"expected_output": "List Content: [Java, Python, Java]\nSecond Element:
+Python\nSet Content (No Duplicates): [Java, C++, Python]\nContains 'Java'?
+true\nProduct 101: Laptop\nSorted Products: [Cable: $10.0, Keyboard: $50.0,
+Monitor: $200.0]", "step_by_step_dry_run": "1. Main method starts. \n2.
+ArrayList is created. 'Java', 'Python', 'Java' are added. Order is
+preserved.\n3. list.get(1) retrieves 'Python'.\n4. HashSet is created using the
+List. It automatically removes the duplicate 'Java'.\n5. 'C++' is added to the
+Set. Order might change as HashSet is unordered.\n6. HashMap is created. Key 101
+is mapped to 'Laptop'.\n7. Product list is created and populated.\n8. A
+Comparator is passed to products.sort(), which compares prices.\n9. The list is
+reordered from lowest to highest price.", "memory_visualization": "Heap:
+ArrayList object contains an internal array [Ref1, Ref2, Ref3]. Each Ref points
+to a String object on the Heap. \nHashMap: Contains an array of nodes. A key
+'101' is hashed to find an index. The node at that index stores the key 101 and
+the value 'Laptop'. \nStack: Reference variables 'list', 'set', and 'inventory'
+point to their respective objects on the Heap.", "real_world_use_cases": [
+"Shopping Cart: Using a List to store added items in the order they were
+picked.", "Unique User IDs: Using a Set to store active session IDs to ensure no
+duplicates.", "Dictionary/Cache: Using a HashMap to store user profiles indexed
+by their numeric ID for O(1) lookup speed.", "Leaderboards: Using a TreeMap to
+keep player scores sorted automatically." ], "common_mistakes": [ "Trying to use
+primitive types (int, double) in angle brackets. (Use Integer, Double
+instead).", "Removing elements using a for-each loop, which throws
+ConcurrentModificationException.", "Forgetting that HashSet and HashMap do not
+maintain order.", "Using a custom object as a Key in a Map without overriding
+hashCode() and equals().", "Confusing the capacity of a collection with its size
+(size is the number of elements it currently holds)." ], "best_practices": [
+"Program to interfaces (e.g., List list = new ArrayList<>()).", "Set an initial
+capacity if the size is known to avoid frequent internal resizing.", "Use
+'isEmpty()' instead of 'size() == 0' for better readability.", "Prefer the
+for-each loop or Stream API for readability unless you need to remove
+elements.", "Use Collections.unmodifiableList() to protect data from being
+changed by external classes." ], "faq": [ { "question": "What is the difference
+between ArrayList and LinkedList?", "answer": "ArrayList uses a dynamic array
+and is faster for accessing elements by index. LinkedList uses nodes and is
+faster for adding/removing elements at the beginning or middle of the list." },
+{ "question": "How does a HashSet detect duplicates?", "answer": "It uses the
+hashCode() and equals() methods. When an object is added, its hashCode
+determines its bucket. If a bucket already has items, equals() is called to
+check if the new item is identical to existing ones." }, { "question": "Can a
+Map have duplicate values?", "answer": "Yes. Keys must be unique, but multiple
+different keys can point to the same value." } ], "summary": "Phase 10 explored
+the Java Collections Framework, a powerful set of tools for managing data. We
+covered the differences between Lists (ordered), Sets (unique), and Maps
+(key-value). We also learned how to use Iterators for safe traversal and how to
+sort objects using the Comparable and Comparator interfaces.", "key_takeaways":
+[ "Collections are dynamic alternatives to arrays.", "List = Order +
+Duplicates.", "Set = Uniqueness + No Order.", "Map = Key-Value pairs.",
+"ArrayList is the default choice for most List needs.", "Use HashMap for fast
+data retrieval by key.", "Comparable is for natural sorting; Comparator is for
+custom sorting.", "Autoboxing handles primitive-to-object conversion
+automatically.", "The Collections utility class provides algorithms like sort
+and shuffle.", "Generics  ensure type safety at compile time." ],
+"preview_of_the_next_topic": "In Phase 11, we will learn about Generics in
+depth, understanding how to create our own type-safe classes, methods, and
+interfaces.", "questions": [ { "difficulty": "Easy", "topic": "Concept",
+"question": "Which Collection interface should be used if you want to store a
+sequence of elements and access them by their position?", "answer": "The 'List'
+interface should be used. It maintains the insertion order and allows positional
+access through index-based methods like get(index)." }, { "difficulty":
+"Moderate", "topic": "Concept", "question": "Explain the difference between
+Comparable and Comparator.", "answer": "Comparable is implemented by the class
+itself (via compareTo method) to provide a natural sort order. Comparator is a
+separate class or lambda (via compare method) used to define multiple or custom
+sorting criteria without modifying the original class." }, { "difficulty":
+"Moderate", "topic": "Coding", "question": "Write code to initialize an
+ArrayList of Integers, add three numbers, and remove the second number.",
+"answer": "List nums = new ArrayList<>(); nums.add(10); nums.add(20);
+nums.add(30); nums.remove(1);" }, { "difficulty": "Hard", "topic": "Coding",
+"question": "Write a method that takes a String and returns a Map containing the
+frequency of each character in that string.", "answer": "public Map<Character,
+Integer> getFreq(String s) { Map<Character, Integer> map = new HashMap<>();
+for(char c : s.toCharArray()) map.put(c, map.getOrDefault(c, 0) + 1); return
+map; }" }, { "difficulty": "Moderate", "topic": "Common Mistake", "question":
+"What happens if you try to add an element to a List while iterating over it
+using a standard for-each loop?", "answer": "It will throw a
+'ConcurrentModificationException'. The for-each loop uses an internal iterator,
+and modifying the collection structure during iteration (except through the
+iterator's own remove method) is forbidden." }, { "difficulty": "Hard", "topic":
+"Common Mistake", "question": "If you create a class 'User' and use it as a key
+in a HashMap without overriding hashCode(), what is the risk?", "answer": "The
+risk is that you won't be able to retrieve the value later. Even if two User
+objects have identical data, they will have different default hash codes (based
+on memory address), so the HashMap will look in the wrong bucket and return
+null." }, { "difficulty": "Moderate", "topic": "Application", "question": "How
+would you sort a List of Strings in descending order (Z to A) using the
+Collections utility class?", "answer": "Collections.sort(list,
+Collections.reverseOrder()); or list.sort(Comparator.reverseOrder());" }, {
+"difficulty": "Hard", "topic": "Application", "question": "Which Map
+implementation would you use if you needed to keep the keys sorted
+automatically? Provide the class name and one requirement for the keys.",
+"answer": "You should use 'TreeMap'. The requirement is that the keys must
+either implement the 'Comparable' interface or a 'Comparator' must be provided
+to the TreeMap constructor so it knows how to sort them." } ], "mcqs": [ {
+"question": "Which of these is NOT an interface in the Collections Framework?",
+"options": { "A": "List", "B": "Set", "C": "ArrayList", "D": "Map" }, "answer":
+"C" }, { "question": "Which collection type allows duplicate elements?",
+"options": { "A": "Set", "B": "List", "C": "Map (Keys)", "D": "None of the
+above" }, "answer": "B" }, { "question": "What is the output? List l = new
+ArrayList<>(); l.add(1); l.add(2); l.add(1, 3); System.out.print(l);",
+"options": { "A": "[1, 2, 3]", "B": "[1, 3, 2]", "C": "[3, 1, 2]", "D": "[1, 2]"
+}, "answer": "B" }, { "question": "What happens when you add a duplicate element
+to a HashSet?", "options": { "A": "The program throws an Exception", "B": "The
+old element is replaced", "C": "The add() method returns false and the set
+remains unchanged", "D": "The element is added at the end" }, "answer": "C" }, {
+"question": "Which method is used to retrieve a value from a HashMap?",
+"options": { "A": "get(key)", "B": "getValue(key)", "C": "fetch(key)", "D":
+"index(key)" }, "answer": "A" }, { "question": "Find the Bug: List list = new
+ArrayList();", "options": { "A": "ArrayList cannot store numbers", "B":
+"Generics do not support primitive types like 'int'", "C": "Missing semicolon",
+"D": "New keyword is not needed" }, "answer": "B" }, { "question": "Find the
+Bug: Map<String, String> map = new HashMap<>(); map.add("key", "value");",
+"options": { "A": "Map uses put(), not add()", "B": "HashMap cannot store
+Strings", "C": "Diamond operator <> is invalid", "D": "Key and Value must be
+different types" }, "answer": "A" }, { "question": "Complete the code: Iterator
+it = list.iterator(); while(it.______) { System.out.println(it.next()); }",
+"options": { "A": "isNext()", "B": "hasNext()", "C": "hasMore()", "D":
+"exists()" }, "answer": "B" }, { "question": "Predict output: Set s = new
+TreeSet<>(); s.add(10); s.add(5); s.add(15); System.out.print(s);", "options": {
+"A": "[10, 5, 15]", "B": "[15, 10, 5]", "C": "[5, 10, 15]", "D": "[10, 15, 5]"
+}, "answer": "C" }, { "question": "Best Approach: You need to store student
+records where you can quickly find a student by their unique Roll Number. Which
+is best?", "options": { "A": "ArrayList", "B": "HashSet", "C": "HashMap<Integer,
+Student>", "D": "LinkedList" }, "answer": "C" } ] }

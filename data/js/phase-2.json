@@ -1,0 +1,317 @@
+{
+  "phaseNumber": 2,
+  "phaseName": "Operators and Expressions",
+  "description": "Learn how to calculate values, compare data, make logical decisions, and master Optional Chaining and Nullish Coalescing.",
+  "learningObjectives": [
+    "Use Arithmetic and Assignment operators accurately",
+    "Differentiate between loose equality (==) and strict equality (===)",
+    "Combine conditions using logical operators (&&, ||, !)",
+    "Write concise conditional code with the Ternary operator (?)",
+    "Use Optional Chaining (?.) to query deeply nested object properties safely",
+    "Understand and use Nullish Coalescing (??) for handling default values"
+  ],
+  "prerequisites": [
+    "Phase 1: Variables (const, let) and primitive data types"
+  ],
+  "introduction": "In JavaScript, operators are the verbs that build expressions. They allow us to combine, compare, transform, and evaluate data. Mastering operators—especially modern additions like Optional Chaining (?.) and Nullish Coalescing (??)—is critical for writing elegant, crash-resistant applications.",
+  "conceptExplanation": "Arithmetic operators handle standard math. Assignment operators modify stored variable values. When comparing values, always prefer strict equality (===) which checks both the value and type, over loose equality (==) which performs type coercion and often yields surprising results. Logical operators let us compose complex truth conditions. The Ternary operator serves as a clean, single-line alternative to an if-else statement. In modern JavaScript, optional chaining (?.) allows you to safely access nested properties without throwing errors if an intermediate property is null or undefined. Paired with Nullish Coalescing (??), we can easily define defaults that handle only null or undefined, without accidentally overwriting falsey values like 0 or empty strings.",
+  "syntax": "// Comparing values\n5 === \"5\" // false (Strict)\n5 == \"5\"  // true (Loose - coerced!)\n\n// Optional Chaining & Nullish Coalescing\nconst user = { details: { title: \"Admin\" } };\nconst age = user.info?.age ?? 18; // Safely default to 18",
+  "syntaxBreakdown": "1. '===' compares both value and type without coercing types.\n2. '?.' safely returns undefined if the property to its left does not exist.\n3. '??' checks if the left-side value is null or undefined. If yes, it returns the right-side fallback.",
+  "rulesAndKeyPoints": [
+    "Arithmetic operators include +, -, *, /, %, and the exponentiation operator (**).",
+    "Strict equality (===) and strict inequality (!==) should always be preferred over loose counterparts.",
+    "Logical AND (&&) returns the first falsy operand, or the last truthy operand if all are truthy.",
+    "Logical OR (||) returns the first truthy operand, or the last operand if all are falsy.",
+    "The Logical NOT (!) operator converts a value to its boolean opposite.",
+    "Falsy values in JS: false, 0, -0, '' (empty string), null, undefined, and NaN.",
+    "Ternary operator syntax is: condition ? expressionIfTrue : expressionIfFalse.",
+    "The Spread operator (...) unpacks iterable elements into individual items.",
+    "Optional Chaining (?.) short-circuits, immediately returning undefined if any intermediate link is nullish.",
+    "Nullish Coalescing (??) differs from Logical OR (||) because it treats 0 and '' (empty string) as valid, truthy values."
+  ],
+  "codeExample1": {
+    "title": "Strict (===) vs Loose (==) Equality",
+    "code": "console.log(\"Strict 10 === '10':\", 10 === \"10\");\nconsole.log(\"Loose 10 == '10':\", 10 == \"10\");\n\nconsole.log(\"Strict true === 1:\", true === 1);\nconsole.log(\"Loose true == 1:\", true == 1);\n\nconsole.log(\"Comparing null and undefined:\");\nconsole.log(\"Loose null == undefined:\", null == undefined);\nconsole.log(\"Strict null === undefined:\", null === undefined);",
+    "description": "Demonstrates how loose equality coerces data types to match, while strict equality enforces absolute type and value matching.",
+    "expectedOutput": "Strict 10 === '10': false\nLoose 10 == '10': true\nStrict true === 1: false\nLoose true == 1: true\nComparing null and undefined:\nLoose null == undefined: true\nStrict null === undefined: false"
+  },
+  "codeExample2": {
+    "title": "Optional Chaining and Nullish Defaults",
+    "code": "const fetchUserData = () => {\n  return {\n    name: \"Devin\",\n    settings: {\n      theme: \"dark\",\n      volume: 0 // A falsy number we want to keep!\n    }\n  };\n};\n\nconst user = fetchUserData();\n\n// Accessing nested settings safely\nconst zipCode = user.location?.zipCode ?? \"00000\";\nconsole.log(\"Zip Code:\", zipCode);\n\n// Comparing || and ?? with falsy values\nconst volumeWithOR = user.settings.volume || 100;\nconst volumeWithCoalescing = user.settings.volume ?? 100;\n\nconsole.log(\"Volume using ||:\", volumeWithOR);\nconsole.log(\"Volume using ??:\", volumeWithCoalescing);",
+    "description": "Shows why nullish coalescing (??) is far superior to logical OR (||) when default-assigning values where zero (0) or empty strings ('') are perfectly valid user entries.",
+    "expectedOutput": "Zip Code: 00000\nVolume using ||: 100\nVolume using ??: 0"
+  },
+  "dryRun": [
+    {
+      "step": 1,
+      "explanation": "Evaluating expression 'user.settings.volume ?? 100'. 'user.settings.volume' exists and is 0.",
+      "state": "Left side: 0, Right side: 100"
+    },
+    {
+      "step": 2,
+      "explanation": "Nullish coalescing checks if left-side is null or undefined. 0 is neither, so it immediately returns 0.",
+      "state": "Result: 0 (No fallback triggered)"
+    },
+    {
+      "step": 3,
+      "explanation": "Evaluating expression 'user.settings.volume || 100'. Left-side is 0.",
+      "state": "Left side: 0, Right side: 100"
+    },
+    {
+      "step": 4,
+      "explanation": "Logical OR checks if left-side is truthy. 0 is falsy, so it bypasses 0 and returns right-side 100.",
+      "state": "Result: 100 (Fallback incorrectly triggered for 0 value)"
+    }
+  ],
+  "memoryVisualization": "```\nShort-circuit evaluation path:\n\n[Optional Chaining: user.location?.zipCode]\nuser -> settings (exists) -> location (nullish) -- [STOP / RETURN UNDEFINED] -> .zipCode is never read\n\n[Nullish Coalescing: undefined ?? '00000']\nleft-side evaluates to undefined -- [FALLBACK TO RIGHT-SIDE] -> returns '00000'\n```",
+  "realWorldUseCases": [
+    "Safely parsing deep API JSON payloads where elements like addresses or coordinates are optional.",
+    "Assigning default game settings (sound levels, sensitivity) without overriding active '0' states.",
+    "Rendering dynamic list views that fall back to standard titles if specific values are omitted."
+  ],
+  "commonMistakes": [
+    {
+      "title": "Using Loose Equality (==)",
+      "badCode": "const input = \"\";\nif (input == 0) {\n  console.log(\"Inputs match!\"); // Surprise! This runs!\n}",
+      "goodCode": "const input = \"\";\nif (input === 0) {\n  console.log(\"Inputs match!\"); // Correctly skipped (type string !== number)\n}",
+      "explanation": "The loose equality operator performs automatic type conversion, turning the empty string into 0. Always use strict equality (===) to prevent logic bugs."
+    },
+    {
+      "title": "Using optional chaining on assignments",
+      "badCode": "const config = {};\nconfig?.theme = \"dark\"; // Throws SyntaxError!",
+      "goodCode": "const config = {};\nconfig.theme = \"dark\"; // Standard assignment\n// Or guard:\nif (config) { config.theme = \"dark\"; }",
+      "explanation": "Optional chaining is strictly for retrieving/reading properties safely. It cannot be on the left-hand side of an assignment."
+    }
+  ],
+  "bestPractices": [
+    "Always default to strict comparison operators: === and !==.",
+    "Use parentheses () to make operator precedence explicit in mathematical or logical statements.",
+    "Use optional chaining (?.) when accessing any data originating from outside sources like backend endpoints or localStorage."
+  ],
+  "faqs": [
+    {
+      "question": "What is short-circuit evaluation?",
+      "answer": "Short-circuiting means a logical expression stops evaluating as soon as the result is determined. For example, in 'A || B', if A is true, JS does not look at B because the whole expression must be true. In 'A && B', if A is false, JS skips B entirely."
+    },
+    {
+      "question": "How does the ternary operator compare to standard if-else blocks?",
+      "answer": "The ternary operator is an expression, meaning it evaluates to a value and can be assigned to variables directly or used inside template literals. Standard if-else blocks are statements and cannot be directly assigned."
+    }
+  ],
+  "summary": "Phase 2 introduced the building blocks of JavaScript logic: comparing data types cleanly, utilizing logical short-circuiting, and modern safe navigation techniques to prevent runtime crashes.",
+  "keyTakeaways": [
+    "Strict equality (===) checks both type and value, avoiding unexpected implicit coercion.",
+    "Optional chaining (?.) safely avoids 'Cannot read property of undefined' crashes.",
+    "Nullish coalescing (??) resolves fallbacks exclusively for null and undefined."
+  ],
+  "previewOfNextTopic": "In Phase 3, we master Control Flow! We will build conditional branching using if-else-if and switch statements, and loop through collections cleanly using for, while, and the elegant modern for...of loop.",
+  "questions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "concept",
+      "format": "write_program",
+      "questionText": "Write a ternary statement that checks if age is 18 or older. If yes, assign 'Allowed' to variable 'status', else assign 'Denied'. Log 'status'.",
+      "solutionCode": "const age = 20;\nconst status = age >= 18 ? \"Allowed\" : \"Denied\";\nconsole.log(status);",
+      "explanation": "Ternary operator encapsulates simple if-else statements directly as assignments."
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "concept",
+      "format": "predict_output",
+      "questionText": "What is the output of this expression and why?\nconsole.log(false || 'Default' && 'Active');",
+      "explanation": "It logs 'Active'. Operator precedence evaluates AND (&&) before OR (||). So 'Default' && 'Active' yields 'Active' (both truthy). Then false || 'Active' returns the first truthy value, which is 'Active'."
+    },
+    {
+      "id": "q3",
+      "difficulty": "Easy-Medium",
+      "type": "practical",
+      "format": "complete_code",
+      "questionText": "Complete this code to print the name of the user nested inside profile safely, falling back to 'Unknown User' if profile or nested properties are missing.",
+      "codeContext": "const response = { profile: null };\n// Print username:\nconst userName = \nconsole.log(userName);",
+      "solutionCode": "const response = { profile: null };\nconst userName = response.profile?.username ?? \"Unknown User\";\nconsole.log(userName);",
+      "explanation": "Optional chaining safely handles response.profile being null, and nullish coalescing handles the resulting undefined state cleanly."
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "mistake",
+      "format": "debug_code",
+      "questionText": "Find the error and correct this code which is supposed to keep the user's customized 'clicks' (even if 0) or default to 10.",
+      "codeContext": "const userSession = { clicks: 0 };\nconst clicks = userSession.clicks || 10;\nconsole.log(\"Clicks:\", clicks);",
+      "solutionCode": "const userSession = { clicks: 0 };\nconst clicks = userSession.clicks ?? 10;\nconsole.log(\"Clicks:\", clicks);",
+      "explanation": "The || operator treats 0 as falsy, overriding it with the fallback. Changing it to nullish coalescing (??) preserves 0 correctly."
+    },
+    {
+      "id": "q5",
+      "difficulty": "Medium",
+      "type": "practical",
+      "format": "optimize_code",
+      "questionText": "Optimize this redundant nested if statement to a single condition using the logical AND (&&) operator.",
+      "codeContext": "let isVerified = true;\nlet hasPaid = true;\nif (isVerified) {\n  if (hasPaid) {\n    console.log(\"Access Granted\");\n  }\n}",
+      "solutionCode": "let isVerified = true;\nlet hasPaid = true;\nif (isVerified && hasPaid) {\n  console.log(\"Access Granted\");\n}",
+      "explanation": "Logical AND combines conditions cleanly on a single line, improving code readability and nested footprint."
+    },
+    {
+      "id": "q6",
+      "difficulty": "Medium-Hard",
+      "type": "mistake",
+      "format": "modify_code",
+      "questionText": "Rewrite this loose assignment code to perform strict verification of inputs before proceeding.",
+      "codeContext": "let quantity = \"10\";\nif (quantity == 10) {\n  console.log(\"Process Quantity\");\n}",
+      "solutionCode": "let quantity = \"10\";\n// Convert string explicitly to match type\nif (Number(quantity) === 10) {\n  console.log(\"Process Quantity\");\n}",
+      "explanation": "Converting the input explicitly and comparing using strict equality avoids dynamic type hazards and silent coercion errors."
+    },
+    {
+      "id": "q7",
+      "difficulty": "Hard",
+      "type": "application",
+      "format": "small_implementation",
+      "questionText": "Create a simple function 'getTheme' that receives an options object. Safely extract options.style.theme. Return 'dark' if it's not set, or if style itself is undefined.",
+      "solutionCode": "function getTheme(options) {\n  return options?.style?.theme ?? \"dark\";\n}\nconsole.log(getTheme({ style: { theme: \"light\" } }));\nconsole.log(getTheme(null));\nconsole.log(getTheme({}));",
+      "explanation": "Utilizes robust optional chain cascading combined with fallback coalescing to support empty configs cleanly."
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "application",
+      "format": "write_program",
+      "questionText": "Explain and demonstrate in a working program how the double NOT (!!) operator can be used as a short way to cast values to absolute booleans.",
+      "solutionCode": "const username = \"koder99\";\nconst emptyString = \"\";\n\nconst hasUser = !!username;\nconst hasText = !!emptyString;\n\nconsole.log(\"Username exists:\", hasUser); // true\nconsole.log(\"Text exists:\", hasText); // false",
+      "explanation": "The first NOT operator converts the value to a boolean and flips its logical state. The second NOT operator flips it back, resulting in the pure boolean cast of the original truthiness."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "type": "theory",
+      "questionText": "What does the loose equality operator (==) do before comparing two values of different types?",
+      "options": {
+        "A": "Throws a TypeCoercionError",
+        "B": "Converts both operands to strings by default",
+        "C": "Implicitly converts (coerces) the operands to a common type",
+        "D": "Compares memory address pointers"
+      },
+      "correctOption": "C",
+      "explanation": "Loose equality performs implicit type coercion to convert values to a comparable type. This often causes counterintuitive comparisons."
+    },
+    {
+      "id": "m2",
+      "type": "theory",
+      "questionText": "Which of the following values is NOT falsy in JavaScript?",
+      "options": {
+        "A": "\"0\" (string containing zero)",
+        "B": "0 (number)",
+        "C": "NaN",
+        "D": "undefined"
+      },
+      "correctOption": "A",
+      "explanation": "Any non-empty string is truthy, including \"0\" and \"false\". 0, NaN, and undefined are falsey."
+    },
+    {
+      "id": "m3",
+      "type": "output_prediction",
+      "questionText": "What is the result of evaluation of: false ?? 'Default';",
+      "options": {
+        "A": "false",
+        "B": "\"Default\"",
+        "C": "TypeError",
+        "D": "undefined"
+      },
+      "correctOption": "A",
+      "explanation": "Nullish coalescing (??) only falls back if the left-side is null or undefined. Since false is a boolean (not nullish), it is returned directly."
+    },
+    {
+      "id": "m4",
+      "type": "output_prediction",
+      "questionText": "What does console.log('3' + 2 - 1) print?",
+      "options": {
+        "A": "4",
+        "B": "31",
+        "C": "32",
+        "D": "321"
+      },
+      "correctOption": "B",
+      "explanation": "'3' + 2 is evaluated first. Due to string concatenation, it becomes '32'. Then, '32' - 1 triggers subtraction which coerces '32' to the number 32, resulting in 31."
+    },
+    {
+      "id": "m5",
+      "type": "output_prediction",
+      "questionText": "What is the evaluated output of: null || undefined || 'Success' || 'Backup';",
+      "options": {
+        "A": "undefined",
+        "B": "\"Success\"",
+        "C": "\"Backup\"",
+        "D": "null"
+      },
+      "correctOption": "B",
+      "explanation": "The OR (||) operator short-circuits on the first truthy value. null and undefined are falsy, so it moves right and stops at \"Success\", returning it."
+    },
+    {
+      "id": "m6",
+      "type": "find_bug",
+      "questionText": "Identify the line with a syntax bug:\n1: const user = {};\n2: let age = user?.profile?.age;\n3: user?.profile?.age = 25;\n4: console.log(age);",
+      "options": {
+        "A": "Line 1",
+        "B": "Line 2",
+        "C": "Line 3",
+        "D": "Line 4"
+      },
+      "correctOption": "C",
+      "explanation": "Line 3 uses optional chaining (?.) on the left-hand side of an assignment, which is a SyntaxError. Optional chaining can only be used to read values."
+    },
+    {
+      "id": "m7",
+      "type": "find_bug",
+      "questionText": "What is wrong with evaluating: 5 < x < 10 inside JavaScript?",
+      "options": {
+        "A": "It is an infinite loop",
+        "B": "It evaluates 5 < x to a boolean (true/false), and then compares that boolean to 10 (coercing it to 1 or 0), yielding bad logic.",
+        "C": "It throws a syntax error",
+        "D": "Nothing, it correctly checks if x is between 5 and 10"
+      },
+      "correctOption": "B",
+      "explanation": "JS evaluates left to right: 5 < x is true or false. That boolean is then coerced to 1 or 0, which is always less than 10. To fix, use: x > 5 && x < 10."
+    },
+    {
+      "id": "m8",
+      "type": "complete_code",
+      "questionText": "Which character replaces the blank for optional chaining:\nlet value = user____settings____theme;",
+      "options": {
+        "A": "?.",
+        "B": "->",
+        "C": "::",
+        "D": "?"
+      },
+      "correctOption": "A",
+      "explanation": "The '?.' operator represents optional chaining, checking for null/undefined before progressing."
+    },
+    {
+      "id": "m9",
+      "type": "complete_code",
+      "questionText": "Complete the statement to check inequality strictly: if (age ____ 18)",
+      "options": {
+        "A": "!=",
+        "B": "!==",
+        "C": "not==",
+        "D": "<>"
+      },
+      "correctOption": "B",
+      "explanation": "Strict inequality '!==' validates that either values or types are different."
+    },
+    {
+      "id": "m10",
+      "type": "best_approach",
+      "questionText": "Which expression is the safest, most modern approach to provide a fallback value of 'No Title' for standard variables?",
+      "options": {
+        "A": "title || 'No Title'",
+        "B": "title !== undefined ? title : 'No Title'",
+        "C": "title ?? 'No Title'",
+        "D": "title ? title : 'No Title'"
+      },
+      "correctOption": "C",
+      "explanation": "'title ?? \"No Title\"' is the safest since it preserves empty strings and zero clicks while successfully falling back on null and undefined."
+    }
+  ]
+}

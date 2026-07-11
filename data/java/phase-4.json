@@ -1,0 +1,163 @@
+{ "phase_metadata": { "phase_number": 4, "phase_name": "Arrays and Data
+Collections", "description": "Mastering the storage and manipulation of multiple
+data elements using fixed-size Arrays, multidimensional structures, and the
+flexible ArrayList.", "java_version": "21 LTS" }, "learning_objectives": [
+"Declare, initialize, and access 1D and 2D arrays", "Understand how arrays are
+stored in Heap memory", "Utilize the java.util.Arrays utility class for sorting
+and searching", "Identify the differences between fixed-size Arrays and dynamic
+ArrayLists", "Implement methods using Varargs (Variable Arguments)" ],
+"prerequisites": [ "Understanding of primitive data types (Phase 2)", "Knowledge
+of loops, especially the 'for' and 'enhanced-for' loops (Phase 3)" ],
+"introduction": "In programming, we often need to store a list of related items,
+like high scores in a game or names in a guest list. Instead of creating 100
+separate variables (score1, score2...), Java provides 'Arrays'. An array is a
+container object that holds a fixed number of values of a single type. Think of
+it like a numbered shelf where every slot is the same size.",
+"concept_explanation": "An array in Java is an object. When you create an array,
+the JVM allocates a continuous block of memory in the Heap. Every element in the
+array is accessed by an 'index', which starts at 0. Because the memory is
+continuous, accessing any element is incredibly fast. However, the trade-off is
+that once an array is created, its size cannot be changed.", "syntax": {
+"one_dimensional": "dataType[] arrayName = new dataType[size];",
+"two_dimensional": "dataType[][] arrayName = new dataType[rows][columns];",
+"varargs": "public void methodName(dataType... variableName) { }" },
+"breakdown_of_syntax": [ { "component": "dataType[]", "explanation": "The type
+of data followed by square brackets indicates an array variable." }, {
+"component": "new", "explanation": "The keyword used to allocate memory on the
+Heap for the array object." }, { "component": "[size]", "explanation": "An
+integer specifying exactly how many elements the array will hold." }, {
+"component": "...", "explanation": "The Varargs symbol, allowing a method to
+accept zero or many arguments of the specified type." } ],
+"rules_and_key_points": [ "Arrays are 0-indexed: the first element is at [0].",
+"The length of an array is fixed after initialization.", "Accessing an index
+outside the range (0 to length-1) throws ArrayIndexOutOfBoundsException.",
+"Arrays can store both primitives and objects.", "The 'length' property (not a
+method) gives the size of the array.", "2D arrays are 'arrays of arrays' in
+Java.", "The Arrays.sort() method uses a dual-pivot Quicksort algorithm.",
+"ArrayList belongs to the Collections Framework and can resize dynamically.",
+"Varargs must always be the last parameter in a method signature.", "Enhanced
+for-loops (for-each) are the cleanest way to iterate through arrays." ],
+"code_example_1": { "title": "Basic 1D Array Operations", "description":
+"Demonstrates declaration, initialization, and iteration.", "code": "public
+class ArrayBasics {\n public static void main(String[] args) {\n // Declare and
+initialize an array of integers\n int[] numbers = {10, 20, 30, 40, 50};\n\n //
+Accessing elements\n System.out.println("First element: " + numbers[0]);\n\n //
+Modifying an element\n numbers[2] = 35;\n\n // Iterating using an enhanced
+for-loop\n System.out.print("Array elements: ");\n for (int num : numbers) {\n
+System.out.print(num + " ");\n }\n }\n}", "output": "First element: 10\nArray
+elements: 10 20 35 40 50 " }, "code_example_2": { "title": "Practical: Using
+Arrays Utility and 2D Arrays", "description": "Using the Arrays class for
+sorting and searching, and a 2D array for a grid.", "code": "import
+java.util.Arrays;\n\npublic class ArrayPro {\n public static void main(String[]
+args) {\n // 1. Sorting and Searching\n String[] fruits = {"Orange", "Apple",
+"Banana", "Grape"};\n Arrays.sort(fruits);\n System.out.println("Sorted: " +
+Arrays.toString(fruits));\n \n int index = Arrays.binarySearch(fruits,
+"Banana");\n System.out.println("Index of Banana: " + index);\n\n // 2. 2D Array
+(3x3 Matrix)\n int[][] matrix = {\n {1, 2, 3},\n {4, 5, 6},\n {7, 8, 9}\n };\n
+\n System.out.println("Center element: " + matrix[1][1]);\n }\n}", "output":
+"Sorted: [Apple, Banana, Grape, Orange]\nIndex of Banana: 1\nCenter element: 5"
+}, "memory_visualization": "In Java, the reference variable (e.g., 'int[] arr')
+lives on the STACK. The actual array object ([10, 20, 30]) lives on the HEAP.
+When you assign one array variable to another, you are copying the reference
+(memory address), not the actual data. Both variables then point to the same
+array in memory.", "real_world_use_cases": [ "Storing pixels in an image (2D
+arrays).", "Implementing undo/redo buffers in text editors.", "Managing a fixed
+list of configuration settings.", "Matrix math in scientific computing
+applications." ], "common_mistakes": [ "Thinking the last index is the length of
+the array (it is length - 1).", "Trying to resize an array after creation (use
+ArrayList instead).", "Forgetting to initialize the array with 'new', leading to
+NullPointerException.", "Comparing two arrays using '==' (checks memory address)
+instead of 'Arrays.equals()' (checks content)." ], "best_practices": [ "Use the
+enhanced for-loop unless you need the index for logic.", "Prefer ArrayList if
+the number of elements is unknown or dynamic.", "Use Arrays.toString() for easy
+debugging/printing of array contents.", "Always validate the index before
+accessing to prevent crashes." ], "faq": [ { "question": "Can an array store
+different data types?", "answer": "No, Java arrays are homogeneous. You can only
+store one type (e.g., all int, all String). However, an Object[] array can store
+any object because all classes inherit from Object." }, { "question": "What is
+the default value of array elements?", "answer": "Numeric types (int, double)
+default to 0/0.0, booleans default to false, and objects/references default to
+null." } ], "summary": "Arrays provide a structured way to handle collections of
+data efficiently. While fixed in size, they offer the best performance for
+indexed access. Combined with the Arrays utility class and the modern ArrayList,
+they form the backbone of data management in Java.", "key_takeaways": [ "Arrays
+are objects stored in the Heap.", "Index starts at 0 and ends at length - 1.",
+"The 'length' property is final and read-only.", "2D arrays are accessed via
+[row][column].", "Arrays.sort() is the standard way to order elements.",
+"ArrayList is a wrapper that provides a dynamic-size array.", "Varargs (...)
+allow flexible method arguments.", "Arrays.equals() compares contents, not
+references.", "Binary search requires the array to be sorted first.", "Enhanced
+for-loops prevent index-related errors." ], "preview_of_next_topic": "In
+Phase 5, we transition from data structures to the heart of Java:
+Object-Oriented Programming (OOP) Basics, covering Classes, Objects, and
+Constructors.", "questions": [ { "id": 1, "difficulty": "Easy", "topic":
+"Concept", "question": "What happens when you try to access numbers[5] in an
+array of size 5?", "answer": "Java will throw an
+'ArrayIndexOutOfBoundsException' at runtime. In a size-5 array, the valid
+indices are 0, 1, 2, 3, and 4. Index 5 is outside the bounds." }, { "id": 2,
+"difficulty": "Moderate", "topic": "Concept", "question": "Explain how a 2D
+array is stored in memory.", "answer": "Java treats a 2D array as an 'array of
+arrays'. The main reference points to an array in the Heap where each element is
+itself a reference to another 1D array object. This allows for 'ragged arrays'
+where rows can have different lengths." }, { "id": 3, "difficulty": "Moderate",
+"topic": "Practical Usage", "question": "Write a snippet to find the maximum
+value in an integer array named 'data'.", "answer": "int max = data[0]; for(int
+i=1; i<data.length; i++) { if(data[i] > max) max = data[i]; } This iterates
+through the array and updates the 'max' variable whenever a larger value is
+found." }, { "id": 4, "difficulty": "Hard", "topic": "Practical Usage",
+"question": "Write a method using Varargs that calculates the sum of any number
+of integers.", "answer": "public int sum(int... numbers) { int total = 0;
+for(int n : numbers) total += n; return total; } The '...' syntax allows you to
+call sum(1, 2) or sum(1, 2, 3, 4) or even sum()." }, { "id": 5, "difficulty":
+"Moderate", "topic": "Common Mistake", "question": "Find the bug: int[] arr =
+new int[3]; arr[0]=1; arr[1]=2; arr[2]=3; arr[3]=4;", "answer": "The bug is
+'arr[3]=4;'. The array is initialized with size 3, meaning valid indices
+are 0, 1, and 2. Writing to index 3 throws an ArrayIndexOutOfBoundsException."
+}, { "id": 6, "difficulty": "Hard", "topic": "Common Mistake", "question": "Why
+does this print 'Not Equal'? int[] a={1}; int[] b={1}; if(a==b)
+System.out.print("Equal"); else System.out.print("Not Equal");", "answer": "The
+'==' operator compares the memory addresses (references) of the objects. Since
+'a' and 'b' are two different objects in the Heap, their addresses are
+different. To compare contents, use 'Arrays.equals(a, b)'." }, { "id": 7,
+"difficulty": "Moderate", "topic": "Coding/Application", "question": "Predict
+the output: int[] vals = {5, 2, 8}; Arrays.sort(vals);
+System.out.print(Arrays.binarySearch(vals, 2));", "answer": "The output is 0.
+First, Arrays.sort(vals) rearranges the array to {2, 5, 8}. Then, binarySearch
+finds the value '2' at index 0." }, { "id": 8, "difficulty": "Hard", "topic":
+"Coding/Application", "question": "Write a small implementation to reverse an
+array in-place without using a second array.", "answer": "for(int i = 0; i <
+arr.length / 2; i++) { int temp = arr[i]; arr[i] = arr[arr.length - 1 - i];
+arr[arr.length - 1 - i] = temp; } This swaps elements from the ends moving
+towards the middle." } ], "mcqs": [ { "id": 1, "type": "Theory", "question":
+"Which of the following is true about Java arrays?", "options": { "A": "Arrays
+can change their size dynamically.", "B": "Arrays are objects in Java.", "C":
+"Array indices start at 1.", "D": "An array can store multiple data types." },
+"answer": "B" }, { "id": 2, "type": "Theory", "question": "What is the default
+value of an element in a newly created 'boolean' array?", "options": { "A":
+"null", "B": "true", "C": "false", "D": "0" }, "answer": "C" }, { "id": 3,
+"type": "Output Prediction", "question": "What is the output? int[] x =
+{1, 2, 3}; System.out.println(x.length);", "options": { "A": "2", "B": "3", "C":
+"4", "D": "Compiler Error" }, "answer": "B" }, { "id": 4, "type": "Output
+Prediction", "question": "What is the output? int[][] a = {{1, 2}, {3, 4, 5}};
+System.out.print(a[1][2]);", "options": { "A": "2", "B": "3", "C": "5", "D":
+"ArrayIndexOutOfBoundsException" }, "answer": "C" }, { "id": 5, "type": "Output
+Prediction", "question": "What is the output? String[] s = new String[2];
+System.out.print(s[0]);", "options": { "A": """", "B": "null", "C": "Compiler
+Error", "D": "0" }, "answer": "B" }, { "id": 6, "type": "Find the Bug",
+"question": "Which line has an error? \n1: int[] arr = new int[5]; \n2: int x =
+arr.length(); \n3: arr[0] = 10;", "options": { "A": "Line 1", "B": "Line 2
+(length is a property, not a method)", "C": "Line 3", "D": "None" }, "answer":
+"B" }, { "id": 7, "type": "Find the Bug", "question": "What is wrong with:
+public void test(int... nums, String name) { }", "options": { "A": "Varargs must
+be the last parameter.", "B": "Varargs cannot be used with String.", "C": "The
+syntax should be int nums[].", "D": "There is nothing wrong." }, "answer": "A"
+}, { "id": 8, "type": "Complete the Code", "question": "To sort an array
+'myArr', use: _______.sort(myArr);", "options": { "A": "Array", "B": "Arrays",
+"C": "Collections", "D": "System" }, "answer": "B" }, { "id": 9, "type":
+"Complete the Code", "question": "How do you declare a dynamic list that can
+grow? _______ list = new _______<>();", "options": { "A": "Array", "B":
+"FixedList", "C": "ArrayList", "D": "VectorArray" }, "answer": "C" }, {
+"id": 10, "type": "Best Approach", "question": "Which is the most efficient way
+to copy an entire array to a new one?", "options": { "A": "Using a for-loop",
+"B": "System.arraycopy() or Arrays.copyOf()", "C": "Assigning 'arr1 = arr2'",
+"D": "Adding elements one by one" }, "answer": "B" } ] }

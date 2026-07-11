@@ -1,0 +1,174 @@
+{ "phase_metadata": { "phase_number": 7, "title": "CSS Selectors and
+Specificity", "description": "Mastering the art of targeting specific HTML
+elements using advanced selectors, pseudo-classes, and understanding how the
+browser resolves style conflicts.", "estimated_time": "4.5 Hours" },
+"learning_objectives": [ "Differentiate between Element, Class, and ID
+selectors", "Utilize combinators like descendant and child selectors to target
+nested elements", "Apply pseudo-classes like :hover and :nth-child for
+interactive and structural styling", "Enhance elements with pseudo-elements like
+::before and ::after", "Calculate CSS specificity to resolve style conflicts
+effectively", "Select elements based on their attributes" ], "prerequisites": [
+"Completion of Phase 6 (CSS Box Model)", "Familiarity with HTML nesting and
+attributes" ], "introduction": "So far, you have styled tags like  or . But what
+if you want to style only the third item in a list, or change a button's color
+only when a user hovers over it? CSS Selectors are the 'search queries' of web
+design. They allow you to pinpoint exactly which elements you want to style,
+making your code precise and powerful.", "concept_explanation": {
+"basic_selectors": "Element selectors target tags (h1). Class selectors target
+groups (.btn). ID selectors target unique elements (#header).", "combinators":
+"These describe relationships between elements. A space (descendant) targets any
+child/grandchild, while a '>' (child) targets only the direct child.",
+"pseudo_classes": "These define a special state of an element. For example,
+':hover' applies when the mouse is over it, and ':nth-child(n)' targets an
+element based on its position in a parent.", "pseudo_elements": "These allow you
+to style specific parts of an element, like the first letter (::first-letter) or
+inserting content before an element (::before).", "attribute_selectors": "Target
+elements based on attributes like [type='text'] or [href^='https'].",
+"specificity_hierarchy": "When rules conflict, the browser uses a point system:
+Inline (1000) > ID (100) > Class/Attribute/Pseudo-class (10) > Element (1)." },
+"syntax": { "combinator_syntax": "nav ul li { ... } /* Descendant /\ndiv > p {
+... } / Direct Child /", "pseudo_syntax": "button:hover { ...
+}\nli:nth-child(even) { ... }\na::after { content: ' ↗'; }", "attribute_syntax":
+"input[type="password"] { ... }" }, "breakdown_of_syntax": { "space":
+"Represents any descendant, no matter how deep it is nested.", "greater_than":
+"The child combinator; targets only elements one level down.", "colon": "Used
+for pseudo-classes (states).", "double_colon": "Used for pseudo-elements (parts
+of elements).", "brackets": "Used for attribute selectors.", "content_property":
+"Required for ::before and ::after to actually display something." },
+"rules_and_key_points": { "rule_1": "IDs must be unique on a page; Classes can
+be reused infinitely.", "rule_2": "The '' selector targets every single element
+on the page.", "rule_3": "Pseudo-classes react to user interaction or document
+structure.", "rule_4": "Pseudo-elements like ::before require the 'content'
+property to work.", "rule_5": "Specificity: A single ID selector (#id) overrides
+many class selectors.", "rule_6": "The !important flag overrides everything but
+is considered a last resort.", "rule_7": "Group multiple selectors with a comma
+(h1, h2, h3) to apply the same style.", "rule_8": "Selectors are read by the
+browser from right to left (right-to-left parsing).", "rule_9": "Pseudo-classes
+always start with one colon (:), pseudo-elements with two (::).", "rule_10":
+"Specificity only matters when properties conflict." }, "code_example_1": {
+"title": "Interactive List Styling", "description": "Using pseudo-classes to
+style a list based on interaction and position.", "code": "/* CSS /\nul li {\n
+padding: 10px;\n list-style: none;\n}\n\nli:first-child {\n font-weight:
+bold;\n}\n\nli:nth-child(odd) {\n background-color: #f9f9f9;\n}\n\nli:hover {\n
+background-color: #e0e0e0;\n cursor: pointer;\n}" }, "code_example_2": {
+"title": "Advanced Combinators and Specificity", "description": "Targeting
+specific nested elements and demonstrating ::after.", "code": "/ Only links
+inside the footer /\nfooter a {\n color: gray;\n}\n\n/ External links only
+/\na[href^="https"]::after {\n content: " (external)";\n font-size: 0.8rem;\n
+color: blue;\n}\n\n/ High specificity rule /\n#main-nav > .active {\n color:
+orange !important;\n}" }, "output": "The first example creates a list where the
+first item is bold, alternate items have a light-gray background, and items
+highlight when hovered. The second example styles links in the footer
+differently and automatically appends the text '(external)' to any link starting
+with 'https'.", "step_by_step_dry_run": [ "Browser reads the CSS rule
+li:nth-child(odd).", "It finds the 1st, 3rd, and 5th <li> elements in every
+list.", "It applies a light-gray background to those specific elements.", "The
+user moves the mouse over the 2nd <li>.", "The :hover pseudo-class becomes
+active, changing its background to a darker gray.", "If a rule .list-item also
+set the background, the browser compares specificity (Class vs Pseudo-class) to
+see which wins." ], "memory_visualization": "Specificity Scoreboard:\nID:
+[1][0][0] (Heavyweight)\nClass/Pseudo: [0][1][0] (Middleweight)\nElement:
+[0][0][1] (Lightweight)\nExample: #header .nav li = 111 points.",
+"real_world_use_cases": [ "Creating 'Zebra-striped' tables for better
+readability using :nth-child(even).", "Adding an arrow icon after every link in
+a navigation menu using ::after.", "Styling navigation links differently based
+on which page is 'active'.", "Targeting specifically password inputs to add an
+icon or border color.", "Highlighting rows in a dashboard when a user hovers
+over them." ], "common_mistakes": [ "Using a space when you meant a '>': 'div p'
+targets all paragraphs, 'div > p' only targets children.", "Forgetting that IDs
+should be unique; using the same ID twice will cause CSS to work but break
+JavaScript.", "Missing the 'content' property in ::before/::after, causing them
+not to appear.", "Assuming pseudo-elements like ::before can be applied to
+self-closing tags like  (they cannot).", "Relying too much on !important instead
+of fixing specificity issues." ], "best_practices": [ "Use classes for styling
+instead of IDs to keep specificity low and styles reusable.", "Prefer the '>'
+child combinator if you only want to style direct children to avoid accidental
+nesting styles.", "Organize selectors from general to specific in your
+stylesheet.", "Use pseudo-elements for decorative content to keep HTML clean.",
+"Avoid deep nesting (e.g., div ul li a) as it makes CSS hard to maintain." ],
+"faqs": [ { "question": "What is the difference between :nth-child and
+:nth-of-type?", "answer": ":nth-child(2) looks for the second child of a parent
+regardless of type. :nth-of-type(2) looks for the second occurrence of that
+specific tag within the parent." }, { "question": "Can I use multiple
+pseudo-classes on one selector?", "answer": "Yes, for example:
+a:hover:first-child targets a link only if it is the first child AND it is being
+hovered." } ], "summary": "Phase 7 taught us how to precisely target HTML
+elements. We moved from simple tag selectors to complex combinators, explored
+the interactive world of pseudo-classes, and learned the mathematical point
+system of specificity that browsers use to resolve styling conflicts.",
+"key_takeaways": [ "Classes are for groups; IDs are for unique individuals.",
+"Combinators (space, >) define how deep to look for elements.", "Pseudo-classes
+(:hover, :focus) describe states.", "Pseudo-elements (::before, ::after) create
+virtual content.", "Specificity is a score (ID > Class > Element).", "Attribute
+selectors target metadata like type or href.", "!important overrides everything
+but should be avoided.", "The '' selector is the most general (0 points).",
+"::before and ::after require a 'content' property.", "Selectors are the logic
+that connects HTML structure to CSS design." ], "preview_next_topic": "In
+Phase 8, we will explore 'CSS Layout Basics'—learning the display property and
+how to position boxes exactly where you want them on the screen.",
+"questions_and_answers": [ { "question": "What is CSS Specificity and how is it
+calculated?", "answer": "CSS Specificity is the set of rules browsers use to
+determine which style rule is applied when multiple rules target the same
+element. It is calculated based on points: Inline styles = 1000, IDs = 100,
+Classes/Pseudo-classes/Attributes = 10, and Elements/Pseudo-elements = 1.",
+"difficulty": "Easy Concept" }, { "question": "Explain the difference between
+the descendant selector (space) and the child selector (>).", "answer": "The
+descendant selector (space) targets all specified elements inside a parent,
+regardless of how deeply nested they are. The child selector (>) only targets
+elements that are direct children (exactly one level down) of the parent.",
+"difficulty": "Moderate Concept" }, { "question": "Write a selector that changes
+the color of a link to red only when it is being hovered AND it is inside a div
+with the class 'sidebar'.", "answer": ".sidebar a:hover {\n color: red;\n}",
+"difficulty": "Moderate Practical" }, { "question": "How would you select every
+even row in a table and give it a light gray background?", "answer":
+"tr:nth-child(even) {\n background-color: lightgray;\n}", "difficulty": "Hard
+Practical" }, { "question": "Identify the bug: A student uses img::before {
+content: 'Image'; } but nothing appears. Why?", "answer": "Pseudo-elements like
+::before and ::after do not work on 'replaced elements' or self-closing tags
+like , , or  because these elements do not have a content area where the
+pseudo-element can be inserted.", "difficulty": "Moderate Mistake" }, {
+"question": "A student wrote #nav .link { color: blue; } and later wrote nav
+.link { color: red; }. Which color will the link be and why?", "answer": "The
+link will be blue. This is because the first selector includes an ID (#nav),
+giving it a higher specificity score (110) compared to the second selector which
+only uses an element and a class (11).", "difficulty": "Hard Mistake" }, {
+"question": "Create a CSS rule that adds a double-quote symbol before and after
+every paragraph with the class 'quote'.", "answer": "p.quote::before {\n
+content: '“';\n}\np.quote::after {\n content: '”';\n}", "difficulty": "Moderate
+Coding" }, { "question": "Write a selector to target only input elements that
+have a 'required' attribute and are currently in focus.", "answer":
+"input[required]:focus {\n border: 2px solid blue;\n}", "difficulty": "Hard
+Coding" } ], "multiple_choice_questions": [ { "question": "Which selector has
+the highest specificity?", "options": { "A": ".container .item", "B": "div p",
+"C": "#main-content", "D": "body" }, "answer": "C", "type": "Theory" }, {
+"question": "Which pseudo-class targets the very first child of a parent?",
+"options": { "A": ":first-of-type", "B": ":first-child", "C": ":initial", "D":
+":top" }, "answer": "B", "type": "Theory" }, { "question": "What is the output
+of: div p { color: red; } applied to
+<div><section><p>Hello</p></section></div>?", "options": { "A": "Text is red
+because it's a descendant", "B": "Text is black because it's not a direct
+child", "C": "Text is invisible", "D": "Browser error" }, "answer": "A", "type":
+"Output Prediction" }, { "question": "Predict the color of the text: \n #t {
+color: red; } .c { color: blue; } \nHello", "options": { "A": "Blue", "B":
+"Red", "C": "Purple", "D": "Black" }, "answer": "B", "type": "Output Prediction"
+}, { "question": "What will li:nth-child(3) select?", "options": { "A": "The
+first 3 list items", "B": "Every 3rd list item", "C": "Only the 3rd list item",
+"D": "All list items except the 3rd" }, "answer": "C", "type": "Output
+Prediction" }, { "question": "Find the bug: .my-class:hover::before { color:
+red; } (Assuming content is missing)", "options": { "A": "The colon order is
+wrong", "B": "It needs a 'content' property to be visible", "C": "Hover cannot
+be combined with before", "D": "Class names cannot have hyphens" }, "answer":
+"B", "type": "Find the Bug" }, { "question": "Find the bug: p > span i { color:
+gold; } in <p><span>Text <i>Gold</i></span></p>", "options": { "A": "The space
+before 'i' is invalid", "B": "It should be p > span > i for descendant", "C":
+"No bug, this works correctly", "D": "i tags cannot be styled" }, "answer": "C",
+"type": "Find the Bug" }, { "question": "Complete the code to target links
+starting with 'https': a[href___='https']", "options": { "A": "*", "B": "$",
+"C": "^", "D": "~" }, "answer": "C", "type": "Complete the Code" }, {
+"question": "Complete the code for a double-colon pseudo-element:
+p____first-line { font-weight: bold; }", "options": { "A": ":", "B": "::", "C":
+"->", "D": "." }, "answer": "B", "type": "Complete the Code" }, { "question":
+"What is the best approach for styling elements that appear multiple times?",
+"options": { "A": "Give each one a unique ID", "B": "Use a shared class", "C":
+"Style them with inline styles", "D": "Use the * selector" }, "answer": "B",
+"type": "Best Approach" } ] }

@@ -1,0 +1,209 @@
+{ "phase_metadata": { "phase_number": 13, "phase_name": "Multithreading and
+Concurrency", "description": "Master the art of performing multiple tasks
+simultaneously in Java using Threads, Synchronization, and the modern Executor
+Framework.", "java_version": "21 LTS" }, "learning_objectives": [ "Understand
+the difference between a Process and a Thread", "Create threads using the Thread
+class and Runnable interface", "Manage the Thread Lifecycle and states",
+"Prevent data corruption using the synchronized keyword", "Implement
+inter-thread communication using wait() and notify()", "Utilize the Executor
+Framework for professional thread management", "Understand the basics of
+asynchronous programming with CompletableFuture" ], "prerequisites": [ "Phase 5:
+OOP Basics (Classes and Objects)", "Phase 9: Exception Handling
+(InterruptedException)", "Phase 12: Java 8+ Features (Lambdas for Runnable)" ],
+"introduction": "Multithreading is a specialized form of multitasking that
+allows a single program to execute multiple parts (threads) concurrently. In
+modern software, this is essential for keeping user interfaces responsive while
+performing heavy calculations in the background, handling multiple client
+requests in a server, or utilizing multi-core processors to speed up data
+processing.", "concept_explanation": { "what_is_it": "A thread is the smallest
+unit of execution within a process. Multithreading allows a program to split
+into two or more simultaneously running tasks.", "why_do_we_need_it": "1.
+Improved Performance: Utilize multiple CPU cores. 2. Responsiveness: Background
+tasks don't freeze the UI. 3. Efficiency: Threads share the same memory space,
+making them 'lightweight' compared to processes.", "thread_vs_runnable": "The
+Thread class is an object-oriented representation of a thread. The Runnable
+interface represents the task to be performed. In modern Java, implementing
+Runnable is preferred as it allows the class to extend another class (Java
+doesn't support multiple inheritance).", "thread_lifecycle": "1. New: Created
+but not started. 2. Runnable: Ready to run (waiting for CPU). 3. Running:
+Actively executing. 4. Blocked/Waiting: Waiting for a resource or another
+thread. 5. Terminated: Execution finished.", "synchronization": "When multiple
+threads access shared data (like a bank balance), 'Race Conditions' can occur
+where data becomes inconsistent. The 'synchronized' keyword ensures only one
+thread can access a code block at a time.", "executor_framework": "Creating
+threads manually with 'new Thread()' is expensive. The ExecutorService (Thread
+Pool) manages a pool of worker threads, reusing them for different tasks to save
+resources." }, "syntax": { "thread_creation": "Thread t = new Thread(() ->
+System.out.println("Running"));\nt.start();", "synchronized_block":
+"synchronized(lockObject) { \n // critical section \n}", "executor_service":
+"ExecutorService executor =
+Executors.newFixedThreadPool(10);\nexecutor.submit(() -> { /* task / });",
+"wait_notify": "lock.wait(); // Release lock and wait\nlock.notify(); // Wake up
+a waiting thread" }, "syntax_breakdown": { "start_method": "Allocates memory for
+a new thread and calls the run() method. Never call run() directly; that
+executes in the current thread.", "join_method": "Causes the current thread to
+wait until the thread it was called on completes.", "volatile_keyword": "Ensures
+that changes to a variable are immediately visible to all threads by
+reading/writing directly from main memory.", "synchronized_keyword": "Acquires
+an 'intrinsic lock' or 'monitor' on an object, preventing other threads from
+entering synchronized blocks of the same object.", "future_object": "A
+placeholder for a result that will be available in the future after a task
+completes." }, "rules_and_key_points": [ "A thread cannot be restarted once it
+has finished execution.", "The 'main' method runs on the main thread.",
+"Synchronization only works if all threads lock on the same object.", "Deadlock
+occurs when two threads wait forever for locks held by each other.",
+"Thread.sleep() does not release the lock it currently holds.", "wait(),
+notify(), and notifyAll() must be called inside a synchronized context.",
+"Atomic classes (like AtomicInteger) provide thread-safe operations without
+explicit synchronization.", "Virtual Threads (Java 19+) are lightweight threads
+intended to reduce the cost of blocking operations.", "Always shut down an
+ExecutorService when it is no longer needed.", "Multithreading does not
+guarantee the order of execution." ], "code_example_1": { "title": "Creating
+Threads (Runnable vs Thread)", "description": "The two standard ways to create
+and start threads in Java.", "code": "class MyThread extends Thread {\n public
+void run() {\n System.out.println("Thread class running...");\n }\n}\n\npublic
+class ThreadBasics {\n public static void main(String[] args) {\n // Method 1:
+Extending Thread\n MyThread t1 = new MyThread();\n t1.start();\n\n // Method 2:
+Implementing Runnable (Modern Lambda approach)\n Runnable task = () -> {\n
+for(int i = 1; i <= 3; i++) {\n System.out.println("Runnable Task: " + i);\n try
+{ Thread.sleep(500); } catch(InterruptedException e) {}\n }\n };\n \n Thread t2
+= new Thread(task);\n t2.start();\n }\n}" }, "code_example_2": { "title":
+"Synchronization and ExecutorService", "description": "Using an ExecutorService
+to handle concurrent updates to a shared counter.", "code": "import
+java.util.concurrent.;\n\nclass Counter {\n private int count = 0;\n\n //
+synchronized ensures atomic updates\n public synchronized void increment() {\n
+count++;\n }\n\n public int getCount() {\n return count;\n }\n}\n\npublic class
+ConcurrencyDemo {\n public static void main(String[] args) throws
+InterruptedException {\n Counter counter = new Counter();\n ExecutorService
+executor = Executors.newFixedThreadPool(5);\n\n // Submit 1000 tasks to
+increment the counter\n for (int i = 0; i < 1000; i++) {\n
+executor.submit(counter::increment);\n }\n\n executor.shutdown();\n // Wait for
+all tasks to finish\n if (executor.awaitTermination(10, TimeUnit.SECONDS)) {\n
+System.out.println("Final Count: " + counter.getCount());\n }\n }\n}" },
+"output": "Thread class running...\nRunnable Task: 1\nRunnable Task: 2\nRunnable
+Task: 3\nFinal Count: 1000", "step_by_step_dry_run": "1. In 'ConcurrencyDemo', a
+Counter object is created on the heap with count = 0.\n2. An ExecutorService
+with a pool of 5 threads is initialized.\n3. A loop submits 1000 increment tasks
+to the pool.\n4. When a thread picks a task, it tries to enter the 'increment'
+method.\n5. Because 'increment' is synchronized, the thread must acquire the
+'lock' on the counter object.\n6. If thread A holds the lock, thread B must wait
+in the 'Blocked' state.\n7. Once thread A finishes incrementing, it releases the
+lock, and thread B can proceed.\n8. This prevents two threads from reading 0 and
+both writing 1 at the same time (Race Condition).\n9. executor.shutdown() stops
+accepting new tasks, and awaitTermination waits for the 1000 increments to
+complete.\n10. The final value 1000 is printed.", "memory_visualization":
+"Process Memory: Shared by all threads. Contains the Heap (where 'Counter'
+object resides).\nThread Stack: Each thread gets its own Stack memory. Contains
+local variables and method call frames. \nLock/Monitor: Every object on the Heap
+has a hidden 'Header' used for locking. The 'synchronized' keyword utilizes this
+header to block other threads.", "real_world_use_cases": [ "Web Servers: Each
+incoming HTTP request is handled by a separate thread from a pool.", "Video
+Rendering: Dividing a video frame into segments and rendering them in
+parallel.", "Database Connection Pools: Reusing existing connections instead of
+creating new ones.", "Mobile Apps: Fetching data from an API on a background
+thread so the UI doesn't stutter." ], "common_mistakes": [ "Calling run()
+instead of start(): run() executes in the current thread like a normal method
+call.", "Shared data without synchronization: Leads to unpredictable results
+(Heisenbugs).", "Not shutting down ExecutorService: Can prevent the JVM from
+exiting.", "Using synchronization too much: Excessive locking leads to poor
+performance and potential deadlocks.", "Ignoring InterruptedException: This
+exception is the signal to a thread that it should stop what it's doing." ],
+"best_practices": [ "Prefer ExecutorService over creating raw 'new Thread()'
+objects.", "Implement Runnable or Callable rather than extending Thread.", "Keep
+synchronized blocks as small as possible to minimize blocking.", "Use
+java.util.concurrent.atomic classes for simple counters.", "Always name your
+threads (especially in thread pools) to make debugging easier.", "Use 'volatile'
+only for visibility, not for atomicity." ], "faq": [ { "question": "What is the
+difference between yield() and sleep()?", "answer": "sleep() pauses the thread
+for a specified duration. yield() is a hint to the scheduler that the thread is
+willing to give up its current use of the CPU, but it stays in the Runnable
+state." }, { "question": "Can a synchronized method be static?", "answer": "Yes.
+A static synchronized method locks on the 'Class' object rather than the
+instance 'this' object." }, { "question": "What is a Daemon thread?", "answer":
+"A daemon thread is a service provider thread that doesn't prevent the JVM from
+exiting when the program finishes. The Garbage Collector is a daemon thread." }
+], "summary": "Phase 13 explored Multithreading, the capability of Java to
+execute concurrent tasks. We learned how to create threads, manage their
+lifecycle, and solve synchronization issues to prevent data corruption. Finally,
+we looked at the Executor Framework as the professional way to manage thread
+pools in modern Java applications.", "key_takeaways": [ "Threads share memory;
+Processes do not.", "Always use .start() to initiate a thread.", "Runnable is
+more flexible than extending Thread.", "Synchronization prevents Race Conditions
+on shared variables.", "Wait/Notify are used for inter-thread communication.",
+"ExecutorService is the standard way to manage thread pools.", "Join() makes one
+thread wait for another to finish.", "Deadlock is a circular dependency on
+locks.", "The volatile keyword ensures variable visibility across threads.",
+"Java 21 Virtual Threads are optimized for I/O heavy tasks." ],
+"preview_of_the_next_topic": "In Phase 14, we will learn about File I/O,
+exploring how to read from and write to the computer's file system using Java.",
+"questions": [ { "difficulty": "Easy", "topic": "Concept", "question": "What is
+the main difference between a process and a thread?", "answer": "A process is an
+independent execution environment with its own memory space (private heap). A
+thread is a subset of a process that shares the memory space and resources of
+the process it belongs to." }, { "difficulty": "Moderate", "topic": "Concept",
+"question": "Why is implementing 'Runnable' generally better than extending
+'Thread'?", "answer": "Implementing 'Runnable' is better because: 1. It supports
+multiple inheritance (your class can still extend another class). 2. It promotes
+better separation of concerns (task vs. execution mechanism). 3. It is
+compatible with modern functional programming and lambdas." }, { "difficulty":
+"Moderate", "topic": "Practical Usage", "question": "How can you ensure that the
+'main' thread finishes only after a secondary thread 't1' has completed its
+work?", "answer": "You should call the 't1.join()' method. This will block the
+'main' thread until 't1' finishes its execution." }, { "difficulty": "Hard",
+"topic": "Practical Usage", "question": "In a Producer-Consumer scenario, why
+must wait() and notify() be called inside a synchronized block?", "answer":
+"They must be called inside a synchronized block because they require the thread
+to own the object's monitor (lock). Calling wait() releases the lock so other
+threads can proceed, and notify() wakes up a thread that is waiting for that
+same lock." }, { "difficulty": "Moderate", "topic": "Common Mistake",
+"question": "Debug this code: Thread t = new Thread(() ->
+System.out.println("Hi")); t.run();", "answer": "The bug is calling 't.run()'.
+This will execute the code in the current thread (the main thread) sequentially.
+To start a new concurrent thread, you must call 't.start()'." }, { "difficulty":
+"Hard", "topic": "Common Mistake", "question": "Explain 'Deadlock' and how to
+avoid it.", "answer": "Deadlock happens when Thread 1 holds Lock A and waits for
+Lock B, while Thread 2 holds Lock B and waits for Lock A. To avoid it, always
+acquire locks in the same consistent order across all threads, or use timed lock
+attempts (tryLock) from the java.util.concurrent.locks package." }, {
+"difficulty": "Moderate", "topic": "Coding", "question": "Write a snippet using
+an ExecutorService that calculates the square of numbers from 1 to 5 using a
+pool of 2 threads.", "answer": "ExecutorService ex =
+Executors.newFixedThreadPool(2);\nfor(int i=1; i<=5; i++) { int n = i;
+ex.submit(() -> System.out.println(n * n)); }\nex.shutdown();" }, {
+"difficulty": "Hard", "topic": "Coding", "question": "Implement a simple
+thread-safe Singleton class using the 'Double-Checked Locking' pattern.",
+"answer": "class Singleton { private static volatile Singleton instance; private
+Singleton() {} public static Singleton getInstance() { if (instance == null) {
+synchronized(Singleton.class) { if (instance == null) instance = new
+Singleton(); } } return instance; } }" } ], "mcqs": [ { "question": "Which state
+is a thread in after it is created but before start() is called?", "options": {
+"A": "Runnable", "B": "Waiting", "C": "New", "D": "Blocked" }, "answer": "C" },
+{ "question": "Which interface should you implement to create a task that
+returns a value?", "options": { "A": "Runnable", "B": "Callable", "C": "Thread",
+"D": "Future" }, "answer": "B" }, { "question": "What is the output? Thread t =
+new Thread(() -> System.out.print("X")); t.start(); t.start();", "options": {
+"A": "XX", "B": "X", "C": "IllegalThreadStateException", "D": "Compilation
+Error" }, "answer": "C" }, { "question": "What is the primary purpose of the
+'volatile' keyword?", "options": { "A": "To lock an object", "B": "To ensure
+thread visibility of variables", "C": "To make a variable final", "D": "To
+prevent a variable from being serialized" }, "answer": "B" }, { "question":
+"Which method is used to pause the current thread for a specific amount of
+time?", "options": { "A": "wait()", "B": "yield()", "C": "Thread.sleep()", "D":
+"join()" }, "answer": "C" }, { "question": "Find the bug: \npublic synchronized
+void move() { \n this.wait(); \n}", "options": { "A": "wait() must be inside a
+loop", "B": "wait() throws a checked InterruptedException that must be handled",
+"C": "wait() cannot be used on 'this'", "D": "The method should not be
+synchronized" }, "answer": "B" }, { "question": "What happens when you call
+t.join()?", "options": { "A": "The thread 't' joins the current thread pool",
+"B": "The current thread waits until 't' finishes", "C": "The thread 't' waits
+until the main thread finishes", "D": "Two threads merge into one" }, "answer":
+"B" }, { "question": "Complete the code: \nExecutorService pool =
+Executors.______(3);", "options": { "A": "newFixedThreadPool", "B":
+"createPool", "C": "getThreadExecutor", "D": "startThreads" }, "answer": "A" },
+{ "question": "Which method wakes up all threads waiting on an object's
+monitor?", "options": { "A": "notify()", "B": "wakeAll()", "C": "notifyAll()",
+"D": "resumeAll()" }, "answer": "C" }, { "question": "Best Approach: You need to
+run 1000 independent tasks. Which approach is best?", "options": { "A":
+"Create 1000 'new Thread()' objects", "B": "Use a single thread and run them one
+by one", "C": "Use an ExecutorService with a fixed thread pool", "D": "Use the
+main thread for everything" }, "answer": "C" } ] }

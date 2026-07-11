@@ -1,0 +1,190 @@
+{ "phase_metadata": { "phase_id": 2, "title": "Java Basics: Variables, Data
+Types, and Operators", "description": "Mastering the building blocks of Java
+programming including data storage, type conversion, mathematical operations,
+and user interaction.", "java_version": "21 LTS" }, "learning_objectives": [
+"Understand how Java manages memory using primitive and reference data types",
+"Identify and implement the three types of Java variables: local, instance, and
+class", "Perform safe type conversions using widening and narrowing casting",
+"Apply arithmetic, logical, and relational operators to build program logic",
+"Utilize the Scanner class to create interactive console applications" ],
+"prerequisites": [ "Phase 1: Understanding of JDK installation and the basic
+structure of a HelloWorld class." ], "introduction": "In the previous phase, we
+learned how to run a basic Java program. Now, we dive into how Java actually
+handles information. Imagine a program as a kitchen: the data types are the
+ingredients, variables are the containers we store them in, and operators are
+the tools (like knives or mixers) we use to process them. To make our programs
+interactive, we will also learn how to listen to the user's input using the
+Scanner tool.", "concept_explanation": { "data_types": "Java is a
+'statically-typed' language, meaning every variable must have a declared type.
+Primitives (like int, double, boolean) are simple values stored directly in the
+Stack memory. Reference types (like String or Scanner) are complex objects
+stored in the Heap memory, with a pointer (address) kept in the Stack.",
+"variables": "Variables are named memory locations. Java provides three scopes:
+Local (inside methods), Instance (inside classes, unique to every object), and
+Class/Static (shared across all objects of a class).", "type_casting": "Casting
+is converting one data type to another. Widening (e.g., int to double) happens
+automatically because there is no risk of data loss. Narrowing (e.g., double to
+int) requires manual syntax because it might truncate decimal values.",
+"operators": "Java uses symbols to perform operations. These include Arithmetic
+(+, -, *, /, %), Relational (==, !=, >, <), Logical (&&, ||, !), and the Ternary
+operator (condition ? true : false).", "scanner": "The Scanner class is part of
+the java.util package. It reads input from the keyboard (System.in) and converts
+it into usable Java types like nextInt() or nextLine()." }, "syntax": {
+"variable_declaration": "dataType variableName = value;",
+"type_casting_explicit": "targetType variableName = (targetType)
+originalVariable;", "scanner_initialization": "Scanner scannerName = new
+Scanner(System.in);" }, "syntax_breakdown": { "dataType": "The kind of data to
+be stored (e.g., int for integers).", "variableName": "The identifier used to
+refer to the value (must follow camelCase).", "assignment_operator": "The '='
+symbol assigns the value on the right to the variable on the left.",
+"new_keyword": "Used to create an instance of a reference type like Scanner.",
+"system_in": "The standard input stream representing the keyboard." },
+"rules_and_key_points": [ "Variable names cannot start with numbers and cannot
+be Java keywords (like 'class' or 'void').", "Local variables must be
+initialized before they are used, or the code will not compile.", "The 'final'
+keyword can be added to a variable to make it a constant (unchangeable).",
+"Integer division (e.g., 5 / 2) results in 2, not 2.5, unless one operand is a
+double.", "The '+' operator performs addition with numbers but concatenation
+with Strings.", "Boolean variables can only store 'true' or 'false'.",
+"Floating-point literals are treated as double by default; use 'f' suffix for
+floats (e.g., 3.14f).", "Char values must be enclosed in single quotes ('A'),
+while Strings use double quotes ("Text").", "Static variables are initialized
+once when the class is loaded into the JVM.", "The Scanner class should be
+closed (scanner.close()) to prevent memory leaks." ], "code_example_1": {
+"title": "Primitive Types and Variables", "description": "This example
+demonstrates how to declare different primitive types and perform basic math.",
+"code": "public class BasicsDemo {\n public static void main(String[] args) {\n
+// Integer types\n int age = 25;\n long largeNumber = 1000000000L; // Note the
+'L' suffix\n \n // Floating point types\n double salary = 55000.50;\n float
+taxRate = 0.05f; // Note the 'f' suffix\n \n // Logical and Character\n boolean
+isEmployee = true;\n char grade = 'A';\n \n // Basic Arithmetic\n double
+netSalary = salary - (salary * taxRate);\n \n System.out.println("Age: " +
+age);\n System.out.println("Grade: " + grade);\n System.out.println("Net Salary:
+" + netSalary);\n }\n}", "output": "Age: 25\nGrade: A\nNet Salary: 52250.475" },
+"code_example_2": { "title": "User Interaction with Scanner", "description": "A
+practical program that asks for user input and performs a narrowing type cast.",
+"code": "import java.util.Scanner;\n\npublic class UserInputDemo {\n public
+static void main(String[] args) {\n // Create a Scanner object to read from
+standard input\n Scanner input = new Scanner(System.in);\n \n
+System.out.print("Enter your full name: ");\n String name = input.nextLine();\n
+\n System.out.print("Enter your hourly wage: ");\n double wage =
+input.nextDouble();\n \n // Narrowing Cast: double to int (decimal part is
+lost)\n int roundedWage = (int) wage;\n \n System.out.println("--- Profile
+Summary ---");\n System.out.println("Name: " + name);\n
+System.out.println("Exact Wage: " + wage);\n System.out.println("Rounded Wage: "
++ roundedWage);\n \n input.close();\n }\n}", "output": "Enter your full name:
+John Doe\nEnter your hourly wage: 25.75\n--- Profile Summary ---\nName: John
+Doe\nExact Wage: 25.75\nRounded Wage: 25" }, "step_by_step_dry_run": "For
+Example 2: \n1. JVM starts the program and allocates memory for the Scanner
+object in the Heap.\n2. The program pauses at input.nextLine(), waiting for the
+user to type and press Enter.\n3. 'John Doe' is stored in a String object.\n4.
+input.nextDouble() reads '25.75'. \n5. During the cast '(int) wage', the JVM
+looks at 25.75, removes the .75, and stores 25 into the 'roundedWage' integer
+variable.\n6. Finally, the system prints the results and closes the input
+stream.", "memory_visualization": { "stack": "Stores primitive variables like
+'age' (25) and 'roundedWage' (25). It also stores the 'reference' (memory
+address) for 'name' and 'input'.", "heap": "Stores the actual String object
+"John Doe" and the Scanner object instance.", "static_area": "Stores class-level
+variables (none in these examples) and the executable code for methods." },
+"real_world_use_cases": [ "E-commerce: Using 'double' for prices and 'int' for
+stock counts.", "Authentication: Using 'boolean' to track if a user is logged
+in.", "Data Entry: Using 'Scanner' to capture user registration details in a
+console-based CRM.", "Financial Apps: Using explicit casting when converting
+high-precision currency data into integers for simple reporting." ],
+"common_mistakes": [ "Attempting to store a large type (double) into a small
+type (int) without an explicit cast.", "Using 'next()' instead of 'nextLine()'
+when the user input contains spaces.", "Forgetting the 'f' suffix for float
+literals, causing a 'possible loss of precision' error because Java defaults to
+double.", "Variable Shadowing: Declaring a local variable with the same name as
+an instance variable, leading to confusion.", "Integer Overflow: Adding to a
+variable that has already reached its maximum value (e.g., Integer.MAX_VALUE
++ 1)." ], "best_practices": [ "Always use meaningful variable names (e.g.,
+'interestRate' instead of 'ir').", "Use the 'final' keyword for values that
+shouldn't change (constants).", "Prefer 'double' over 'float' for better
+precision in calculations.", "Initialize variables at the point of declaration
+whenever possible.", "Always close the Scanner resource using a
+try-with-resources block or manual close() call." ],
+"frequently_asked_questions": [ { "question": "What is the difference between
+float and double?", "answer": "Float is a 32-bit single-precision type (approx 7
+decimal digits), while Double is a 64-bit double-precision type (approx 15
+decimal digits). Use double for most calculations." }, { "question": "Why do we
+need the Scanner class?", "answer": "Standard Java doesn't have a built-in
+keyword to read keyboard input; Scanner is a utility class provided by the API
+to bridge that gap." } ], "summary": "Phase 2 covered the essential syntax for
+storing data using various types and variables. We explored how to convert
+types, perform operations, and interact with users via the console.
+Understanding these basics is critical before moving to logic control.",
+"key_takeaways": [ "Primitives store values; Reference types store addresses.",
+"Local variables live on the Stack; Objects live on the Heap.", "Implicit
+casting is safe; Explicit casting requires (type) syntax.", "The '%' operator
+returns the remainder of a division.", "Scanner.nextLine() reads a whole line
+including spaces.", "Static variables belong to the class, not an object.",
+"Java is case-sensitive (Age vs age).", "Strings are objects, not primitives.",
+"The 'final' keyword creates constants.", "The JVM initializes instance
+variables to default values (0, null, false), but not local variables." ],
+"preview_of_next_topic": "In Phase 3: Control Flow, we will learn how to make
+decisions using if/else statements and repeat actions using loops.",
+"questions_and_answers": [ { "difficulty": "Easy", "question": "Explain what a
+variable is in Java.", "answer": "A variable is a container that holds data
+while a Java program is executing. It represents a named memory location where
+values can be stored and updated. Every variable must have a specific data type,
+which determines what kind of data it can hold and how much memory it occupies."
+}, { "difficulty": "Easy-Medium", "question": "What is the difference between
+Widening and Narrowing Casting?", "answer": "Widening Casting (Automatic)
+happens when you pass a smaller type to a larger type (e.g., int to double). It
+is safe because there is no chance of losing data. Narrowing Casting (Manual)
+happens when you pass a larger type to a smaller type (e.g., double to int).
+This requires an explicit cast like '(int)' because decimal data or precision
+might be lost." }, { "difficulty": "Medium", "question": "Fix the following
+code: \nint x = 10.5;\nSystem.out.println(x);", "answer": "The code fails
+because 10.5 is a double and cannot be directly stored in an int. To fix it, use
+an explicit cast: 'int x = (int) 10.5;'. This will store the value 10 in x." },
+{ "difficulty": "Medium-Hard", "question": "Write a code snippet that uses the
+Ternary operator to check if a number is even or odd.", "answer": "int num = 10;
+\nString result = (num % 2 == 0) ? "Even" : "Odd";
+\nSystem.out.println(result);" }, { "difficulty": "Medium", "question":
+"Identify the bug in this Scanner usage:\nScanner sc = new
+Scanner(System.in);\nint age = sc.nextInt();\nString name = sc.nextLine();",
+"answer": "After calling nextInt(), a 'newline' character remains in the buffer.
+nextLine() will consume that newline immediately and return an empty string for
+the name. To fix this, add an extra sc.nextLine() after sc.nextInt() to clear
+the buffer." }, { "difficulty": "Hard", "question": "Predict and explain the
+output of: System.out.println(10 + 20 + "Java" + 10 + 20);", "answer": "The
+output is '30Java1020'. Explanation: Java evaluates from left to right. 10 + 20
+(both ints) equals 30. Then, 30 + "Java" becomes a String '30Java'. Once a
+String is involved, the remaining '+' operators perform concatenation, so
+'30Java' + 10 becomes '30Java10', and then '30Java1020'." }, { "difficulty":
+"Medium", "question": "Write a program that takes a temperature in Celsius from
+the user and converts it to Fahrenheit.", "answer": "Scanner sc = new
+Scanner(System.in);\nSystem.out.print("Enter Celsius: ");\ndouble celsius =
+sc.nextDouble();\ndouble fahrenheit = (celsius * 9/5)
++ 32;\nSystem.out.println("Fahrenheit: " + fahrenheit);" }, { "difficulty":
+"Hard", "question": "Design a small implementation to calculate the area of a
+circle where the radius is provided by the user, using the Math.PI constant and
+ensuring the result is stored as an integer.", "answer": "Scanner sc = new
+Scanner(System.in);\nSystem.out.print("Enter radius: ");\ndouble r =
+sc.nextDouble();\nint area = (int) (Math.PI * r *
+r);\nSystem.out.println("Integer Area: " + area);" } ], "mcqs": [ { "question":
+"Which of these is NOT a primitive data type in Java?", "options": { "A": "int",
+"B": "boolean", "C": "String", "D": "char" }, "answer": "C" }, { "question":
+"What is the default value of an uninitialized local variable?", "options": {
+"A": "0", "B": "null", "C": "false", "D": "None; it causes a compilation error"
+}, "answer": "D" }, { "question": "What is the result of 7 % 3 in Java?",
+"options": { "A": "2", "B": "1", "C": "0.33", "D": "2.1" }, "answer": "B" }, {
+"question": "Which operator is used to compare two values for equality?",
+"options": { "A": "=", "B": "equals()", "C": "==", "D": "===" }, "answer": "C"
+}, { "question": "Predict the output: int a=5; System.out.println(a++);",
+"options": { "A": "5", "B": "6", "C": "0", "D": "Error" }, "answer": "A" }, {
+"question": "Find the bug: float f = 1.2;", "options": { "A": "Missing 'f'
+suffix for the float literal", "B": "float cannot hold decimals", "C":
+"Variables cannot be named 'f'", "D": "Missing quotes" }, "answer": "A" }, {
+"question": "Which memory area stores actual objects in Java?", "options": {
+"A": "Stack", "B": "Metaspace", "C": "Heap", "D": "Register" }, "answer": "C" },
+{ "question": "Which method is used to read a single word from the Scanner?",
+"options": { "A": "nextLine()", "B": "read()", "C": "next()", "D": "getWord()"
+}, "answer": "C" }, { "question": "Complete the code: double d = 9.8; int i =
+___ d;", "options": { "A": "(int)", "B": "int", "C": "cast", "D": "new int" },
+"answer": "A" }, { "question": "What is the best approach to store a value that
+should never change?", "options": { "A": "Use a static variable", "B": "Use the
+final keyword", "C": "Use uppercase letters only", "D": "Use a private variable"
+}, "answer": "B" } ] }

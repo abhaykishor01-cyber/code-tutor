@@ -1,0 +1,415 @@
+{
+  "metadata": {
+    "phaseNumber": 10,
+    "title": "Exception Handling",
+    "description": "Master Python's robust error-handling mechanisms, including try-except-else-finally blocks, raising exceptions, creating custom exception classes, and navigating the built-in exception hierarchy.",
+    "learningObjectives": [
+      "Understand the difference between syntax errors and runtime exceptions",
+      "Implement robust error handling using try, except, else, and finally blocks",
+      "Identify and handle common built-in exceptions in Python",
+      "Raise exceptions intentionally using the raise statement",
+      "Design and implement custom exception classes inheriting from Exception",
+      "Navigate and leverage Python's built-in exception hierarchy"
+    ],
+    "prerequisites": [
+      "Basic Python syntax and control flow",
+      "Functions and scope",
+      "Object-Oriented Programming basics (classes and inheritance)"
+    ]
+  },
+  "introduction": "In software development, errors are inevitable. Users enter invalid data, network connections drop, files go missing, and database queries fail. If these errors are left unhandled, Python terminates execution immediately and displays a traceback, resulting in a poor user experience and potential data corruption. Exception handling is the process of anticipating, detecting, and gracefully responding to these runtime errors. By mastering exception handling, you can build resilient, production-grade Python applications that degrade gracefully under failure conditions, clean up system resources, and provide clear, actionable feedback to users and administrators.",
+  "conceptExplanation": "An exception is an object representing an error that occurs during the execution of a program. When an error occurs, Python 'raises' an exception. If this exception is not 'caught' and handled, the program crashes. To manage this, Python provides a structured control flow using four keywords: 'try', 'except', 'else', and 'finally'. The 'try' block contains the code that might raise an exception. The 'except' block contains the code that executes if an exception occurs in the 'try' block. The 'else' block runs only if no exceptions were raised in the 'try' block, which is useful for code that depends on the successful execution of the 'try' block. The 'finally' block always runs, regardless of whether an exception occurred or was handled, making it the ideal place for resource cleanup (like closing files or database connections). Python organizes exceptions in a class hierarchy, with 'BaseException' at the root, and 'Exception' as the parent class for almost all standard exceptions. We can also define our own custom exceptions by inheriting from the 'Exception' class, allowing us to represent domain-specific errors in our applications.",
+  "syntax": {
+    "definition": "The standard structure of an exception handling block in Python, including custom exception definition, raising exceptions, and handling them with try-except-else-finally.",
+    "syntaxBlock": "class CustomError(Exception):\n    \"\"\"Custom exception class.\"\"\"\n    pass\n\ntry:\n    # Code that may raise an exception\n    if condition:\n        raise CustomError(\"Error message\")\nexcept CustomError as error_variable:\n    # Handle specific custom exception\n    print(error_variable)\nexcept Exception as general_error:\n    # Handle any other standard exception\n    print(general_error)\nelse:\n    # Execute if no exception was raised in the try block\n    print(\"Success!\")\nfinally:\n    # Always execute, regardless of exceptions\n    print(\"Cleanup operations\")",
+    "breakdown": [
+      {
+        "token": "class CustomError(Exception)",
+        "explanation": "Defines a new custom exception class that inherits from Python's built-in Exception class."
+      },
+      {
+        "token": "try",
+        "explanation": "Begins the block of code monitored for runtime exceptions."
+      },
+      {
+        "token": "raise",
+        "explanation": "Intentionally triggers an exception instance, stopping normal execution flow."
+      },
+      {
+        "token": "except CustomError as error_variable",
+        "explanation": "Catches a specific exception type and binds the exception object to a local variable for inspection."
+      },
+      {
+        "token": "else",
+        "explanation": "Defines a block of code that executes only if the try block completes successfully without raising any exceptions."
+      },
+      {
+        "token": "finally",
+        "explanation": "Defines a block of code that is guaranteed to execute before leaving the try-except structure, even if an exception is unhandled or a return statement is encountered."
+      }
+    ]
+  },
+  "rulesAndKeyPoints": [
+    "Never use a bare 'except:' clause; always specify the exception class (e.g., 'except Exception:' or 'except ValueError:') to avoid catching system-exiting exceptions like KeyboardInterrupt.",
+    "Exception handlers are evaluated sequentially from top to bottom. Always place more specific exception classes (subclasses) above general exception classes (parent classes).",
+    "The 'finally' block will execute even if there is a 'return', 'break', or 'continue' statement inside the 'try' or 'except' blocks.",
+    "Custom exceptions should always inherit from the built-in 'Exception' class, never directly from 'BaseException'.",
+    "The 'else' block is highly recommended because it keeps the 'try' block focused strictly on the code that might fail, preventing accidental catching of exceptions raised by code that should run only on success.",
+    "When re-raising an exception inside an except block, a bare 'raise' statement preserves the original traceback."
+  ],
+  "codeExample1": {
+    "title": "Safe Division with Input Validation",
+    "description": "A robust division function demonstrating try-except-else-finally blocks to handle division by zero and invalid data types.",
+    "code": "def safe_divide(numerator, denominator):\n    try:\n        print(f\"Attempting to divide {numerator} by {denominator}...\")\n        result = numerator / denominator\n    except ZeroDivisionError as e:\n        print(f\"[Error Handled] Cannot divide by zero. Details: {e}\")\n        result = None\n    except TypeError as e:\n        print(f\"[Error Handled] Invalid data types. Details: {e}\")\n        result = None\n    else:\n        print(\"Division completed successfully with no errors!\")\n    finally:\n        print(\"Cleaning up division operation resources.\\n\")\n    return result\n\n# Test Case 1: Successful division\nres1 = safe_divide(10, 2)\n\n# Test Case 2: Division by zero\nres2 = safe_divide(10, 0)\n\n# Test Case 3: Type mismatch\nres3 = safe_divide(10, \"two\")",
+    "expectedOutput": "Attempting to divide 10 by 2...\nDivision completed successfully with no errors!\nCleaning up division operation resources.\n\nAttempting to divide 10 by 0...\n[Error Handled] Cannot divide by zero. Details: division by zero\nCleaning up division operation resources.\n\nAttempting to divide 10 by two...\n[Error Handled] Invalid data types. Details: unsupported operand type(s) for /: 'int' and 'str'\nCleaning up division operation resources.",
+    "dryRun": [
+      {
+        "step": 1,
+        "lineNumber": 2,
+        "codeLine": "try:",
+        "state": "numerator = 10, denominator = 0",
+        "description": "The interpreter enters the try block to monitor for exceptions."
+      },
+      {
+        "step": 2,
+        "lineNumber": 4,
+        "codeLine": "result = numerator / denominator",
+        "state": "numerator = 10, denominator = 0",
+        "description": "Division by zero occurs. Python halts execution of the try block and raises a ZeroDivisionError."
+      },
+      {
+        "step": 3,
+        "lineNumber": 5,
+        "codeLine": "except ZeroDivisionError as e:",
+        "state": "e = ZeroDivisionError('division by zero')",
+        "description": "The interpreter matches the raised exception with the ZeroDivisionError handler. Execution jumps here."
+      },
+      {
+        "step": 4,
+        "lineNumber": 6,
+        "codeLine": "print(f\"[Error Handled]...\")",
+        "state": "result = None",
+        "description": "Prints the error message and assigns None to result."
+      },
+      {
+        "step": 5,
+        "lineNumber": 11,
+        "codeLine": "finally:",
+        "state": "result = None",
+        "description": "The interpreter enters the finally block, which is guaranteed to run."
+      },
+      {
+        "step": 6,
+        "lineNumber": 12,
+        "codeLine": "print(\"Cleaning up...\")",
+        "state": "result = None",
+        "description": "Prints the cleanup message, completing the try-except-finally structure."
+      }
+    ]
+  },
+  "codeExample2": {
+    "title": "Database Transaction Manager with Custom Exceptions",
+    "description": "A realistic database transaction simulator that uses custom exceptions, raises errors, and ensures connection cleanup using finally.",
+    "code": "class DatabaseConnectionError(Exception):\n    \"\"\"Raised when the database connection fails.\"\"\"\n    pass\n\nclass TransactionFailedError(Exception):\n    \"\"\"Raised when a database transaction cannot be completed.\"\"\"\n    pass\n\nclass DatabaseService:\n    def __init__(self, is_connected=True):\n        self.is_connected = is_connected\n\n    def execute_withdrawal(self, balance, amount):\n        if not self.is_connected:\n            raise DatabaseConnectionError(\"Lost connection to database server.\")\n        if amount > balance:\n            raise TransactionFailedError(f\"Insufficient funds. Balance: {balance}, Requested: {amount}\")\n        return balance - amount\n\ndef process_withdrawal(db_service, balance, amount):\n    print(\"--- Starting Transaction ---\")\n    try:\n        new_balance = db_service.execute_withdrawal(balance, amount)\n    except DatabaseConnectionError as e:\n        print(f\"[LOG] Connection Error: {e}. Retrying connection...\")\n        return None\n    except TransactionFailedError as e:\n        print(f\"[LOG] Transaction Aborted: {e}\")\n        raise  # Re-raising to let caller handle or log further\n    else:\n        print(f\"[LOG] Transaction successful. New balance: {new_balance}\")\n        return new_balance\n    finally:\n        print(\"[CLEANUP] Closing database resources and releasing locks.\")\n\n# Test Case 1: Successful Transaction\ndb = DatabaseService(is_connected=True)\nprocess_withdrawal(db, 500, 100)\n\n# Test Case 2: Insufficient Funds (Raises TransactionFailedError and re-raises)\ntry:\n    process_withdrawal(db, 500, 600)\nexcept TransactionFailedError:\n    print(\"[CALLER] Caught the re-raised TransactionFailedError.\")",
+    "expectedOutput": "--- Starting Transaction ---\n[LOG] Transaction successful. New balance: 400\n[CLEANUP] Closing database resources and releasing locks.\n--- Starting Transaction ---\n[LOG] Transaction Aborted: Insufficient funds. Balance: 500, Requested: 600\n[CLEANUP] Closing database resources and releasing locks.\n[CALLER] Caught the re-raised TransactionFailedError."
+  },
+  "memoryVisualization": {
+    "title": "Exception Propagation Stack Frame",
+    "description": "Visualizing how an exception object is created on the heap and referenced by the active stack frame during propagation.",
+    "diagramType": "stack",
+    "elements": [
+      {
+        "label": "db_service",
+        "address": "0x1001",
+        "value": "DatabaseService object",
+        "description": "Instance of DatabaseService on the heap"
+      },
+      {
+        "label": "e",
+        "address": "0x1002",
+        "value": "TransactionFailedError object",
+        "description": "Exception instance containing error message and traceback"
+      },
+      {
+        "label": "balance",
+        "address": "0x1003",
+        "value": "500",
+        "description": "Local variable in process_withdrawal stack frame"
+      },
+      {
+        "label": "amount",
+        "address": "0x1004",
+        "value": "600",
+        "description": "Local variable in process_withdrawal stack frame"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    {
+      "title": "API Gateway Request Handling",
+      "description": "In web services, API gateways use exception handling to catch network timeouts, connection failures, and bad status codes. This prevents the entire gateway from crashing and allows it to return a clean JSON error response (e.g., HTTP 503 Service Unavailable) to the client."
+    },
+    {
+      "title": "File Parser and Data Pipeline",
+      "description": "Data pipelines processing CSV or JSON files use exception handling to catch missing files (FileNotFoundError) or malformed rows (ValueError). Using a try-except-finally block ensures that file descriptors are closed properly, and malformed rows are logged to a dead-letter queue without stopping the entire pipeline."
+    }
+  ],
+  "commonMistakes": [
+    {
+      "mistake": "Using a bare except clause",
+      "wrongCode": "try:\n    value = int(input(\"Enter a number: \"))\nexcept:\n    print(\"An error occurred!\")",
+      "correctCode": "try:\n    value = int(input(\"Enter a number: \"))\nexcept ValueError as e:\n    print(f\"Invalid input: {e}\")",
+      "explanation": "A bare except clause catches all exceptions, including SystemExit and KeyboardInterrupt. This makes it impossible to terminate the program using Ctrl+C. Always catch specific exceptions."
+    },
+    {
+      "mistake": "Incorrect order of exception handlers",
+      "wrongCode": "try:\n    result = 10 / int(\"abc\")\nexcept Exception as e:\n    print(\"General Exception caught first!\")\nexcept ValueError as e:\n    print(\"ValueError caught!\")",
+      "correctCode": "try:\n    result = 10 / int(\"abc\")\nexcept ValueError as e:\n    print(\"ValueError caught!\")\nexcept Exception as e:\n    print(\"General Exception caught!\")",
+      "explanation": "Because Exception is the parent class of ValueError, the first except block will catch the ValueError, and the second block will never execute. Always place more specific exceptions first."
+    }
+  ],
+  "bestPractices": [
+    "Keep the try block as small as possible, containing only the statements that might raise the expected exception.",
+    "Always inherit custom exceptions from the built-in Exception class, not BaseException.",
+    "Use the else block for code that should only run if the try block succeeded, keeping it separate from error-prone code.",
+    "Always use finally blocks or context managers (with statements) to release external resources like files, sockets, or database connections.",
+    "Include descriptive, user-friendly error messages when raising exceptions, and log the full traceback for debugging purposes."
+  ],
+  "faqs": [
+    {
+      "question": "What is the difference between BaseException and Exception?",
+      "answer": "BaseException is the absolute root of all exceptions in Python. Exception inherits from BaseException and is the parent class for all non-system-exiting exceptions. System-exiting exceptions like KeyboardInterrupt and SystemExit inherit directly from BaseException, which is why you should always inherit custom exceptions from Exception to avoid catching system control signals."
+    },
+    {
+      "question": "Does the finally block execute if I return from the try or except block?",
+      "answer": "Yes. Python guarantees that the finally block will execute before the function returns, even if a return statement is encountered inside the try or except blocks. If the finally block itself contains a return statement, that return value will override any previous return values."
+    },
+    {
+      "question": "When should I use the else block instead of putting code inside the try block?",
+      "answer": "You should use the else block for code that must execute only if the try block succeeds, but does not itself raise the exceptions being caught. This prevents the except block from accidentally catching errors raised by the success-path code."
+    },
+    {
+      "question": "What does a bare 'raise' statement do inside an except block?",
+      "answer": "A bare 'raise' statement re-raises the active exception currently being handled. This is useful when you want to log an error or perform partial cleanup in the except block, but still want the exception to propagate up the call stack to be handled by the caller."
+    }
+  ],
+  "summary": "In this phase, you mastered Python's robust exception handling framework. You learned how to use try, except, else, and finally blocks to control program flow during runtime errors. You explored Python's built-in exception hierarchy, understood the importance of catching specific exceptions, and learned how to raise exceptions intentionally. Finally, you learned how to design and implement custom exception classes to represent domain-specific errors, ensuring your applications are resilient, maintainable, and production-ready.",
+  "keyTakeaways": [
+    "Exceptions are runtime errors that disrupt normal program execution; handling them prevents application crashes.",
+    "The try-except-else-finally structure provides complete control over error handling and resource cleanup.",
+    "The finally block is guaranteed to run, making it essential for resource management.",
+    "Custom exceptions should inherit from Exception and provide clear, domain-specific error context.",
+    "Re-raising exceptions with a bare raise statement preserves the original traceback for debugging."
+  ],
+  "previewNextTopic": "Advanced Python: Decorators, Generators, and Context Managers.",
+  "revisionPoints": [
+    "An exception is an object representing a runtime error.",
+    "The try block contains code that might raise an exception.",
+    "The except block handles specific exceptions raised in the try block.",
+    "The else block runs only if no exceptions were raised in the try block.",
+    "The finally block always runs, regardless of whether an exception occurred.",
+    "Never use bare except: clauses; always catch specific exceptions.",
+    "Exception handlers are evaluated sequentially from top to bottom.",
+    "Custom exceptions must inherit from the built-in Exception class.",
+    "The raise statement is used to manually trigger exceptions.",
+    "A bare raise statement inside an except block re-raises the caught exception."
+  ],
+  "questions": [
+    {
+      "id": "Q1",
+      "difficulty": "Easy",
+      "type": "write_program",
+      "prompt": "Write a function named 'parse_integer(s)' that takes a string 's' and attempts to convert it to an integer. If a ValueError occurs, catch it and return None. Otherwise, return the converted integer.",
+      "correctSolution": "def parse_integer(s):\n    try:\n        return int(s)\n    except ValueError:\n        return None",
+      "explanation": "The function uses a try-except block to catch ValueError. If int(s) raises a ValueError, the except block catches it and returns None. Otherwise, the converted integer is returned."
+    },
+    {
+      "id": "Q2",
+      "difficulty": "Easy",
+      "type": "write_program",
+      "prompt": "Write a program that attempts to open a file named 'data.txt' in read mode. Handle the FileNotFoundError by printing 'File not found!'. Use a finally block to print 'File operation attempted.' regardless of success or failure.",
+      "correctSolution": "try:\n    file = open('data.txt', 'r')\n    content = file.read()\n    file.close()\nexcept FileNotFoundError:\n    print('File not found!')\nfinally:\n    print('File operation attempted.')",
+      "explanation": "The try block attempts to open and read 'data.txt'. If the file does not exist, FileNotFoundError is caught and a message is printed. The finally block runs in both cases, printing the completion message."
+    },
+    {
+      "id": "Q3",
+      "difficulty": "Medium",
+      "type": "write_program",
+      "prompt": "Write a function named 'get_percentage(part, total)' that calculates the percentage of 'part' relative to 'total'. Handle ZeroDivisionError (return 0.0) and TypeError (return None) using separate except blocks.",
+      "correctSolution": "def get_percentage(part, total):\n    try:\n        return (part / total) * 100\n    except ZeroDivisionError:\n        return 0.0\n    except TypeError:\n        return None",
+      "explanation": "The function handles division by zero by returning 0.0, and handles type mismatches (e.g., passing strings) by returning None, demonstrating multiple specific except blocks."
+    },
+    {
+      "id": "Q4",
+      "difficulty": "Medium",
+      "type": "write_program",
+      "prompt": "Create a custom exception class named 'InvalidAgeError' that inherits from Exception. Write a function 'verify_age(age)' that raises 'InvalidAgeError' with the message 'Age must be between 0 and 120' if the age is less than 0 or greater than 120.",
+      "correctSolution": "class InvalidAgeError(Exception):\n    pass\n\ndef verify_age(age):\n    if age < 0 or age > 120:\n        raise InvalidAgeError(\"Age must be between 0 and 120\")\n    return True",
+      "explanation": "We define a custom exception class inheriting from Exception. In verify_age, we check the boundaries and use the raise keyword to trigger our custom exception with a descriptive message."
+    },
+    {
+      "id": "Q5",
+      "difficulty": "Medium",
+      "type": "write_program",
+      "prompt": "Write a function 'fetch_config(config_dict, key, default)' that retrieves a key from a dictionary. Use a try-except-else block. If the key is missing (KeyError), catch it and return the default value. Use the else block to return the successfully retrieved value.",
+      "correctSolution": "def fetch_config(config_dict, key, default):\n    try:\n        value = config_dict[key]\n    except KeyError:\n        return default\n    else:\n        return value",
+      "explanation": "The try block attempts to access the key. If a KeyError is raised, the except block catches it and returns the default. If no exception occurs, the else block executes and returns the retrieved value."
+    },
+    {
+      "id": "Q6",
+      "difficulty": "Hard",
+      "type": "write_program",
+      "prompt": "Create a custom exception hierarchy for a library system: define a base exception 'LibraryError', and two subclasses 'BookNotAvailableError' and 'UserBlockedError'. Write a function 'borrow_book(book_status, user_status)' that raises 'BookNotAvailableError' if book_status is 'checked_out', and 'UserBlockedError' if user_status is 'blocked'. Both exceptions must inherit from 'LibraryError'.",
+      "correctSolution": "class LibraryError(Exception):\n    pass\n\nclass BookNotAvailableError(LibraryError):\n    pass\n\nclass UserBlockedError(LibraryError):\n    pass\n\ndef borrow_book(book_status, user_status):\n    if book_status == 'checked_out':\n        raise BookNotAvailableError(\"The requested book is currently checked out.\")\n    if user_status == 'blocked':\n        raise UserBlockedError(\"The user is blocked from borrowing books.\")\n    return \"Book borrowed successfully!\"",
+      "explanation": "This demonstrates an exception hierarchy. Both specific exceptions inherit from LibraryError, which inherits from Exception. This allows callers to catch either specific errors or the general LibraryError."
+    },
+    {
+      "id": "Q7",
+      "difficulty": "Hard",
+      "type": "write_program",
+      "prompt": "Write a function 'process_data(data_list)' that iterates over a list of values. It should sum the values. If a TypeError occurs, log the error by printing 'Logging type error...' and re-raise the exception using a bare raise statement so the caller is forced to handle it.",
+      "correctSolution": "def process_data(data_list):\n    try:\n        total = 0\n        for item in data_list:\n            total += item\n        return total\n    except TypeError:\n        print(\"Logging type error...\")\n        raise",
+      "explanation": "The function catches TypeError, prints a log message, and then uses a bare 'raise' statement to re-raise the exact same TypeError up the call stack, preserving the original traceback."
+    },
+    {
+      "id": "Q8",
+      "difficulty": "Challenge",
+      "type": "write_program",
+      "prompt": "Design a robust JSON configuration loader function 'load_config(filepath)'. It should open a file, parse its JSON content, and return the dictionary. It must handle FileNotFoundError (return empty dict), json.JSONDecodeError (raise a custom 'MalformedConfigError'), and ensure the file is closed using a finally block (do not use a 'with' statement for this exercise to demonstrate explicit finally block usage). Import 'json' inside the solution.",
+      "correctSolution": "import json\n\nclass MalformedConfigError(Exception):\n    pass\n\ndef load_config(filepath):\n    file = None\n    try:\n        file = open(filepath, 'r')\n        return json.load(file)\n    except FileNotFoundError:\n        return {}\n    except json.JSONDecodeError as e:\n        raise MalformedConfigError(f\"Invalid JSON format: {e}\") from e\n    finally:\n        if file is not None:\n            file.close()",
+      "explanation": "This challenge combines file handling, JSON parsing, custom exceptions, exception chaining (raise from), and explicit resource cleanup in a finally block, ensuring the file is closed if it was successfully opened."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": 1,
+      "type": "output_prediction",
+      "question": "What is the output of the following code?\n\ndef check_val():\n    try:\n        return 1\n    finally:\n        return 2\n\nprint(check_val())",
+      "options": {
+        "A": "1",
+        "B": "2",
+        "C": "1 followed by 2",
+        "D": "SyntaxError"
+      },
+      "correctOption": "B",
+      "explanation": "The finally block is guaranteed to execute before leaving the try block. If the finally block contains a return statement, it overrides any return statement executed in the try block."
+    },
+    {
+      "id": 2,
+      "type": "find_the_bug",
+      "question": "Identify the bug in the following exception handling code:\n\ntry:\n    x = 1 / 0\nexcept Exception as e:\n    print(\"General error\")\nexcept ZeroDivisionError as e:\n    print(\"Zero division error\")",
+      "options": {
+        "A": "The except blocks are in the wrong order; ZeroDivisionError will never be caught by its specific handler.",
+        "B": "You cannot catch ZeroDivisionError using Exception.",
+        "C": "The variable 'e' cannot be reused in multiple except blocks.",
+        "D": "There is no bug; the code is perfectly valid and optimal."
+      },
+      "correctOption": "A",
+      "explanation": "Exception is the parent class of ZeroDivisionError. Since Python evaluates except blocks sequentially, the general Exception block will catch the error first, making the ZeroDivisionError block unreachable."
+    },
+    {
+      "id": 3,
+      "type": "output_prediction",
+      "question": "What is the output of the following code snippet?\n\ntry:\n    print(\"A\")\nexcept ValueError:\n    print(\"B\")\nelse:\n    print(\"C\")\nfinally:\n    print(\"D\")",
+      "options": {
+        "A": "A\nB\nD",
+        "B": "A\nC\nD",
+        "C": "A\nD",
+        "D": "A\nB\nC\nD"
+      },
+      "correctOption": "B",
+      "explanation": "The try block executes successfully without raising any exceptions, so the else block runs, followed by the finally block."
+    },
+    {
+      "id": 4,
+      "type": "complete_the_code",
+      "question": "Which of the following is the correct way to catch both ValueError and TypeError in a single except block?",
+      "options": {
+        "A": "except ValueError, TypeError:",
+        "B": "except (ValueError, TypeError):",
+        "C": "except ValueError or TypeError:",
+        "D": "except [ValueError, TypeError]:"
+      },
+      "correctOption": "B",
+      "explanation": "To catch multiple exceptions in a single except block, they must be passed as a parenthesized tuple of exception classes."
+    },
+    {
+      "id": 5,
+      "type": "output_prediction",
+      "question": "What is the output of the following code?\n\nclass MyCustomError(ValueError):\n    pass\n\ntry:\n    raise MyCustomError(\"Custom message\")\nexcept ValueError as e:\n    print(f\"Caught ValueError: {e}\")\nexcept MyCustomError as e:\n    print(f\"Caught MyCustomError: {e}\")",
+      "options": {
+        "A": "Caught MyCustomError: Custom message",
+        "B": "Caught ValueError: Custom message",
+        "C": "The program crashes with an unhandled MyCustomError.",
+        "D": "Caught ValueError: Custom message\nCaught MyCustomError: Custom message"
+      },
+      "correctOption": "B",
+      "explanation": "MyCustomError inherits from ValueError. Since the ValueError except block is defined first, it catches the exception because MyCustomError is an instance of ValueError."
+    },
+    {
+      "id": 6,
+      "type": "theory",
+      "question": "Which built-in exception class should user-defined custom exceptions inherit from?",
+      "options": {
+        "A": "BaseException",
+        "B": "Exception",
+        "C": "SystemError",
+        "D": "TypeError"
+      },
+      "correctOption": "B",
+      "explanation": "Custom exceptions should always inherit from Exception. Inheriting from BaseException is discouraged because it includes system-exiting exceptions like KeyboardInterrupt."
+    },
+    {
+      "id": 7,
+      "type": "output_prediction",
+      "question": "What is the output of the following code?\n\ntry:\n    try:\n        raise ValueError(\"Inner Error\")\n    except ValueError as e:\n        print(\"Caught Inner\")\n        raise\nexcept ValueError:\n    print(\"Caught Outer\")",
+      "options": {
+        "A": "Caught Inner",
+        "B": "Caught Inner\nCaught Outer",
+        "C": "Caught Outer",
+        "D": "The program crashes due to a double exception."
+      },
+      "correctOption": "B",
+      "explanation": "The inner except block catches the ValueError, prints 'Caught Inner', and then re-raises it using a bare 'raise'. The outer except block then catches this re-raised exception and prints 'Caught Outer'."
+    },
+    {
+      "id": 8,
+      "type": "output_prediction",
+      "question": "What happens if an exception is raised inside the 'else' block of a try-except-else-finally structure?",
+      "options": {
+        "A": "It is caught by the preceding 'except' blocks in the same structure.",
+        "B": "It is ignored and the program continues.",
+        "C": "It bypasses the 'finally' block and crashes immediately.",
+        "D": "It propagates outwards to any enclosing try-except blocks, but the local 'finally' block still executes first."
+      },
+      "correctOption": "D",
+      "explanation": "Exceptions raised in the else block are not caught by the except blocks of the same try-except structure. They propagate outwards, but the local finally block is still guaranteed to execute before propagation."
+    },
+    {
+      "id": 9,
+      "type": "theory",
+      "question": "What is the primary purpose of the 'raise' keyword in Python?",
+      "options": {
+        "A": "To terminate the program immediately without cleanup.",
+        "B": "To trigger an exception intentionally.",
+        "C": "To define a new exception class.",
+        "D": "To return a value from a generator function."
+      },
+      "correctOption": "B",
+      "explanation": "The 'raise' keyword is used to intentionally trigger an exception, stopping normal execution flow and initiating exception propagation."
+    },
+    {
+      "id": 10,
+      "type": "best_approach",
+      "question": "Why is using a bare 'except:' clause considered a bad practice in Python?",
+      "options": {
+        "A": "It causes a syntax error in Python 3.12+.",
+        "B": "It prevents the 'finally' block from executing.",
+        "C": "It catches system-interrupt signals like KeyboardInterrupt, making it difficult to stop the program with Ctrl+C.",
+        "D": "It makes the code run significantly slower."
+      },
+      "correctOption": "C",
+      "explanation": "A bare 'except:' catches BaseException, which includes KeyboardInterrupt and SystemExit. This prevents users from terminating infinite loops or stuck scripts using standard keyboard interrupts."
+    }
+  ]
+}

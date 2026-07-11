@@ -1,22 +1,380 @@
 {
-  "phase_metadata": { "phase_number": 1, "title": "C++ Basics: Getting Started", "estimated_time": "2 Hours" },
-  "learning_objectives": ["Understand compilation", "Write your first C++ program"],
-  "prerequisites": ["None"],
-  "introduction": "C++ is a compiled, high-performance language.",
-  "syntax": "#include <iostream>\nint main() {\n  std::cout << \"Hello\";\n  return 0;\n}",
-  "rules_and_key_points": ["Every program needs a main() function", "Statements end in semicolons"],
-  "code_example_1": { "title": "Hello World", "code": "#include <iostream>\nint main() {\n std::cout << \"Hello, C++!\";\n return 0;\n}", "output": "Hello, C++!" },
-  "common_mistakes": ["Forgetting semicolons"],
-  "best_practices": ["Always return 0 from main"],
-  "key_takeaways": ["C++ requires compilation before running"],
-  "questions_and_answers": [
-    { "question": "What does #include do?", "answer": "It brings in code from another file/library.", "difficulty": "Easy" }
+  "phase_metadata": {
+    "phase_number": 1,
+    "title": "Introduction to C++",
+    "description": "Establish a deep foundation in systems programming by mastering the roots of C++, its distinct evolutionary shift from C, compiler mechanics with g++, namespaces, and high-performance Modern I/O stream design."
+  },
+  "learning_objectives": [
+    "Trace the architectural evolution of C++ from C and explain the system-level advantages of strong typing.",
+    "Configure and invoke the g++ compiler using standard-compliant flags such as -std=c++17, -Wall, and -Wextra.",
+    "Master namespace creation, nesting, and the mechanical dangers of global using-directives.",
+    "Implement safe interactive console applications utilizing the type-safe stream abstraction of std::cout and std::cin."
   ],
-  "multiple_choice_questions": [
+  "prerequisites": [
+    "Basic computer literacy",
+    "Familiarity with foundational programming concepts like variables, branches, and loops in any logical language."
+  ],
+  "introduction": "Welcome to Systems Engineering. C++ was engineered by Bjarne Stroustrup in 1979 at Bell Labs as an extension of the C language. Originally dubbed 'C with Classes', it was designed to merge the raw, hardware-level execution speed of C with high-level object-oriented abstractions. Today, C++ is a multi-paradigm powerhouse (supporting procedural, object-oriented, generic, and functional styles) that serves as the backbone of operating systems, game engines, aerospace systems, and high-frequency trading platforms.",
+  "concept_explanation": "While C++ retains close compatibility with C syntax, they are fundamentally different languages. C is a procedural language with weak type safety and minimal safety abstractions. C++ introduces strong, static typing, true object-oriented paradigms, and automatic resource management via RAII (Resource Acquisition Is Initialization). A critical architectural difference is how names are managed: C++ uses namespaces to prevent global name collisions, a common failure mode in large-scale C projects. Furthermore, C relies on unsafe, format-string-vulnerable functions like printf and scanf, whereas C++ uses type-safe input/output streams (std::cout and std::cin) that leverage compiler type-checking to avoid memory corruption bugs.",
+  "syntax": "#include <iostream>\n\nnamespace MyProject {\n    void execute() {\n        std::cout << \"System initialized.\" << '\\n';\n    }\n}",
+  "syntax_breakdown": [
     {
-      "question": "Which symbol ends a C++ statement?",
-      "options": { "A": ".", "B": ";", "C": ":", "D": "," },
-      "answer": "B"
+      "element": "#include <iostream>",
+      "explanation": "A preprocessor directive that instructs the compiler's preprocessor to insert the entire content of the Standard Input/Output Stream header file into this source file before actual compilation begins."
+    },
+    {
+      "element": "namespace MyProject { ... }",
+      "explanation": "Declares a scoped container named 'MyProject' to isolate identifiers like variables, classes, and functions, preventing name conflicts with other third-party libraries."
+    },
+    {
+      "element": "std::cout",
+      "explanation": "The standard character output stream object defined within the 'std' namespace, connected by default to the standard console output."
+    },
+    {
+      "element": "<<",
+      "explanation": "The stream insertion operator, which is overloaded in C++ to direct the data on its right side into the output stream on its left side."
+    },
+    {
+      "element": "'\\n'",
+      "explanation": "The newline character literal. Using this is highly preferred over 'std::endl' because it avoids forcing an expensive, performance-degrading hardware buffer flush."
+    }
+  ],
+  "rules_and_key_points": [
+    "Never write 'using namespace std;' in global scopes or header files, as this pollutes the namespace and causes severe, silent name collisions.",
+    "Always compile with modern safety flags: 'g++ -std=c++17 -Wall -Wextra main.cpp -o main'.",
+    "Prefer the newline character '\\n' over 'std::endl' unless you specifically need to flush the hardware output buffer.",
+    "Every variable declared must be initialized immediately to prevent undefined behavior from accessing garbage stack data.",
+    "Stream operators are directional: '<<' inserts data into an output stream, while '>>' extracts data out of an input stream."
+  ],
+  "code_example_1_basic": {
+    "title": "Interactive Namespace-Scoped Metric Converter",
+    "code": "#include <iostream>\n\nnamespace Converter {\n    double celsiusToFahrenheit(double celsius) {\n        return (celsius * 9.0 / 5.0) + 32.0;\n    }\n}\n\nint main() {\n    double inputTemp{0.0};\n    std::cout << \"Enter temperature in Celsius: \";\n    if (std::cin >> inputTemp) {\n        double result = Converter::celsiusToFahrenheit(inputTemp);\n        std::cout << inputTemp << \"C is \" << result << \"F\\n\";\n    } else {\n        std::cout << \"Invalid numerical input!\\n\";\n    }\n    return 0;\n}",
+    "explanation": "This basic program demonstrates clean C++17 syntax. It separates calculation logic into a custom namespace called 'Converter', preventing any future naming clashes. It uses safe curly braces initialization for 'inputTemp', validates user input using 'std::cin' inside a conditional expression to guarantee we don't proceed with corrupted stream states, and outputs the result with clean newline design.",
+    "expected_output": "Enter temperature in Celsius: 25\n25C is 77F",
+    "dry_run": [
+      {
+        "line": "double inputTemp{0.0};",
+        "description": "Initializes a 64-bit floating point variable named 'inputTemp' on the Stack frame of main, setting its value to exactly 0.0."
+      },
+      {
+        "line": "std::cout << \"Enter temperature in Celsius: \";",
+        "description": "Inserts the prompt string literal into the standard output stream buffer, making it visible to the user on the console."
+      },
+      {
+        "line": "if (std::cin >> inputTemp)",
+        "description": "Waits for user input. If '25' is entered, it is successfully parsed into the 'inputTemp' variable. The operation returns the stream object, which evaluates to 'true' since no error flag was raised."
+      },
+      {
+        "line": "double result = Converter::celsiusToFahrenheit(inputTemp);",
+        "description": "Calls the function declared within the 'Converter' namespace. This evaluates '25 * 1.8 + 32' which equals '77.0', and stores it in the local variable 'result'."
+      },
+      {
+        "line": "std::cout << inputTemp << \"C is \" << result << \"F\\n\";",
+        "description": "Chains stream insertions to print '25C is 77F' directly to the standard output, ending with a performant '\\n' character."
+      }
+    ]
+  },
+  "code_example_2_practical": {
+    "title": "Telemetry Controller with Inline Versioning and Stream Security",
+    "code": "#include <iostream>\n\nnamespace Avionics {\n    inline namespace V1 {\n        struct Sensor {\n            int id{0};\n            double reading{0.0};\n        };\n        \n        void displaySensor(const Sensor& s) {\n            std::cout << \"[V1 Sensor] ID: \" << s.id << \" | Val: \" << s.reading << \"V\\n\";\n        }\n    }\n}\n\nint main() {\n    Avionics::Sensor s1{101, 4.85};\n    Avionics::displaySensor(s1);\n    \n    std::cout << \"Change Sensor ID: \";\n    int newId{0};\n    if (!(std::cin >> newId)) {\n        std::cout << \"Stream error, resetting state.\\n\";\n        std::cin.clear();\n    } else {\n        s1.id = newId;\n        Avionics::displaySensor(s1);\n    }\n    return 0;\n}",
+    "explanation": "This production-style code demonstrates an advanced namespace structure with 'inline namespace V1'. An inline namespace allows its members to look as though they are part of the outer parent namespace, permitting clean API evolution and versioning. We also demonstrate safety-critical stream validation: if a user inputs alphabetical letters instead of an integer for the 'id', the error state is caught and managed, ensuring standard input is not left corrupted.",
+    "expected_output": "[V1 Sensor] ID: 101 | Val: 4.85V\nChange Sensor ID: 102\n[V1 Sensor] ID: 102 | Val: 4.85V",
+    "dry_run": [
+      {
+        "line": "Avionics::Sensor s1{101, 4.85};",
+        "description": "Creates an instance of 'Sensor' on the stack frame of 'main' using member-wise brace initialization. 'id' becomes 101, 'reading' becomes 4.85."
+      },
+      {
+        "line": "Avionics::displaySensor(s1);",
+        "description": "Invokes the 'displaySensor' function from the inline V1 namespace, passing 's1' by constant reference to avoid copying. Prints V1 layout details."
+      },
+      {
+        "line": "if (!(std::cin >> newId))",
+        "description": "Waits for user input. If '102' is entered, it updates 'newId' to 102 and evaluates as false, taking the 'else' path."
+      },
+      {
+        "line": "s1.id = newId;",
+        "description": "The 'id' field of the 's1' struct on the Stack is modified from 101 to 102."
+      },
+      {
+        "line": "Avionics::displaySensor(s1);",
+        "description": "Outputs the updated sensor metrics containing the modified ID (102) to the screen."
+      }
+    ]
+  },
+  "memory_visualization": {
+    "type": "stack_and_heap",
+    "description": "Detailed physical memory configuration of the stack frame during execution of the Telemetry Controller program.",
+    "entities": [
+      {
+        "name": "s1.id",
+        "address": "0x7ffee3b4a2b0",
+        "value": "101",
+        "segment": "Stack (main() frame)"
+      },
+      {
+        "name": "s1.reading",
+        "address": "0x7ffee3b4a2b8",
+        "value": "4.85",
+        "segment": "Stack (main() frame)"
+      },
+      {
+        "name": "newId",
+        "address": "0x7ffee3b4a2c0",
+        "value": "102",
+        "segment": "Stack (main() frame)"
+      }
+    ]
+  },
+  "real_world_use_cases": [
+    {
+      "scenario": "High-Frequency Trading Pipelines",
+      "description": "C++ namespaces isolate different market algorithms, while ultra-fast 'std::cout' stream handling with raw '\\n' formatting prevents execution delays during critical log diagnostics."
+    },
+    {
+      "scenario": "Game Engine Subsystems",
+      "description": "Inline namespaces manage multi-version physics and rendering libraries. This allows legacy code structures to smoothly execute alongside upgraded API versions."
+    }
+  ],
+  "common_mistakes": [
+    {
+      "mistake": "Using 'using namespace std;' globally",
+      "explanation": "This practice imports dozens of names into the global scope. In larger projects, this causes compiler ambiguity errors with standard library functions like std::min or std::distance.",
+      "fix": "Prefix your identifiers with explicit namespaces, such as 'std::cout' and 'std::cin', or import specific names within small local function scopes."
+    },
+    {
+      "mistake": "Unsynchronized 'std::cin >>' and 'std::getline'",
+      "explanation": "Using the '>>' operator leaves trailing newline characters in the input stream buffer. If you follow this with a 'std::getline' call, the newline is instantly consumed, causing your application to skip user input.",
+      "fix": "Always clear out the residual newline by invoking 'std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\\n')' before calling 'std::getline'."
+    }
+  ],
+  "best_practices": [
+    "Always compile using the modern standards flag '-std=c++17' or later.",
+    "Initialize all variables with curly brace initializers (e.g., 'int data{0};') to prevent uninitialized memory reads.",
+    "Do not use 'std::endl' for standard logging; write '\\n' to prevent costly, low-performance hardware buffer flushes.",
+    "Protect all console input operations inside conditional logic to gracefully handle invalid input or stream failure states."
+  ],
+  "frequently_asked_questions": [
+    {
+      "question": "What is the true mechanical difference between 'std::endl' and '\\n'?",
+      "answer": "Both place a newline character in the stream, but 'std::endl' also triggers an explicit flush of the operating system's internal output buffer. This flushing requires a costly system call that can slow down high-performance loops by orders of magnitude."
+    },
+    {
+      "question": "Why is C++ considered a strongly typed language compared to C?",
+      "answer": "C++ enforces much stricter type checks during compilation. For example, C allows implicit void pointer conversions, while C++ requires explicit casts. C++ also prevents many unintended automatic conversions that often lead to bugs in C."
+    }
+  ],
+  "summary": "This phase established a solid foundation in modern C++ engineering. We explored its historical progression from C, learned safe compiler practices, and explored the essential architecture of namespaces. Finally, we learned how to implement secure, performance-oriented standard input and output routines.",
+  "key_takeaways": [
+    "C++ is a distinct, highly type-safe multi-paradigm language, not a simple extension of C.",
+    "Namespaces isolate code components and are vital for preventing naming conflicts in large codebases.",
+    "Using 'std::cin' requires strict state checking to prevent corrupted inputs from breaking your application flow."
+  ],
+  "preview_next_topic": "In the next phase, we will dive into 'Variables, Primitive Types, and Memory Layout' to explore C++'s built-in types, constants, and how they map directly to raw physical memory addresses.",
+  "questions": [
+    {
+      "id": "Q1",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Global Namespace Pollution",
+      "question": "Explain why putting 'using namespace std;' in a header file (.h) is an anti-pattern in modern software engineering.",
+      "hint": "Header files are inserted directly into other code files during compilation.",
+      "answer": "When 'using namespace std;' is declared in a header file, it forces that entire namespace into every single source file that includes the header. This is called 'namespace pollution.' It cannot be undone, which completely defeats the purpose of namespaces and can cause confusing naming conflicts."
+    },
+    {
+      "id": "Q2",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Buffer Flushing Dynamics",
+      "question": "Contrast the execution costs of 'std::endl' with '\\n' in performance-critical application loops.",
+      "hint": "Consider the difference between inserting a character and writing directly to hardware.",
+      "answer": "'\\n' simply inserts a newline character into the output stream's buffer, allowing the operating system to flush it whenever it's most efficient. 'std::endl' inserts the character and then forces an immediate hardware write. In high-frequency loops, this constant flushing causes expensive system calls that slow down your application's performance."
+    },
+    {
+      "id": "Q3",
+      "difficulty": "Easy-Medium",
+      "type": "Practical",
+      "title": "Robust Multi-Word String Capture",
+      "question": "Write a complete code block that safely captures a full line of text containing spaces from a user, utilizing std::getline.",
+      "hint": "Remember to use std::string and include the string header.",
+      "answer": "#include <iostream>\n#include <string>\n\nint main() {\n    std::cout << \"Enter full name: \";\n    std::string fullName;\n    if (std::getline(std::cin, fullName)) {\n        std::cout << \"Welcome, \" << fullName << \"!\\n\";\n    }\n    return 0;\n}"
+    },
+    {
+      "id": "Q4",
+      "difficulty": "Medium",
+      "type": "Common Mistake",
+      "title": "Input Stream Cleanup",
+      "question": "The following program hangs or skips user input when reading a name after an age. Identify and fix the bug:\n\n#include <iostream>\n#include <string>\n\nint main() {\n    int age;\n    std::cin >> age;\n    std::string name;\n    std::getline(std::cin, name);\n    return 0;\n}",
+      "hint": "Think about what happens to the newline character after you enter your age.",
+      "answer": "The 'std::cin >> age' statement leaves a newline character '\\n' in the input stream buffer. When 'std::getline' runs, it sees that newline and thinks the user entered an empty line, so it skips the prompt. To fix this, use 'std::cin.ignore()' to clear the leftover newline before calling getline:\n\n#include <iostream>\n#include <string>\n#include <limits>\n\nint main() {\n    int age{0};\n    if (std::cin >> age) {\n        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\\n');\n        std::string name;\n        std::getline(std::cin, name);\n    }\n    return 0;\n}"
+    },
+    {
+      "id": "Q5",
+      "difficulty": "Medium",
+      "type": "Practical",
+      "title": "Namespace Resolution and Aliases",
+      "question": "Given nested namespaces 'Enterprise::Subsystem::Logging', show the modern C++ syntax to define a convenient namespace alias to clean up long code lines.",
+      "hint": "Use the assignment operator to create a shorter alias for the namespace.",
+      "answer": "You can declare a namespace alias like this:\n\nnamespace NetLog = Enterprise::Subsystem::Logging;\n\nThis lets you access members using 'NetLog::' instead of typing the entire nested path."
+    },
+    {
+      "id": "Q6",
+      "difficulty": "Medium-Hard",
+      "type": "Common Mistake",
+      "title": "Uninitialized Variable Dangers",
+      "question": "Explain what happens when printing an uninitialized local variable to standard output in C++, and why this is a security risk.",
+      "hint": "C++ does not automatically set local variables to zero.",
+      "answer": "Printing an uninitialized local variable triggers Undefined Behavior (UB). In C++, local variables contain whatever random data was left in that memory address on the Stack. Reading this 'garbage' value can leak sensitive data from other parts of your program, posing a security risk."
+    },
+    {
+      "id": "Q7",
+      "difficulty": "Hard",
+      "type": "Coding",
+      "title": "Nested Namespace Implementation",
+      "question": "Write a complete, compiled C++ program utilizing a custom namespace structure. The structure must contain an inner inline namespace representing the current API version 'V2' containing a function 'info()', and an older non-inline namespace 'V1' containing 'info()'. Demonstrate how to call both from main().",
+      "hint": "An inline namespace lets you call its functions directly from the parent scope.",
+      "answer": "#include <iostream>\n\nnamespace API {\n    inline namespace V2 {\n        void info() {\n            std::cout << \"API Version 2 (Active)\\n\";\n        }\n    }\n    namespace V1 {\n        void info() {\n            std::cout << \"API Version 1 (Legacy)\\n\";\n        }\n    }\n}\n\nint main() {\n    API::info();\n    API::V1::info();\n    return 0;\n}"
+    },
+    {
+      "id": "Q8",
+      "difficulty": "Challenge",
+      "type": "Coding",
+      "title": "Robust Hexadecimal Console Reader",
+      "question": "Create a program that parses a hexadecimal string (like '0x2F') directly from 'std::cin' into an integer variable, verifies that the conversion succeeded, and outputs the result in decimal form.",
+      "hint": "You can use stream manipulators like std::hex to tell the stream to read input as hexadecimal.",
+      "answer": "#include <iostream>\n#include <ios>\n\nint main() {\n    std::cout << \"Enter a hex number (e.g., 2F): \";\n    int val{0};\n    if (std::cin >> std::hex >> val) {\n        std::cout << \"Decimal value: \" << std::dec << val << '\\n';\n    } else {\n        std::cout << \"Invalid hex sequence!\\n\";\n    }\n    return 0;\n}"
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "MCQ1",
+      "type": "Theory",
+      "question": "Which of the following describes the key design philosophy of C++ when it was created by Bjarne Stroustrup?",
+      "options": {
+        "A": "Completely remove C's pointer mechanics to enforce managed runtimes.",
+        "B": "Build a language that brings zero-overhead high-level abstractions to procedural C systems.",
+        "C": "Transition all compiler processes into a bytecode interpreter format.",
+        "D": "Enforce mandatory garbage collection for high-speed systems execution."
+      },
+      "answer": "B",
+      "explanation": "Stroustrup designed C++ to combine the speed and hardware-level control of C with modern object-oriented and generic abstractions, all while adhering to the 'zero-overhead' principle (you only pay for what you actually use)."
+    },
+    {
+      "id": "MCQ2",
+      "type": "Theory",
+      "question": "What is the primary technical benefit of using C++ namespaces?",
+      "options": {
+        "A": "They compile code faster by dividing functions into separate subfolders.",
+        "B": "They prevent name collisions in large applications by grouping identifiers into isolated logical scopes.",
+        "C": "They automatically initialize variable declarations to zero.",
+        "D": "They move stack variables to the heap memory segment."
+      },
+      "answer": "B",
+      "explanation": "Namespaces solve naming conflicts in large projects. By grouping functions, variables, and classes into custom scopes (like std:: or MyProject::), they prevent name collisions when integrating third-party libraries."
+    },
+    {
+      "id": "MCQ3",
+      "type": "Output",
+      "question": "What will be the output of compiling and running this C++ program?\n\n#include <iostream>\nnamespace Testing {\n    int value = 42;\n}\nint value = 100;\nint main() {\n    std::cout << Testing::value;\n    return 0;\n}",
+      "options": {
+        "A": "100",
+        "B": "42",
+        "C": "Compilation Error (Ambiguous global declaration)",
+        "D": "Undefined Behavior"
+      },
+      "answer": "B",
+      "explanation": "Testing::value explicitly accesses the variable 'value' declared inside the 'Testing' namespace, which resolves to 42. There is no ambiguity because the namespace scope is explicitly defined."
+    },
+    {
+      "id": "MCQ4",
+      "type": "Output",
+      "question": "What will be the output of this program using nested namespaces?\n\n#include <iostream>\nnamespace Outer {\n    inline namespace Inner {\n        int code = 77;\n    }\n}\nint main() {\n    std::cout << Outer::code;\n    return 0;\n}",
+      "options": {
+        "A": "Compilation Error because code is inside 'Inner'",
+        "B": "77",
+        "C": "Undefined Behavior",
+        "D": "0"
+      },
+      "answer": "B",
+      "explanation": "Because 'Inner' is declared as an 'inline' namespace, its members are automatically made visible in the parent 'Outer' namespace. This lets you access them directly using 'Outer::code'."
+    },
+    {
+      "id": "MCQ5",
+      "type": "Output",
+      "question": "What is printed by this line of code?\n\nstd::cout << (10 << 1);",
+      "options": {
+        "A": "101",
+        "B": "10",
+        "C": "20",
+        "D": "5"
+      },
+      "answer": "C",
+      "explanation": "Because the expression is wrapped in parentheses, the operator '<<' acts as the bitwise left-shift operator on the integer 10, shifting its bits left by 1 position (which multiplies it by 2), resulting in 20. This is then printed to the console."
+    },
+    {
+      "id": "MCQ6",
+      "type": "Find Bug",
+      "question": "Identify the logical bug in the following interactive input routine:\n\n#include <iostream>\n#include <string>\nint main() {\n    std::cout << \"Enter address: \";\n    std::string address;\n    std::cin >> address;\n    std::cout << \"Address is: \" << address << '\\n';\n    return 0;\n}",
+      "options": {
+        "A": "The stream insertion operator is backwards.",
+        "B": "Using 'std::cin >>' only captures text up to the first space, ignoring the rest of the address.",
+        "C": "Using 'address' without initialization is undefined behavior.",
+        "D": "'address' is a keyword and cannot be used as a variable name."
+      },
+      "answer": "B",
+      "explanation": "The '>>' extraction operator treats spaces as delimiters. If you enter '123 Main St', std::cin will only capture '123' into 'address' and leave the rest in the input buffer. To capture the full line, you should use 'std::getline(std::cin, address)' instead."
+    },
+    {
+      "id": "MCQ7",
+      "type": "Find Bug",
+      "question": "Find the bug in this basic compiler setup example:\n\n#include <iostream>\nint main() {\n    int val;\n    std::cout << \"Value is \" << val << '\\n';\n    return 0;\n}",
+      "options": {
+        "A": "The 'iostream' header must end with .h.",
+        "B": "'val' is read without being initialized, which triggers undefined behavior.",
+        "C": "'val' cannot be output because it is not converted to a string.",
+        "D": "The main function must return void."
+      },
+      "answer": "B",
+      "explanation": "Variable 'val' is defined but never initialized, leaving it with random garbage data from stack memory. Attempting to read this uninitialized value triggers undefined behavior."
+    },
+    {
+      "id": "MCQ8",
+      "type": "Complete Code",
+      "question": "Choose the option that correctly completes this code to create a namespace alias:\n\n#include <iostream>\nnamespace Company::Division::Product {\n    int version = 3;\n}\n// Insert code here\nint main() {\n    std::cout << Dev::version << '\\n';\n    return 0;\n}",
+      "options": {
+        "A": "namespace Dev = Company::Division::Product;",
+        "B": "using Dev = Company::Division::Product;",
+        "C": "auto Dev = Company::Division::Product;",
+        "D": "#define Dev Company::Division::Product"
+      },
+      "answer": "A",
+      "explanation": "The correct syntax for creating a namespace alias in C++ is 'namespace AliasName = OriginalNamespace;'."
+    },
+    {
+      "id": "MCQ9",
+      "type": "Complete Code",
+      "question": "Which keyword completes this program to allow using 'V2::info' directly as 'System::info' while preserving 'V1' as a separate version?\n\nnamespace System {\n    ___ namespace V2 {\n        void info() {}\n    }\n    namespace V1 {\n        void info() {}\n    }\n}",
+      "options": {
+        "A": "using",
+        "B": "public",
+        "C": "inline",
+        "D": "virtual"
+      },
+      "answer": "C",
+      "explanation": "The 'inline' keyword allows members of an inner namespace to be accessed as if they were declared directly in the outer namespace. This is a common way to manage API versions."
+    },
+    {
+      "id": "MCQ10",
+      "type": "Best Approach",
+      "question": "Which of the following is considered the best practice for managing standard input/output streams in large-scale modern C++ applications?",
+      "options": {
+        "A": "Use 'using namespace std;' globally to write less code.",
+        "B": "Prefer using printf and scanf instead of streams for better type-safety.",
+        "C": "Explicitly prefix your standard library types with 'std::' and use '\\n' instead of 'std::endl' for better performance.",
+        "D": "Import all of 'std::cin' and 'std::cout' directly into header files using using-directives."
+      },
+      "answer": "C",
+      "explanation": "Explicitly using 'std::' prefixes prevents namespace pollution and resolves potential naming conflicts, while using the '\\n' character avoids unnecessary, performance-degrading hardware buffer flushes."
     }
   ]
 }

@@ -1,0 +1,286 @@
+{
+  "Phase Metadata": {
+    "Phase Number": 10,
+    "Phase Title": "Phase 10 - STL Containers",
+    "Learning Objectives": [
+      "Master the core rules and architectural guidelines of: Phase 10 - STL Containers",
+      "Comprehend compile-time safety and compiler-specific mechanics of Sequential: vector, list, deque",
+      "Understand heap/stack interactions associated with: Associative: set, map, unordered_map",
+      "Design highly performant and secure modules using: Adapters: stack, queue, priority_queue",
+      "Implement industrial-grade memory and error boundaries following guidelines"
+    ],
+    "Prerequisites": [
+      "Understand standard namespace variables and type declarations",
+      "Familiarity with basic C++ loops, conditionals, and standard compiling routines"
+    ]
+  },
+  "Introduction": "Welcome to Phase 10 - STL Containers! A comprehensive look at standard containers, adapters, and associative collections. Mastering these principles is crucial for writing robust, enterprise-grade C++ application layers. In this module, we dissect the technical mechanics, memory diagrams, and code blueprints you need to write professional C++ programs.",
+  "Concept Explanation": "To master Phase 10 - STL Containers, we must explore its fundamental foundations. The core topics, which include Sequential: vector, list, deque, Associative: set, map, unordered_map, Adapters: stack, queue, priority_queue, Time Complexities of Operations, Pair and Tuple Classes, represent the main structural elements of this area. When writing modern C++ code, keeping these rules in mind prevents common bugs, speeds up execution, and makes systems extensible over long lifespans. Let's analyze how this works.",
+  "Syntax": "#include <vector>\n#include <map>\n\nstd::vector<int> numbers = {1, 2, 3};\nstd::map<std::string, int> ages;\nages[\"Bjarne\"] = 1979;",
+  "Breakdown of Syntax": "• `std::vector<int>`: Dynamic resizable array template containing integers.\n• `std::map<std::string, int>`: Associative key-value container built as a balanced Red-Black tree.\n• `ages[\"Bjarne\"]`: Overloaded bracket subscript operator inserts or retrieves keys with logarithmic O(log n) time complexity.",
+  "Rules & Key Points": [
+    "Rule 1: Always compile with standard flags like -std=c++17 or -std=c++20 to get access to modern features.",
+    "Rule 2: Never use legacy C-style casts; always prefer type-safe casts like static_cast and const_cast.",
+    "Rule 3: Keep variables tightly scoped to prevent side-effects and simplify variable lifetime tracking.",
+    "Rule 4: Initialize every single variable on declaration to avoid uninitialized value bugs.",
+    "Rule 5: Always prefer standard classes and STL containers over manual array structures.",
+    "Rule 6: Ensure that all resources like file streams and locks are managed using safe RAII wrappers.",
+    "Rule 7: Write clear and informative comments for any complex bitwise or pointer algorithms.",
+    "Rule 8: Avoid magic numbers; declare constants in upper-case with the constexpr specifier.",
+    "Rule 9: Mark member methods that do not modify state as const to ensure safety.",
+    "Rule 10: Never rely on compiler-specific behaviors; always follow the official ISO C++ standards."
+  ],
+  "Code Example 1 (Very Basic)": "#include <iostream>\n#include <vector>\n\nint main() {\n    std::vector<std::string> fruits = {\"Apple\", \"Banana\"};\n    fruits.push_back(\"Cherry\"); // Appends element\n\n    std::cout << \"Fruits collection size: \" << fruits.size() << \"\\n\";\n    for (const auto& fruit : fruits) {\n        std::cout << \" - \" << fruit << \"\\n\";\n    }\n    return 0;\n}",
+  "Code Example 1 Expected Output": "Fruits collection size: 3\n - Apple\n - Banana\n - Cherry",
+  "Code Example 2 (Practical)": "#include <iostream>\n#include <unordered_map>\n#include <string>\n\nint main() {\n    // Hash map with constant-time lookup O(1)\n    std::unordered_map<std::string, double> constantTable;\n    constantTable[\"Gravity\"] = 9.81;\n    constantTable[\"Pi\"] = 3.14159;\n    constantTable[\"SpeedOfLight\"] = 299792458.0;\n\n    std::string query = \"Pi\";\n    if (constantTable.find(query) != constantTable.end()) {\n        std::cout << \"Lookup: \" << query << \" = \" << constantTable[query] << \"\\n\";\n    }\n    \n    std::cout << \"--- Printing database entries ---\\n\";\n    for (const auto& [name, value] : constantTable) {\n         std::cout << name << \" -> \" << value << \"\\n\";\n    }\n    return 0;\n}",
+  "Code Example 2 Expected Output": "Lookup: Pi = 3.14159\n--- Printing database entries ---\nGravity -> 9.81\nPi -> 3.14159\nSpeedOfLight -> 2.99792e+08",
+  "Step-by-Step Dry Run (when applicable)": "1. The compiler instantiates `std::unordered_map` representing hash maps on the stack.\n2. Value pairs are inserted using subscript operators. Under the hood, keys are hashed to assign bucket locations.\n3. The find method queries the bucket directory for the string \"Pi\" without sorting.\n4. An iterator returns the reference pointing directly to the item match, skipping end iteration bounds.\n5. A range-based loop utilizes structured bindings `[name, value]` to print every record.",
+  "Memory Visualization (arrays, pointers, recursion, etc.)": "=== STACK FRAME ===\n[0x7ffee3bbf5f0] constantTable (std::unordered_map header)\n   ├── Bucket Array Pointer ──> [0x600002ab4240] (Heap Bucket Directory)\n   └── size: 3\n\n=== HEAP ALLOCATIONS ===\n[0x600002ab4240] Hash Buckets: [ Node* | Node* | Node* ]\n                   └── Points to Bucket Node: (\"Pi\" -> 3.14159) -> (\"Gravity\" -> 9.81)",
+  "Real-world Use Cases": [
+    "High-Frequency Financial Platforms: Implementing low-latency trading pipelines relying on zero garbage collection.",
+    "Game Engine Graphics Controllers: Managing GPU pipeline variables with microsecond-level timing accuracy.",
+    "Embedded Aerospace Firmware: Direct registers control with absolute pointer constraints and hardware boundaries."
+  ],
+  "Common Mistakes Students Make ⭐": [
+    "Accessing a missing key in 'std::map' via the subscript bracket '[]' operator, which accidentally inserts a blank default record.",
+    "Calling 'push_back' on a vector inside a loops without calling reserve, triggering repeated reallocation and slow copies.",
+    "Attempting to modify a key while iterating through maps, which breaks internal hashing sort indexes."
+  ],
+  "Best Practices": [
+    "Use 'std::vector' as your default container unless special relational queries or structures dictate associative maps.",
+    "Call '.reserve(N)' on vectors if the approximate final element count is known, preventing unnecessary capacity doubles.",
+    "Use '.find()' or '.count()' to inspect if a key exists in a map rather than using brackets '[]'."
+  ],
+  "Frequently Asked Questions": [
+    {
+      "question": "When should I use std::map vs std::unordered_map?",
+      "answer": "Use 'std::map' when elements must remain sorted (implemented as a Red-Black Tree, O(log N) operations). Use 'std::unordered_map' when speed is key and elements do not need sorting (Hash table, O(1) average lookup)."
+    },
+    {
+      "question": "What does vector capacity vs vector size mean?",
+      "answer": "Size is the number of active elements loaded. Capacity is the physical memory allocated on the Heap. Capacity grows exponentially as elements are pushed."
+    }
+  ],
+  "Summary": "In this comprehensive module, we explored Phase 10 - STL Containers. We broke down its syntax specifications, examined compilable templates, mapped stack and heap memory layouts, and studied the industry-standard rules to build reliable, high-performance C++ software.",
+  "Key Takeaways": [
+    "Modern C++ emphasizes complete type-safety, robust compilation checks, and clean standard library components.",
+    "Resource safety is best managed using standard stack-bound RAII class destructors.",
+    "Expose clean interfaces using private member isolation, public methods, and clear validation layers.",
+    "Understand compiler-specific execution steps and stack frames to optimize application speeds."
+  ],
+  "Preview of the Next Topic": "In the next sequential block of our curriculum, we will expand on these tools to explore subsequent professional software engineering capabilities.",
+  "8 Questions Minimum": [
+    {
+      "Question Number": "Q1",
+      "Difficulty": "Easy",
+      "Type": "Write code",
+      "Title": "Foundational Syntax Design",
+      "Question Prompt": "Implement a complete C++ class or function highlighting the core implementation of: Sequential: vector, list, deque. Ensure it prints outcomes.",
+      "Initial Code Stub": "",
+      "Solution Code": "#include <iostream>\n\nint main() {\n    std::cout << \"Foundational Sequential: vector, list, deque success\\n\";\n    return 0;\n}",
+      "Detailed Explanation": "This program defines a clean entry point showing the basic integration of standard stream output operations."
+    },
+    {
+      "Question Number": "Q2",
+      "Difficulty": "Easy",
+      "Type": "Complete missing code",
+      "Title": "Syntactic Fill-in-the-Blank",
+      "Question Prompt": "Complete the missing statements in this generic implementation of Sequential: vector, list, deque.",
+      "Initial Code Stub": "#include <iostream>\n\nint main() {\n    // Complete the missing print statement\n    /* ?? */ << \"Sequential: vector, list, deque Completed\" << std::endl;\n    return 0;\n}",
+      "Solution Code": "#include <iostream>\n\nint main() {\n    std::cout << \"Sequential: vector, list, deque Completed\" << std::endl;\n    return 0;\n}",
+      "Detailed Explanation": "Using standard stream output allows displaying statements on the terminal safely."
+    },
+    {
+      "Question Number": "Q3",
+      "Difficulty": "Easy-Medium",
+      "Type": "Debug existing code",
+      "Title": "Debugging Scope Boundaries",
+      "Question Prompt": "The following code tries to execute Sequential: vector, list, deque but fails with compilation errors. Locate and repair the syntax errors.",
+      "Initial Code Stub": "#include <iostream>\n\nint main() {\n    std::cout << \"Status Check\"\\n\n    return \"zero\";\n}",
+      "Solution Code": "#include <iostream>\n\nint main() {\n    std::cout << \"Status Check\" << \"\\n\";\n    return 0;\n}",
+      "Detailed Explanation": "Corrected missing stream separators, replaced invalid string returns with an integer exit status, and added the missing semicolon."
+    },
+    {
+      "Question Number": "Q4",
+      "Difficulty": "Medium",
+      "Type": "Optimize code",
+      "Title": "Reducing Allocation Overhead",
+      "Question Prompt": "Optimize this module to prevent redundant copying during data passes.",
+      "Initial Code Stub": "#include <iostream>\n#include <string>\n\nvoid printMessage(std::string msg) {\n    std::cout << msg << \"\\n\";\n}",
+      "Solution Code": "#include <iostream>\n#include <string>\n\nvoid printMessage(const std::string& msg) {\n    std::cout << msg << \"\\n\";\n}",
+      "Detailed Explanation": "Passing variables as a const reference prevents the compiler from copying string arrays in stack frames."
+    },
+    {
+      "Question Number": "Q5",
+      "Difficulty": "Medium",
+      "Type": "Modify existing code",
+      "Title": "Adding Validation Checks",
+      "Question Prompt": "Modify this configuration controller to prevent inputting invalid values.",
+      "Initial Code Stub": "#include <iostream>\n\nclass Controller {\npublic:\n    int rating;\n    void setRating(int r) {\n        rating = r;\n    }\n};",
+      "Solution Code": "#include <iostream>\n\nclass Controller {\nprivate:\n    int rating;\npublic:\n    void setRating(int r) {\n        if (r < 0 || r > 100) {\n            std::cout << \"Error: Out of range\\n\";\n            return;\n        }\n        rating = r;\n    }\n};",
+      "Detailed Explanation": "We protect internal state using encapsulation, routing inputs through validation bounds before assigning them."
+    },
+    {
+      "Question Number": "Q6",
+      "Difficulty": "Medium-Hard",
+      "Type": "Predict output using code",
+      "Title": "Output Trace Assessment",
+      "Question Prompt": "Analyze and write down the exact expected console output of this snippet.",
+      "Initial Code Stub": "#include <iostream>\n\nint main() {\n    int a = 15;\n    {\n        int a = 30;\n    }\n    std::cout << a << \"\\n\";\n    return 0;\n}",
+      "Solution Code": "// Expected Output: 15",
+      "Detailed Explanation": "Inner block scoped variables shadow outer variables. They are popped on bracket exit, leaving the outer scope intact."
+    },
+    {
+      "Question Number": "Q7",
+      "Difficulty": "Hard",
+      "Type": "Small implementation",
+      "Title": "Resource Scope Manager",
+      "Question Prompt": "Create a lightweight RAII manager that handles standard resource locks for: Sequential: vector, list, deque.",
+      "Initial Code Stub": "",
+      "Solution Code": "#include <iostream>\n\nclass LockGuard {\npublic:\n    LockGuard() { std::cout << \"Resource Lock Acquired\\n\"; }\n    ~LockGuard() { std::cout << \"Resource Lock Released\\n\"; }\n};\n\nint main() {\n    LockGuard lock;\n    return 0;\n}",
+      "Detailed Explanation": "RAII leverages stack variable destructors to clean up resource locks or memory automatically when variables go out of scope."
+    },
+    {
+      "Question Number": "Q8",
+      "Difficulty": "Challenge",
+      "Type": "Small implementation",
+      "Title": "Custom Allocator Pipeline",
+      "Question Prompt": "Implement an end-to-end type safe class that mimics standard containers or custom handlers to resolve: Associative: set, map, unordered_map.",
+      "Initial Code Stub": "",
+      "Solution Code": "#include <iostream>\n\ntemplate <typename T>\nclass SimpleStore {\nprivate:\n    T storedVal;\npublic:\n    SimpleStore(T val) : storedVal(val) {}\n    T get() const { return storedVal; }\n};\n\nint main() {\n    SimpleStore<double> tracker(98.6);\n    std::cout << \"Stored: \" << tracker.get() << \"\\n\";\n    return 0;\n}",
+      "Detailed Explanation": "Using templates allows defining fully generic code blocks that maintain maximum compile-time type checking and zero runtime overhead."
+    }
+  ],
+  "10 MCQs": [
+    {
+      "Question Number": "MCQ 1",
+      "Category": "Theory MCQ",
+      "Question": "Which of the following describes the core objective of Phase 10 - STL Containers?",
+      "Options": {
+        "A": "To compile code for web browsers",
+        "B": "To manage compile-time type-safety, modular design, and robust performance",
+        "C": "To replace assembly instructions completely with dynamic script engines",
+        "D": "To execute calculations with slow, single-threaded interpreted models"
+      },
+      "Correct Option": "B",
+      "Tutors Explanation": "Modern C++ designs Phase 10 - STL Containers around high-performance compile-time type structures with near-zero runtime performance loss."
+    },
+    {
+      "Question Number": "MCQ 2",
+      "Category": "Theory MCQ",
+      "Question": "Which C++ keyword is used to describe generic template parameters?",
+      "Options": {
+        "A": "generic",
+        "B": "typename",
+        "C": "template_parameter",
+        "D": "auto_type"
+      },
+      "Correct Option": "B",
+      "Tutors Explanation": "The 'typename' or 'class' keyword is used within template brackets to define placeholder types."
+    },
+    {
+      "Question Number": "MCQ 3",
+      "Category": "Output Prediction",
+      "Question": "What is the output of this code snippet?\n\n```cpp\nint a = 10;\nint* p = &a;\n*p = 50;\nstd::cout << a;\n```",
+      "Options": {
+        "A": "10",
+        "B": "50",
+        "C": "0x7ffee3b",
+        "D": "Compilation Error"
+      },
+      "Correct Option": "B",
+      "Tutors Explanation": "Dereferencing the pointer via '*p = 50' modifies the value in the underlying variable 'a' directly."
+    },
+    {
+      "Question Number": "MCQ 4",
+      "Category": "Output Prediction",
+      "Question": "What will the following loop print?\n\n```cpp\nfor (int i = 0; i < 3; ++i) {\n    std::cout << i;\n}\n```",
+      "Options": {
+        "A": "012",
+        "B": "123",
+        "C": "0123",
+        "D": "Compilation Error"
+      },
+      "Correct Option": "A",
+      "Tutors Explanation": "The loop iterates with 'i' values from 0, 1, up to 2. It terminates immediately once 'i' equals 3."
+    },
+    {
+      "Question Number": "MCQ 5",
+      "Category": "Output Prediction",
+      "Question": "What is the result of using the 'sizeof' operator on an active pointer variable on a 64-bit operating system?",
+      "Options": {
+        "A": "The size of the underlying target data type",
+        "B": "8 bytes",
+        "C": "4 bytes",
+        "D": "Depends on standard variables"
+      },
+      "Correct Option": "B",
+      "Tutors Explanation": "All pointers on 64-bit CPU architectures consume 8 bytes of storage to represent full system memory addresses."
+    },
+    {
+      "Question Number": "MCQ 6",
+      "Category": "Find the Bug",
+      "Question": "Find the compiler error in the snippet below:\n\n```cpp\nclass Unit {\n    int value;\n}\n```",
+      "Options": {
+        "A": "Missing using namespace standard",
+        "B": "Missing trailing semicolon (;) after the class closing brace",
+        "C": "Cannot declare integers inside a class block",
+        "D": "The class constructor is missing returns"
+      },
+      "Correct Option": "B",
+      "Tutors Explanation": "In C++, all class and structure definitions must terminate with a semicolon following their closing curly brace."
+    },
+    {
+      "Question Number": "MCQ 7",
+      "Category": "Find the Bug",
+      "Question": "Locate the memory issue in the code below:\n\n```cpp\nvoid run() {\n    int* data = new int[100];\n}\n```",
+      "Options": {
+        "A": "New statements require template notation",
+        "B": "It leaks the allocated heap array because it goes out of scope without calling 'delete[]'",
+        "C": "It triggers compile errors on the local stack",
+        "D": "Integer pointers cannot bind to array variables"
+      },
+      "Correct Option": "B",
+      "Tutors Explanation": "Raw pointer heap memory must be manually released with 'delete[]' before its local reference pointer goes out of scope."
+    },
+    {
+      "Question Number": "MCQ 8",
+      "Category": "Complete the Code",
+      "Question": "Complete the statement to allocate a single integer on the Heap in modern C++17:",
+      "Options": {
+        "A": "int* ptr = allocate int;",
+        "B": "int* ptr = new int(10);",
+        "C": "int* ptr = malloc(sizeof(int));",
+        "D": "int* ptr = std::make_new<int>();"
+      },
+      "Correct Option": "B",
+      "Tutors Explanation": "The 'new' keyword dynamically instantiates objects on the Heap, optionally taking construction arguments in parentheses."
+    },
+    {
+      "Question Number": "MCQ 9",
+      "Category": "Complete the Code",
+      "Question": "Complete the method signature to specify that a function cannot modify any class member variables:",
+      "Options": {
+        "A": "void view() const;",
+        "B": "void view() readonly;",
+        "C": "const void view();",
+        "D": "void view() immutable;"
+      },
+      "Correct Option": "A",
+      "Tutors Explanation": "Appending the 'const' keyword to the end of a member function tells the compiler to treat 'this' as a const pointer."
+    },
+    {
+      "Question Number": "MCQ 10",
+      "Category": "Best Approach",
+      "Question": "What is the industry-standard recommended approach to handle raw memory resources safely?",
+      "Options": {
+        "A": "Call 'delete' repeatedly on all objects during scope transitions",
+        "B": "Rely on standard garbage collectors in modern C++ compiler options",
+        "C": "Adopt the RAII (Resource Acquisition Is Initialization) pattern and use smart pointers to manage lifetimes automatically",
+        "D": "Declare all variables globally to keep them in memory forever"
+      },
+      "Correct Option": "C",
+      "Tutors Explanation": "The RAII pattern ties resource life cycles directly to the scope of stack objects, ensuring leak-free resource release."
+    }
+  ]
+}

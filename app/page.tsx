@@ -426,16 +426,81 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="card glass p-12 text-center">
-        <h2 className="text-3xl font-bold">Ready to start your first phase?</h2>
-        <p className="text-white/60 mt-3 max-w-md mx-auto">
-          It&apos;s free, it&apos;s locked step-by-step, and your first certificate is closer than you think.
-        </p>
-        <Link href={`/${LANGUAGES[0].id}`} className="btn-primary text-base px-7 py-3 mt-6 inline-flex">
-          Start Learning Free →
-        </Link>
-      </section>
+      {/* FINAL CTA */}
+<section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.04] via-white/[0.03] to-gold-500/10 px-8 py-16 text-center shadow-2xl backdrop-blur md:px-16">
+
+  {/* Background Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,215,0,0.12),transparent_60%)]" />
+
+  <div className="relative">
+
+    <span className="inline-flex items-center rounded-full border border-gold-500/20 bg-gold-500/10 px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.2em] text-gold-300">
+      Start Your Journey
+    </span>
+
+    <h2 className="mx-auto mt-6 max-w-4xl text-4xl font-extrabold tracking-tight leading-tight md:text-5xl">
+      Build real programming skills,
+      <br />
+      <span className="text-gold-400">
+        one unlocked phase at a time.
+      </span>
+    </h2>
+
+    <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/65">
+      Follow structured learning paths, practice real coding problems,
+      complete quizzes, unlock every phase, and earn professional
+      certificates as you master each programming language.
+    </p>
+
+    {/* Highlights */}
+
+    <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm text-white/70">
+
+      <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2">
+        ✓ Structured Learning
+      </div>
+
+      <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2">
+        ✓ Real Coding Practice
+      </div>
+
+      <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2">
+        ✓ Progress Tracking
+      </div>
+
+      <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2">
+        ✓ Course Certificates
+      </div>
+
+    </div>
+
+    {/* Buttons */}
+
+    <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
+
+      <Link
+        href={`/${LANGUAGES[0].id}`}
+        className="btn-primary px-8 py-3 text-base transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      >
+        Start Learning Free →
+      </Link>
+
+      <Link
+        href="/dashboard"
+        className="btn-secondary px-8 py-3 text-base transition-all duration-300 hover:-translate-y-1"
+      >
+        View Dashboard
+      </Link>
+
+    </div>
+
+    <p className="mt-8 text-sm text-white/45">
+      No subscriptions. No hidden costs. Learn at your own pace.
+    </p>
+
+  </div>
+
+</section>
 
       {/* FOOTER */}
       <footer className="border-t border-white/10 pt-8 pb-4 text-sm text-white/40 flex flex-col sm:flex-row justify-between gap-4">

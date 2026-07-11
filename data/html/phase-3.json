@@ -1,0 +1,156 @@
+{ "phase_metadata": { "phase_number": 3, "title": "HTML Lists and Tables",
+"description": "Organizing data into structured lists and presenting complex
+information using semantic tables.", "estimated_time": "3 Hours" },
+"learning_objectives": [ "Differentiate between unordered, ordered, and
+description lists", "Create complex multi-level nested lists", "Construct data
+tables using tr, th, and td tags", "Merge table cells using colspan and rowspan
+attributes", "Implement semantic table structures with thead, tbody, and tfoot"
+], "prerequisites": [ "Understanding of basic HTML tags (Phase 1)", "Knowledge
+of parent-child nesting in HTML" ], "introduction": "Raw text is hard to read.
+To make information digestible, we use lists for steps or items and tables for
+data. This phase teaches you how to group related items together and how to
+build grid-like structures to display schedules, pricing, or data comparisons.",
+"concept_explanation": { "unordered_lists": "Used for a collection of items
+where the order doesn't matter. By default, browsers display these with bullet
+points.", "ordered_lists": "Used when the sequence is important (like a recipe).
+Browsers automatically number these items.", "description_lists": "A list of
+terms and their corresponding descriptions. It uses a specific trio of tags: dl
+(list), dt (term), and dd (description).", "tables": "Tables organize data into
+rows and columns. A table is built row-by-row (tr), and each row contains header
+cells (th) or data cells (td).", "spanning": "Sometimes a cell needs to stretch
+across multiple columns (colspan) or multiple rows (rowspan). This is essential
+for complex layouts.", "table_semantics": "Modern HTML uses thead, tbody, and
+tfoot to group rows. This helps screen readers and allows browsers to keep
+headers visible when printing long tables." }, "syntax": { "unordered_list": "\n
+Item\n", "ordered_list": "\n First\n", "description_list": "\n Term\n
+Description\n", "table_structure": "\n \n Header\n Data\n \n" },
+"breakdown_of_syntax": { "ul_ol": "The container for the list items.", "li":
+"List Item. This is the only valid direct child of a  or .", "tr": "Table Row. A
+container for cells within a horizontal line.", "th": "Table Header. Defines a
+header cell, usually bold and centered by default.", "td": "Table Data. Defines
+a standard data cell.", "colspan": "Attribute on  or  to merge columns
+horizontally.", "rowspan": "Attribute on  or  to merge rows vertically." },
+"rules_and_key_points": { "rule_1": "The  tag must always be inside a  or .",
+"rule_2": "Do not put text directly inside a  or ; it must be inside an .",
+"rule_3": "Ordered lists can use the 'type' attribute (1, A, a, I, i) to change
+numbering styles.", "rule_4": "Description lists () can have multiple  tags for
+a single .", "rule_5": "A  must contain at least one .", "rule_6": "The  tag is
+for labels/headers;  is for the actual values.", "rule_7": "Attributes like
+colspan and rowspan take a numeric value (e.g., colspan='2').", "rule_8": "Table
+cells must always be placed inside a .", "rule_9": "thead, tbody, and tfoot must
+appear in that specific order in your code (though browsers are forgiving).",
+"rule_10": "Tables should be used for tabular data, not for building page
+layouts (use Flexbox/Grid for layouts instead)." }, "code_example_1": { "title":
+"Nested Lists and Descriptions", "description": "Demonstrating an ordered list
+containing an unordered list and a description list.", "code": "Grocery Shopping
+Strategy\n\n Fruits\n \n Apples\n Bananas\n \n \n Dairy\n\n\nWeb Terms\n\n
+HTML\n The structure of the web.\n CSS\n The style of the web.\n" },
+"code_example_2": { "title": "Semantic Table with Cell Spanning", "description":
+"A complex table showing student grades with merged cells and semantic
+sections.", "code": "<table border="1">\n \n \n Student\n <th
+colspan="2">Subjects & Grades\n \n \n \n \n <td rowspan="2">John Doe\n Math\n
+A\n \n \n Science\n B\n \n \n \n \n <td colspan="2">Average\n B+\n \n \n" },
+"output": "Example 1 displays a numbered list where item 1 has sub-bullets,
+followed by a list of terms and definitions. Example 2 displays a table with a
+border; the top header spans two columns, John Doe's name spans two rows next to
+his subjects, and the footer shows the average across the bottom.",
+"step_by_step_dry_run": [ "Browser reads  and starts a grid context.", "The 
+section is processed;  Student is drawn in col 1, then Subject & Grades is drawn
+stretching across col 2 and 3 because of colspan='2'.", "Inside , the first  is
+read. 'John Doe' is placed in col 1, but rowspan='2' tells the browser to
+reserve the space in the next row's col 1 as well.", "The next two  tags fill
+col 2 and 3 of the current row.", "The second  is read. Since col 1 is already
+taken by John's rowspan, the first  of this row is placed directly into col 2.",
+"Finally,  is rendered with 'Average' spanning two columns followed by the final
+grade." ], "memory_visualization": "Visualize a Table as a Coordinate
+System:\nRow 1: [1,1] [1,2] [1,3]\nRow 2: [2,1] [2,2] [2,3]\nColspan='2' merges
+[1,2] and [1,3] into one big cell.\nRowspan='2' merges [1,1] and [2,1] into one
+tall cell.", "real_world_use_cases": [ "Creating a 'Table of Contents' for a
+blog post using nested lists.", "Displaying a weekly school or work schedule.",
+"Comparison tables for pricing plans (Basic vs. Pro).", "Defining technical
+terms in a glossary section.", "Building navigation menus (traditionally done
+using  and )." ], "common_mistakes": [ "Putting content like  or  as a direct
+child of  instead of inside .", "Forgetting to wrap  tags inside a , which
+causes rendering chaos.", "Miscalculating colspan/rowspan values, leading to
+tables that look 'broken' or misaligned.", "Using tables for general layout
+(like positioning a sidebar), which is bad for accessibility.", "Not including 
+for header cells, which makes tables hard for screen readers to navigate." ],
+"best_practices": [ "Use , , and  for better accessibility and SEO.", "Always
+use  for table headers instead of just styling  with bold text.", "Keep nesting
+levels in lists reasonable (usually no more than 3 levels deep).", "Add a
+'scope' attribute to  (e.g., ) to help assistive technologies.", "Use CSS to add
+padding and borders to tables rather than the old 'border' attribute." ],
+"faqs": [ { "question": "Can I put a table inside a list?", "answer": "Yes, you
+can put almost any HTML element inside an , including another list or a table."
+}, { "question": "What is the difference between  and ?", "answer": " is for a
+simple bulleted list.  is for a dictionary-style list where you have a term and
+an explanation for that term." } ], "summary": "In Phase 3, we explored the two
+main ways to organize content: Lists and Tables. We learned how to handle nested
+sequences, how to define terms using description lists, and how to construct
+robust, semantic tables that can handle complex row and column merging.",
+"key_takeaways": [ " is for bulleted lists;  is for numbered lists.", " is the
+mandatory container for list content.", " uses  for terms and  for
+descriptions.", "Tables are built row-by-row using .", " is for headers;  is for
+standard data.", "colspan merges cells horizontally across columns.", "rowspan
+merges cells vertically across rows.", "The thead, tbody, and tfoot tags group
+table sections semantically.", "Tables must only be used for tabular data, not
+page layout.", "Proper nesting is key to valid HTML in both lists and tables."
+], "preview_next_topic": "In Phase 4, we will dive into HTML Forms—the primary
+way users interact with websites by entering data, sending messages, and
+creating accounts.", "questions_and_answers": [ { "question": "What is the
+primary semantic difference between  and ?", "answer": "The primary difference
+is intent:  (Unordered List) implies the order of items is irrelevant, while 
+(Ordered List) implies a specific sequence or hierarchy where the position of an
+item matters.", "difficulty": "Easy Concept" }, { "question": "When would you
+choose a Description List () over an Unordered List ()?", "answer": "You should
+use a Description List when you have a set of 'key-value' pairs, such as a
+glossary of terms, a metadata list (e.g., Author: Name), or a list of FAQ
+questions and answers, where each item has a specific label and associated
+content.", "difficulty": "Moderate Concept" }, { "question": "Write the HTML
+code for an ordered list that starts at the number 5 and uses Roman numerals.",
+"answer": "<ol type="I" start="5">\n Fifth item\n Sixth item\n", "difficulty":
+"Moderate Practical" }, { "question": "Create a table row with three cells: the
+first cell should span 2 rows, and the second cell should span 3 columns.",
+"answer": "\n <td rowspan="2">Spans 2 Rows\n <td colspan="3">Spans 3 Columns\n
+Normal Cell\n", "difficulty": "Hard Practical" }, { "question": "Identify the
+error in this code: Data 1Data 2", "answer": "The  tags are not wrapped in a 
+(Table Row) tag. In HTML, table data cells must always be immediate children of
+a row.", "difficulty": "Moderate Mistake" }, { "question": "A student wants to
+merge 3 columns in the header. They wrote . Why is this wrong?", "answer": "The
+'rowspan' attribute merges cells vertically across rows. To merge columns
+horizontally, they must use the 'colspan' attribute (e.g., ).", "difficulty":
+"Hard Mistake" }, { "question": "Write a 3x2 table (3 rows, 2 columns) where the
+first row contains header cells.", "answer": "\n \n Header 1\n Header 2\n \n \n
+Row 2, Col 1\n Row 2, Col 2\n \n \n Row 3, Col 1\n Row 3, Col 2\n \n",
+"difficulty": "Moderate Coding" }, { "question": "Create a nested list
+representing a menu: 'Coffee' (with sub-items 'Latte', 'Mocha') and 'Tea' (with
+sub-items 'Green', 'Black').", "answer": "\n Coffee\n \n Latte\n Mocha\n \n \n
+Tea\n \n Green\n Black\n \n \n", "difficulty": "Hard Coding" } ],
+"multiple_choice_questions": [ { "question": "Which tag is used to represent an
+individual item in both ordered and unordered lists?", "options": { "A": "",
+"B": "", "C": "", "D": "" }, "answer": "C", "type": "Theory" }, { "question":
+"In a description list, which tag is used for the description/definition
+itself?", "options": { "A": "", "B": "", "C": "", "D": "" }, "answer": "B",
+"type": "Theory" }, { "question": "Predict the output of AB:", "options": { "A":
+"• A • B", "B": "A B", "C": "1. A 2. B", "D": "A. A B. B" }, "answer": "C",
+"type": "Output Prediction" }, { "question": "What does  do?", "options": { "A":
+"Creates 4 new columns", "B": "Makes the cell span across 4 rows", "C": "Makes
+the cell span across 4 columns", "D": "Deletes 4 columns" }, "answer": "C",
+"type": "Output Prediction" }, { "question": "What is the correct tag for a
+table header cell?", "options": { "A": "", "B": "", "C": "", "D": "" },
+"answer": "D", "type": "Output Prediction" }, { "question": "Find the bug:
+Fruits Veggie Wait for more ", "options": { "A": "Missing closing ", "B": "The 
+tag cannot be a direct child of ", "C": " cannot contain text", "D": "No bug" },
+"answer": "B", "type": "Find the Bug" }, { "question": "Find the bug:   Item 1 
+Item 2  ", "options": { "A": "Missing closing  for the first row", "B": "Missing
+closing ", "C": " should be ", "D": "Rows cannot contain Item text" }, "answer":
+"A", "type": "Find the Bug" }, { "question": "Complete the code for a
+description term:  <>Coffee</> Black drink ", "options": { "A": "di", "B": "dt",
+"C": "term", "D": "dd" }, "answer": "B", "type": "Complete the Code" }, {
+"question": "Complete the code to group the main content rows:  ... <>...</> ",
+"options": { "A": "tmain", "B": "tcontent", "C": "tbody", "D": "tr" }, "answer":
+"C", "type": "Complete the Code" }, { "question": "What is the best approach for
+an accessible table?", "options": { "A": "Use  for everything and make headers
+bold with CSS", "B": "Use  for headers and include thead/tbody sections", "C":
+"Use  instead of ", "D": "Use colspan on every single row" }, "answer": "B",
+"type": "Best Approach" } ] }

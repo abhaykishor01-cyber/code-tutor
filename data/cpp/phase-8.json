@@ -1,0 +1,288 @@
+{
+  "Phase Metadata": {
+    "Phase Number": 8,
+    "Phase Title": "Phase 8 - Templates & Generics",
+    "Learning Objectives": [
+      "Understand the mechanics of compile-time generic programming and template instantiation.",
+      "Design, implement, and instantiate robust Function and Class Templates.",
+      "Apply Full and Partial Template Specialization to customize behavior for specific types.",
+      "Utilize basic Variadic Templates and Type Traits to write highly flexible, type-safe APIs."
+    ],
+    "Prerequisites": [
+      "Proficiency with C++ Classes, Constructors, and Destructors.",
+      "Understanding of Function Overloading and Name Resolution.",
+      "Familiarity with Compile-time vs. Run-time execution phases."
+    ]
+  },
+  "Introduction": "Templates are the foundation of generic programming in C++. They allow developers to write code that is independent of any particular type. Instead of writing duplicate logic for integers, floats, and custom classes, you write a single template. At compile time, the compiler uses this template to generate type-specific versions of your code. This process guarantees absolute type safety with zero runtime overhead, making templates a cornerstone of high-performance C++ libraries like the STL.",
+  "Concept Explanation": "Templates operate on the principle of compile-time code generation (instantiation). When you define a template, you are not defining a function or a class; you are defining a blueprint. When you call a template function or instantiate a template class with a specific type (e.g., `std::vector<int>`), the compiler generates the actual machine code for that specific type. This is called template instantiation.\n\nThere are two primary forms of templates:\n1. **Function Templates**: Define a family of functions. The compiler can often automatically deduce the template arguments from the function arguments.\n2. **Class Templates**: Define a family of classes. Since C++17, Class Template Argument Deduction (CTAD) allows the compiler to deduce class template arguments in many common scenarios.\n\nTo handle edge cases where generic logic fails (e.g., comparing raw pointers instead of values, or optimizing memory layout for `bool`), C++ provides **Template Specialization**. This allows you to write a dedicated implementation for a specific type. \n\nModern C++ introduces **Type Traits** (via the `<type_traits>` header) and **Variadic Templates** (templates accepting an arbitrary number of arguments). Type traits allow you to query properties of types at compile time (e.g., checking if a type is an integer) and conditionally enable or disable templates using SFINAE (Substitution Failure Is Not An Error) or `std::enable_if_t`.",
+  "Syntax": "template <typename T>\nT findMax(T a, T b) {\n    return (a > b) ? a : b;\n}",
+  "Breakdown of Syntax": "template: The keyword that alerts the compiler that a template declaration is beginning.\n<typename T>: The template parameter list. 'typename' (or 'class') declares that 'T' is a placeholder for a type that will be specified or deduced later.\nT: The placeholder type. It is used as the return type and the parameter types of the 'findMax' function.\nfindMax: The name of the function template.\n(a > b) ? a : b: The generic logic. Any type 'T' used with this template must support the operator '>' comparison.",
+  "Rules & Key Points": [
+    "Templates are processed entirely at compile time; they do not exist as templates in the compiled binary.",
+    "The compiler generates a separate copy of the function or class for each unique set of template arguments used (instantiation).",
+    "Template definitions must generally reside in header files because the compiler needs the full definition to instantiate the code at the call site.",
+    "Class Template Argument Deduction (CTAD) in C++17 allows instantiating class templates without explicit type parameters if the constructor arguments make the type clear.",
+    "Full Specialization allows a completely different implementation of a template for one specific type.",
+    "Partial Specialization allows specializing a template for a subset of types (e.g., specializing `Storage<T*>` for all pointer types).",
+    "Variadic templates use parameter packs (declared with an ellipsis `...`) to accept an arbitrary number of template arguments.",
+    "Type traits (`<type_traits>`) allow compile-time introspection of types, enabling conditional compilation and static assertions.",
+    "Using `static_assert` inside templates provides clear, readable compile-time error messages instead of long, cryptic compiler dumps.",
+    "Template instantiation can lead to 'code bloat' if a template is instantiated with many different types, increasing binary size."
+  ],
+  "Code Example 1 (Very Basic)": "#include <iostream>\n#include <string>\n\n// A simple class template representing a generic 2D coordinate\ntemplate <typename T>\nclass Point2D {\nprivate:\n    T x;\n    T y;\npublic:\n    Point2D(T xVal, T yVal) : x(xVal), y(yVal) {}\n\n    T getX() const { return x; }\n    T getY() const { return y; }\n\n    void display() const {\n        std::cout << \"Point(\" << x << \", \" << y << \")\\n\";\n    }\n};\n\nint main() {\n    // Explicit instantiation with int\n    Point2D<int> intPoint(5, 10);\n    intPoint.display();\n\n    // C++17 Class Template Argument Deduction (CTAD) with double\n    Point2D doublePoint(3.14, 2.71);\n    doublePoint.display();\n\n    // Instantiation with std::string\n    Point2D<std::string> stringPoint(\"Alpha\", \"Beta\");\n    stringPoint.display();\n\n    return 0;\n}",
+  "Code Example 1 Expected Output": "Point(5, 10)\nPoint(3.14, 2.71)\nPoint(Alpha, Beta)",
+  "Code Example 2 (Practical)": "#include <iostream>\n#include <type_traits>\n\n// Primary Class Template\ntemplate <typename T>\nclass SmartStorage {\nprivate:\n    T value;\npublic:\n    SmartStorage(T val) : value(val) {\n        // Enforce that we do not use raw pointers in the primary template\n        static_assert(!std::is_pointer_v<T>, \"Use the pointer specialization for raw pointers!\");\n    }\n    \n    void display() const {\n        std::cout << \"Value: \" << value << \"\\n\";\n    }\n};\n\n// Full Specialization for raw pointers to prevent printing raw memory addresses\ntemplate <typename T>\nclass SmartStorage<T*> {\nprivate:\n    T* ptr;\npublic:\n    SmartStorage(T* p) : ptr(p) {}\n    \n    void display() const {\n        if (ptr) {\n            std::cout << \"Pointed Value: \" << *ptr << \"\\n\";\n        } else {\n            std::cout << \"Pointer is null\\n\";\n        }\n    }\n};\n\nint main() {\n    int num = 42;\n    \n    // Instantiates primary template SmartStorage<int>\n    SmartStorage<int> normalStorage(num);\n    normalStorage.display();\n    \n    // Instantiates specialized template SmartStorage<int*>\n    SmartStorage<int*> pointerStorage(&num);\n    pointerStorage.display();\n    \n    return 0;\n}",
+  "Code Example 2 Expected Output": "Value: 42\nPointed Value: 42",
+  "Step-by-Step Dry Run (when applicable)": "Step-by-step execution trace of Example 2:\n1. The program starts in `main()`. An integer variable `num` is allocated on the stack and initialized to `42`.\n2. `SmartStorage<int> normalStorage(num);` is executed. The compiler matches this with the primary template `SmartStorage<T>` where `T` is resolved to `int`.\n3. During compilation of `SmartStorage<int>`, the `static_assert(!std::is_pointer_v<int>)` evaluates to `static_assert(!false)`, which passes. The constructor copies `42` into the member variable `value`.\n4. `SmartStorage<int*> pointerStorage(&num);` is executed. The compiler matches this with the specialized template `SmartStorage<T*>` where `T` is resolved to `int`.\n5. The specialized constructor is called, storing the memory address of `num` (e.g., `0x7ffee3bbf5fc`) in the member variable `ptr`.\n6. `normalStorage.display()` is called. It executes the primary template's `display()` method, printing \"Value: 42\" to the console.\n7. `pointerStorage.display()` is called. It executes the specialized template's `display()` method. It checks if `ptr` is not null, dereferences it (`*ptr`), and prints \"Pointed Value: 42\" to the console.",
+  "Memory Visualization (arrays, pointers, recursion, etc.)": "+-------------------------------------------------------------------+\n|                           STACK MEMORY                            |\n+-------------------------------------------------------------------+\n| Address        | Variable       | Type               | Value      |\n|----------------|----------------|--------------------|------------|\n| 0x7ffee3bbf5fc | num            | int                | 42         |\n| 0x7ffee3bbf5f0 | normalStorage  | SmartStorage<int>  | [value=42] |\n| 0x7ffee3bbf5e8 | pointerStorage | SmartStorage<int*> | [ptr=0x7ff]| -> points to 0x7ffee3bbf5fc\n+-------------------------------------------------------------------+\n|                           HEAP MEMORY                             |\n+-------------------------------------------------------------------+\n| (No heap allocations are made in this example)                    |\n+-------------------------------------------------------------------+",
+  "Real-world Use Cases": [
+    "Standard Template Library (STL): Containers like `std::vector<T>`, `std::map<K, V>`, and algorithms like `std::sort` rely entirely on templates to provide type-safe, high-performance data structures.",
+    "Compile-Time Math & Physics Engines: Libraries like Eigen use templates to define matrices and vectors of arbitrary sizes and types, optimizing arithmetic operations at compile time.",
+    "Type-Safe Serialization/Deserialization: JSON and Protocol Buffer libraries use templates and type traits to automatically map arbitrary C++ structs to serialized formats without manual parsing code."
+  ],
+  "Common Mistakes Students Make ⭐": [
+    "Splitting template declarations into a `.h` file and definitions into a `.cpp` file. This causes linker errors because the compiler needs the full definition to instantiate the template at the call site.",
+    "Forgetting to use the `typename` keyword when referring to a nested dependent type (e.g., writing `T::iterator` instead of `typename T::iterator`).",
+    "Unintended code bloat: Instantiating a large class template with many different types (e.g., `MyClass<int>`, `MyClass<double>`, `MyClass<float>`) can significantly increase the size of the compiled binary.",
+    "Failing to constrain template parameters, leading to extremely long, unreadable compiler error messages when an unsupported type is passed."
+  ],
+  "Best Practices": [
+    "Prefer `typename` over `class` in template parameter lists for modern clarity.",
+    "Use `static_assert` combined with `<type_traits>` to enforce type constraints early and provide clean, readable compilation errors.",
+    "Keep template definitions in header files (or `.hpp` files) to ensure they are visible to all translation units that instantiate them.",
+    "Use C++17 fold expressions to simplify variadic template parameter pack expansion."
+  ],
+  "Frequently Asked Questions": [
+    {
+      "question": "Why do templates cause long compilation times?",
+      "answer": "Because templates are instantiated at compile time. For every unique type used with a template, the compiler must parse, analyze, and generate machine code for that specific instantiation. This significantly increases the workload of the compiler compared to pre-compiled non-generic code."
+    },
+    {
+      "question": "What is SFINAE and how does it relate to templates?",
+      "answer": "SFINAE stands for 'Substitution Failure Is Not An Error'. It is a rule in C++ template resolution: if a substitution of a template parameter fails during overload resolution, the compiler does not throw an error; it simply discards that overload and looks for others. This allows developers to conditionally enable or disable specific template overloads based on type properties."
+    }
+  ],
+  "Summary": "Templates and Generics in C++ enable powerful compile-time polymorphism. By writing code that operates on placeholder types, you achieve maximum code reuse without sacrificing type safety or runtime performance. Through class and function templates, specialization, variadic templates, and type traits, C++ developers can build highly optimized, flexible, and robust software architectures that adapt dynamically to any data type at compile time.",
+  "Key Takeaways": [
+    "Templates generate type-specific code at compile time, ensuring zero runtime overhead.",
+    "Template definitions must be visible in headers to allow the compiler to perform instantiation.",
+    "Template Specialization allows customizing behavior for specific types or categories of types.",
+    "Type traits and static assertions enable robust compile-time validation of template arguments."
+  ],
+  "Preview of the Next Topic": "In the next phase, we will explore the Standard Template Library (STL) Containers. We will see how the template concepts learned here are applied to build industry-standard data structures like vectors, lists, deques, and associative maps.",
+  "8 Questions Minimum": [
+    {
+      "Question Number": "Q1",
+      "Difficulty": "Easy",
+      "Type": "Write code",
+      "Title": "Generic Array Accumulator",
+      "Question Prompt": "Write a function template named `accumulateArray` that takes a pointer to an array of any numeric type and its size, and returns the sum of all elements in the array. Ensure it works with both `int` and `double` arrays.",
+      "Initial Code Stub": "// Write your accumulateArray function template here",
+      "Solution Code": "#include <iostream>\n\ntemplate <typename T>\nT accumulateArray(const T* arr, size_t size) {\n    T sum = 0;\n    for (size_t i = 0; i < size; ++i) {\n        sum += arr[i];\n    }\n    return sum;\n}",
+      "Detailed Explanation": "The function template `accumulateArray` uses a template parameter `T` to represent the numeric type. It initializes a sum variable of type `T` to 0, iterates through the array, accumulates the values, and returns the total."
+    },
+    {
+      "Question Number": "Q2",
+      "Difficulty": "Easy",
+      "Type": "Complete missing code",
+      "Title": "Generic Box Container",
+      "Question Prompt": "Complete the missing parts of the `Box` class template so that it can store a single value of any type, retrieve it, and check if it is empty (holding a default-constructed value).",
+      "Initial Code Stub": "template <typename T>\nclass Box {\nprivate:\n    T value;\n    bool occupied;\npublic:\n    // Complete the constructors and methods\n};",
+      "Solution Code": "#include <iostream>\n\ntemplate <typename T>\nclass Box {\nprivate:\n    T value;\n    bool occupied;\npublic:\n    Box() : occupied(false) {}\n    Box(T val) : value(val), occupied(true) {}\n    \n    T getValue() const { return value; }\n    bool isEmpty() const { return !occupied; }\n};",
+      "Detailed Explanation": "The class template `Box` uses a template parameter `T` to store a generic value. The constructor initializes the state, and `getValue` and `isEmpty` provide access to the internal state."
+    },
+    {
+      "Question Number": "Q3",
+      "Difficulty": "Easy-Medium",
+      "Type": "Debug existing code",
+      "Title": "Fixing Pointer Comparison Template",
+      "Question Prompt": "The following template function `isEqual` is supposed to compare two values. However, when passed pointers, it compares the memory addresses instead of the values being pointed to. Debug and fix this by adding a template specialization for pointer types.",
+      "Initial Code Stub": "#include <iostream>\n\ntemplate <typename T>\nbool isEqual(T a, T b) {\n    return a == b;\n}\n\n// Debug and add the pointer specialization here",
+      "Solution Code": "#include <iostream>\n\n// Primary template\ntemplate <typename T>\nbool isEqual(T a, T b) {\n    return a == b;\n}\n\n// Full specialization for pointers\ntemplate <typename T>\nbool isEqual(T* a, T* b) {\n    if (!a || !b) return a == b;\n    return *a == *b;\n}",
+      "Detailed Explanation": "By adding a template specialization for pointer types `T*`, we can dereference the pointers and compare the actual values they point to, while also safely handling null pointers."
+    },
+    {
+      "Question Number": "Q4",
+      "Difficulty": "Medium",
+      "Type": "Modify existing code",
+      "Title": "Vector Printer Specialization",
+      "Question Prompt": "Modify the existing `Printer` class template to add a partial template specialization for `std::vector<T>`. The specialization should print the vector elements in the format `[elem1, elem2, ...]` instead of trying to print the vector directly.",
+      "Initial Code Stub": "#include <iostream>\n\ntemplate <typename T>\nclass Printer {\npublic:\n    void print(const T& val) {\n        std::cout << val << \"\\n\";\n    }\n};",
+      "Solution Code": "#include <iostream>\n\n// Primary template\ntemplate <typename T>\nclass Printer {\npublic:\n    void print(const T& val) {\n        std::cout << val << \"\\n\";\n    }\n};\n\n// Partial specialization for std::vector\n#include <vector>\ntemplate <typename T>\nclass Printer<std::vector<T>> {\npublic:\n    void print(const std::vector<T>& vec) {\n        std::cout << \"[\";\n        for (size_t i = 0; i < vec.size(); ++i) {\n            std::cout << vec[i];\n            if (i + 1 < vec.size()) std::cout << \", \";\n        }\n        std::cout << \"]\\n\";\n    }\n};",
+      "Detailed Explanation": "We partially specialize the `Printer` class template for `std::vector<T>`. This allows the compiler to select this specialized version whenever a `std::vector` is passed, enabling custom formatting for collections."
+    },
+    {
+      "Question Number": "Q5",
+      "Difficulty": "Medium",
+      "Type": "Predict output using code",
+      "Title": "Template Overload Resolution",
+      "Question Prompt": "Predict the output of the following code, which features a mix of a primary template, a specialized template, and a non-template function overload.",
+      "Initial Code Stub": "#include <iostream>\n\ntemplate <typename T>\nvoid printVal(T val) {\n    std::cout << \"Template: \" << val << \"\\n\";\n}\n\ntemplate <typename T>\nvoid printVal(T* val) {\n    std::cout << \"Specialization: pointer to \" << *val << \"\\n\";\n}\n\nvoid printVal(int val) {\n    std::cout << \"Non-template: \" << val << \"\\n\";\n}\n\nint main() {\n    int x = 42;\n    printVal(x);\n    printVal(3.14);\n    printVal(&x);\n    return 0;\n}",
+      "Solution Code": "// Output:\n// Non-template: 42\n// Template: 3.14\n// Specialization: pointer to 42",
+      "Detailed Explanation": "C++ overload resolution rules prefer non-template functions over template functions if they match perfectly. Thus, `printVal(int)` calls the non-template. `printVal(double)` matches the primary template. `printVal(int*)` matches the pointer specialization."
+    },
+    {
+      "Question Number": "Q6",
+      "Difficulty": "Medium-Hard",
+      "Type": "Small implementation",
+      "Title": "Variadic Print All",
+      "Question Prompt": "Implement a variadic template function `printAll` that accepts an arbitrary number of arguments of any types and prints them to the console separated by spaces, ending with a newline. Use C++17 fold expressions.",
+      "Initial Code Stub": "#include <iostream>\n\n// Implement printAll using C++17 fold expressions",
+      "Solution Code": "#include <iostream>\n\ntemplate <typename... Args>\nvoid printAll(Args... args) {\n    ((std::cout << args << \" \"), ...);\n    std::cout << \"\\n\";\n}",
+      "Detailed Explanation": "The variadic template uses `typename... Args` to accept a parameter pack. The fold expression `((std::cout << args << \" \"), ...)` expands to print each argument followed by a space in sequence."
+    },
+    {
+      "Question Number": "Q7",
+      "Difficulty": "Hard",
+      "Type": "Optimize code",
+      "Title": "Constraining Templates with Type Traits",
+      "Question Prompt": "Optimize and secure the following `multiply` template function so that it only compiles if the template argument `T` is an arithmetic type (integer or floating-point). Use `std::enable_if_t` or `static_assert` with `<type_traits>`.",
+      "Initial Code Stub": "#include <iostream>\n#include <type_traits>\n\ntemplate <typename T>\nT multiply(T a, T b) {\n    return a * b;\n}",
+      "Solution Code": "#include <iostream>\n\ntemplate <typename T>\nT multiply(T a, T b) {\n    static_assert(std::is_arithmetic_v<T>, \"Template argument must be an arithmetic type!\");\n    return a * b;\n}",
+      "Detailed Explanation": "Using `static_assert` with `std::is_arithmetic_v<T>` ensures that if a developer tries to compile `multiply` with a non-numeric type (like `std::string`), the compilation fails immediately with a clear, readable error message."
+    },
+    {
+      "Question Number": "Q8",
+      "Difficulty": "Challenge",
+      "Type": "Write code",
+      "Title": "Type-Safe Registry with Conditional Cloning",
+      "Question Prompt": "Write a class template `Registry<T>` that holds a single value of type `T`. Implement a method `cloneValue()` that returns a copy of the held value. Use `std::enable_if_t` or `if constexpr` to ensure that `cloneValue()` only compiles if `T` is copy-constructible. If `T` is not copy-constructible, calling `cloneValue()` should trigger a compile-time assertion or fail substitution.",
+      "Initial Code Stub": "// Write your Registry class template here",
+      "Solution Code": "#include <iostream>\n#include <type_traits>\n\ntemplate <typename T>\nclass Registry {\nprivate:\n    T value;\npublic:\n    Registry(T val) : value(val) {}\n    \n    T cloneValue() const {\n        if constexpr (std::is_copy_constructible_v<T>) {\n            return value;\n        } else {\n            static_assert(std::is_copy_constructible_v<T>, \"Type is not copy-constructible!\");\n        }\n    }\n};",
+      "Detailed Explanation": "Using C++17 `if constexpr`, we can conditionally compile branches of code. If `T` is copy-constructible, the copy is returned. If not, the `static_assert` is triggered, preventing compilation of invalid copy operations."
+    }
+  ],
+  "10 MCQs": [
+    {
+      "Question Number": "MCQ 1",
+      "Category": "Theory MCQ",
+      "Question": "What is template instantiation in C++?",
+      "Options": {
+        "A": "The process of resolving template errors at runtime.",
+        "B": "The compile-time generation of concrete function or class code from a template blueprint for specific types.",
+        "C": "The dynamic allocation of template objects on the heap.",
+        "D": "The process of converting C++ templates into C-style macros."
+      },
+      "Correct Option": "B",
+      "Tutors Explanation": "Template instantiation is the process where the compiler generates actual machine code for a specific type from the template blueprint at compile time."
+    },
+    {
+      "Question Number": "MCQ 2",
+      "Category": "Theory MCQ",
+      "Question": "Why is the 'typename' keyword required when referring to a nested dependent type inside a template?",
+      "Options": {
+        "A": "To tell the compiler that the nested name represents a type rather than a static member or variable.",
+        "B": "To force the compiler to allocate the type on the stack.",
+        "C": "To prevent the template from being specialized.",
+        "D": "To allow the template to accept multiple parameters."
+      },
+      "Correct Option": "A",
+      "Tutors Explanation": "Without `typename`, the compiler assumes a dependent name (like `T::const_iterator`) is a static member variable or function, leading to syntax errors during parsing."
+    },
+    {
+      "Question Number": "MCQ 3",
+      "Category": "Output Prediction",
+      "Question": "What is the output of the following code?\n\ntemplate <typename T>\nvoid func(T x) { std::cout << 1; }\n\ntemplate <>\nvoid func<int>(int x) { std::cout << 2; }\n\nvoid func(int x) { std::cout << 3; }\n\nint main() {\n    func(5);\n}",
+      "Options": {
+        "A": "1",
+        "B": "2",
+        "C": "3",
+        "D": "Compilation Error"
+      },
+      "Correct Option": "C",
+      "Tutors Explanation": "C++ overload resolution rules prefer non-template functions over template functions (including specializations) if they provide an exact match."
+    },
+    {
+      "Question Number": "MCQ 4",
+      "Category": "Output Prediction",
+      "Question": "What is the output of the following code?\n\ntemplate <typename T>\nclass Counter {\npublic:\n    static int count;\n};\n\ntemplate <typename T>\nint Counter<T>::count = 0;\n\nint main() {\n    Counter<int>::count = 5;\n    Counter<double>::count = 10;\n    std::cout << Counter<int>::count << \" \" << Counter<double>::count;\n}",
+      "Options": {
+        "A": "5 5",
+        "B": "10 10",
+        "C": "5 10",
+        "D": "0 0"
+      },
+      "Correct Option": "C",
+      "Tutors Explanation": "Each distinct template instantiation (`Counter<int>` and `Counter<double>`) gets its own static member variables, completely independent of other instantiations."
+    },
+    {
+      "Question Number": "MCQ 5",
+      "Category": "Output Prediction",
+      "Question": "What is the output of the following code?\n\ntemplate <typename T, typename U>\nstruct Checker {\n    static void print() { std::cout << \"A\"; }\n};\n\ntemplate <typename T>\nstruct Checker<T, T> {\n    static void print() { std::cout << \"B\"; }\n};\n\nint main() {\n    Checker<int, double>::print();\n    Checker<int, int>::print();\n}",
+      "Options": {
+        "A": "A A",
+        "B": "B B",
+        "C": "A B",
+        "D": "B A"
+      },
+      "Correct Option": "C",
+      "Tutors Explanation": "`Checker<int, double>` matches the primary template (printing 'A'). `Checker<int, int>` matches the partial specialization where both template arguments are the same type (printing 'B')."
+    },
+    {
+      "Question Number": "MCQ 6",
+      "Category": "Find the Bug",
+      "Question": "Why does splitting a template class definition into a `.h` file and its method implementations into a `.cpp` file typically cause a linker error?",
+      "Options": {
+        "A": "The compiler cannot compile `.cpp` files containing templates.",
+        "B": "The linker does not support templates.",
+        "C": "When compiling other source files, the compiler only sees the template declaration in the header and cannot instantiate the methods without their definitions.",
+        "D": "Templates must be compiled using a separate template compiler."
+      },
+      "Correct Option": "C",
+      "Tutors Explanation": "Because templates are instantiated at compile time, the compiler must have access to the full implementation of the template methods in every translation unit where they are used."
+    },
+    {
+      "Question Number": "MCQ 7",
+      "Category": "Find the Bug",
+      "Question": "Identify the syntax error in the following template specialization:\n\ntemplate <typename T>\nclass Storage { T val; };\n\n// Specialization for char\nclass Storage<char> { char val; };",
+      "Options": {
+        "A": "The specialization is missing the 'template <>' prefix.",
+        "B": "The specialization must use 'typename char' instead of 'char'.",
+        "C": "You cannot specialize a class template with 'char'.",
+        "D": "The member variable 'val' must be public."
+      },
+      "Correct Option": "A",
+      "Tutors Explanation": "Full template specializations must be prefixed with `template <>` to indicate to the compiler that it is a specialization of an existing template."
+    },
+    {
+      "Question Number": "MCQ 8",
+      "Category": "Complete the Code",
+      "Question": "Fill in the blank to complete the C++17 fold expression that sums all arguments of a variadic template:\n\ntemplate <typename... Args>\nauto sum(Args... args) {\n    return ____________;\n}",
+      "Options": {
+        "A": "(args + ...)",
+        "B": "sum(args...)",
+        "C": "args + ... + 0",
+        "D": "fold(args, +)"
+      },
+      "Correct Option": "A",
+      "Tutors Explanation": "`(args + ...)` is a valid C++17 unary right fold expression that expands to sum all elements in the parameter pack."
+    },
+    {
+      "Question Number": "MCQ 9",
+      "Category": "Complete the Code",
+      "Question": "Which standard type trait should be used to restrict a template to only accept pointer types?",
+      "Options": {
+        "A": "std::is_pointer_v<T>",
+        "B": "std::has_pointer_v<T>",
+        "C": "std::is_address_v<T>",
+        "D": "std::check_pointer<T>::value"
+      },
+      "Correct Option": "A",
+      "Tutors Explanation": "`std::is_pointer_v<T>` is the standard helper template variable from `<type_traits>` that evaluates to `true` if `T` is a pointer type."
+    },
+    {
+      "Question Number": "MCQ 10",
+      "Category": "Best Approach",
+      "Question": "What is the best approach to enforce that a template class `Matrix<T>` only compiles for arithmetic types (like float, double, int) in modern C++17?",
+      "Options": {
+        "A": "Use runtime `if` statements to check the type of `T`.",
+        "B": "Use `static_assert(std::is_arithmetic_v<T>, \"Message\")` inside the class definition.",
+        "C": "Write separate duplicate classes for `MatrixInt`, `MatrixFloat`, and `MatrixDouble`.",
+        "D": "Use dynamic casting to verify the type at runtime."
+      },
+      "Correct Option": "B",
+      "Tutors Explanation": "Using `static_assert` with `std::is_arithmetic_v<T>` is the cleanest, most performant, and most descriptive way to enforce compile-time type constraints in C++17."
+    }
+  ]
+}

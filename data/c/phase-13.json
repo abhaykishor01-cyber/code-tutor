@@ -1,0 +1,326 @@
+{
+  "metadata": {
+    "phaseNumber": 13,
+    "title": "Enumerations",
+    "duration": "2 Hours",
+    "difficulty": "Intermediate"
+  },
+  "learningObjectives": [
+    "Understand the purpose and mechanics of enumerations (enums) in C.",
+    "Learn to declare, define, and initialize enum types and variables.",
+    "Master the use of typedef with enums to write cleaner, self-documenting code.",
+    "Integrate enums effectively within switch statements for clean control structures.",
+    "Contrast enums with preprocessor #define macros to recognize when and why to use each."
+  ],
+  "prerequisites": [
+    "Variables and Primitive Data Types",
+    "Control Flow Structures (Switch statements)",
+    "Preprocessor Directives (#define basics)"
+  ],
+  "introduction": "An enumeration (enum) is a user-defined data type in C that consists of a set of named integer constants. Instead of using arbitrary numeric codes (like 0, 1, and 2) to represent distinct states, enums allow you to assign clear, self-documenting names (such as RED, YELLOW, GREEN) to those values. This significantly improves program readability, debuggability, and maintainability without incurring any performance or memory overhead.",
+  "conceptExplanation": "Enums are essentially a collection of integer constants grouped under a single type name. By default, the C compiler assigns the value 0 to the first identifier in the list, 1 to the second, 2 to the third, and so on. However, you can explicitly override these defaults and assign custom integer values to any or all of the identifiers.\n\nMemory Behavior:\nAn enum variable behaves exactly like a standard integer variable. Under the hood, the compiler allocates enough memory for an integer (typically 4 bytes on modern architectures) to store the active enum value. At the hardware level, there is no performance penalty for using enums; they are treated as standard literal integers during CPU cycles.\n\nEnum vs #define:\nWhile both #define preprocessor macros and enums let you define symbolic constants, enums have distinct advantages. Preprocessor macros are simple text replacements handled before compilation; they do not respect scope, are invisible to the debugger, and have no type safety. In contrast, enums are fully integrated into the compiler's symbol table. This allows the compiler to perform type check warnings and enables debuggers to display the symbolic names (e.g., 'COLOR_RED') instead of raw numeric values (e.g., '0') when analyzing stack frames or watch variables.",
+  "syntax": "enum TagName {\n    CONSTANT_1,\n    CONSTANT_2 = 10,\n    CONSTANT_3\n};\n\ntypedef enum {\n    STATE_IDLE,\n    STATE_RUNNING,\n    STATE_ERROR\n} State_t;",
+  "syntaxBreakdown": [
+    "enum keyword: Tells the compiler that a new enumerated type is being declared.",
+    "TagName: An optional identifier name for the enum structure, used to declare variables later using 'enum TagName varName;'.",
+    "Curly braces {}: Encloses the list of symbolic constants (called enumerators).",
+    "Comma-separated list: Each enumerator is separated by a comma. The last enumerator can optionally have a trailing comma.",
+    "Explicit Assignment (= value): Allows overriding of the default auto-increment sequence. If not specified, the value defaults to 0 for the first item, or previous_value + 1 for subsequent items.",
+    "typedef: Allows binding the anonymous or tagged enum structure directly to a clean type alias (e.g., State_t), simplifying declarations by eliminating the need to write the 'enum' keyword each time."
+  ],
+  "rulesAndKeyPoints": [
+    "By default, the first enumerator has the value 0. Each subsequent enumerator increases by 1 from the previous constant.",
+    "Explicit assignments can be made to any enumerator. Unassigned enumerators following an explicit assignment will increment by 1 from that custom value.",
+    "Multiple enumerator constants within the same enum can share the same numeric value.",
+    "Enumerator constants must be unique identifiers within their scope. You cannot have two different enums in the same scope containing an identical constant name.",
+    "An enum variable is fundamentally treated as an integer type, meaning you can implicitly cast and assign integer values to it, though doing so carelessly defeats the purpose of type safety.",
+    "Enums cannot be directly updated at runtime. The constant names are compile-time definitions, not variables."
+  ],
+  "codeExample1": {
+    "title": "Enum Basics and Typedef Definition",
+    "code": "#include <stdio.h>\n\n// Defining an enum with explicit and implicit values\nenum ProtocolState {\n    STATE_DISCONNECTED, // Defaults to 0\n    STATE_CONNECTING,   // Defaults to 1\n    STATE_CONNECTED,    // Defaults to 2\n    STATE_ERROR = -1,   // Explicitly set to -1\n    STATE_TIMEOUT       // Defaults to previous + 1, which is 0!\n};\n\n// Using typedef to define a cleaner enum type\ntypedef enum {\n    ROLE_GUEST = 100,\n    ROLE_USER = 200,\n    ROLE_ADMIN = 300\n} UserRole;\n\nint main() {\n    enum ProtocolState current_state = STATE_CONNECTING;\n    UserRole active_role = ROLE_ADMIN;\n\n    printf(\"Current State Value: %d\\n\", current_state);\n    printf(\"Timeout State Value: %d\\n\", STATE_TIMEOUT);\n    printf(\"User Role Code: %d\\n\", active_role);\n\n    return 0;\n}",
+    "explanation": "This code demonstrates the rules of auto-incrementing values. STATE_DISCONNECTED defaults to 0, and the sequence reaches STATE_CONNECTED at 2. By explicitly overriding STATE_ERROR to -1, the following constant STATE_TIMEOUT automatically resolves to 0. Additionally, the UserRole enum demonstrates using typedef to create a direct custom type name (UserRole) without requiring the 'enum' keyword during declaration."
+  },
+  "codeExample2": {
+    "title": "State Management with Enum and Switch Statements",
+    "code": "#include <stdio.h>\n\ntypedef enum {\n    STATUS_OK,\n    STATUS_WARNING,\n    STATUS_CRITICAL,\n    STATUS_UNKNOWN\n} SystemStatus;\n\nvoid handle_status(SystemStatus status) {\n    switch (status) {\n        case STATUS_OK:\n            printf(\"System Operational.\\n\");\n            break;\n        case STATUS_WARNING:\n            printf(\"Warning detected. Monitor resources.\\n\");\n            break;\n        case STATUS_CRITICAL:\n            printf(\"Critical Alert! Initiating shutdown procedure.\\n\");\n            break;\n        case STATUS_UNKNOWN:\n        default:\n            printf(\"Status ambiguous. Run self-diagnostics.\\n\");\n            break;\n    }\n}\n\nint main() {\n    SystemStatus current_sys = STATUS_CRITICAL;\n    printf(\"Sending alert for status code: %d\\n\", current_sys);\n    handle_status(current_sys);\n    return 0;\n}",
+    "explanation": "This example shows the industry-standard design pattern of coupling enums with switch statements to implement clean state routers. Passing SystemStatus directly to the helper function guarantees readability. The switch block handles every named enumeration cleanly, and the default block acts as a fallback.",
+    "expectedOutput": "Sending alert for status code: 2\nCritical Alert! Initiating shutdown procedure."
+  },
+  "stepByStepDryRun": [
+    "Program starts execution in main().",
+    "An enum variable 'current_sys' of type 'SystemStatus' is declared and initialized to STATUS_CRITICAL.",
+    "The compiler resolves the label STATUS_CRITICAL to the underlying integer literal 2 (since STATUS_OK=0, STATUS_WARNING=1, STATUS_CRITICAL=2).",
+    "printf is called, outputting the integer representation '2' to standard output.",
+    "The function handle_status() is invoked, passing the value 2 into the parameter variable 'status'.",
+    "The switch(status) statement evaluates the value 2.",
+    "The runtime matches value 2 to 'case STATUS_CRITICAL:' and jumps control directly to that case block.",
+    "The critical warning diagnostic message is printed to console.",
+    "The break statement is hit, exiting the switch block.",
+    "The handle_status function finishes execution, control returns to main(), and the program returns 0."
+  ],
+  "memoryVisualization": {
+    "type": "Stack Allocation Diagram",
+    "description": "This diagram illustrates how enum variables are laid out inside the Stack frame. To the CPU and Memory Controller, an enum is simply stored inside standard integer registers or stack locations with the standard size of an 'int'.",
+    "nodes": [
+      {
+        "label": "Stack Frame (main)",
+        "value": "Activation Record",
+        "address": "0x7FFEE3C1B000",
+        "color": "slate"
+      },
+      {
+        "label": "current_sys (SystemStatus)",
+        "value": "2 (stored as 4-byte int representing STATUS_CRITICAL)",
+        "address": "0x7FFEE3C1B00C",
+        "color": "emerald"
+      },
+      {
+        "label": "active_role (UserRole)",
+        "value": "300 (stored as 4-byte int representing ROLE_ADMIN)",
+        "address": "0x7FFEE3C1B008",
+        "color": "sky"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "State Machine Controllers: Widely used in protocol stacks (TCP/UDP), embedded devices, and robotics to manage system states (INIT, IDLE, READY, FAULT).",
+    "API Response Codes: Used to encapsulate REST, RPC, or application-level error codes and execution flags.",
+    "Configuration & Settings Flags: Defining menu selections, device configurations, or privilege levels.",
+    "Abstract Syntax Tree Node Classification: Used in compiler design to identify expression types (ADD_NODE, MULT_NODE, CONST_NODE)."
+  ],
+  "commonMistakes": [
+    "Duplicate Constant Names: Trying to declare the same identifier name in two different enums within the same scope. Enums share the global/local scope of their containing block, leading to identifier collisions.",
+    "Assuming Custom Types Are Strictly Typesafe: In standard C, you can assign any raw integer (even invalid ones like 999) to an enum variable without triggering a compile-time error. This requires careful developer discipline or compiler flags.",
+    "Confusing Enums with Strings: Forgetting that enums are numeric. Printing an enum with %s instead of %d will result in undefined behavior, as the system tries to treat the integer value as a memory pointer.",
+    "Assigning values to enum constants at runtime: Attempting to do 'STATUS_OK = 5;' inside a function. Enum identifiers are compile-time constants, not mutable variables."
+  ],
+  "bestPractices": [
+    "Always use 'typedef enum' when defining custom types to keep type declarations clean and eliminate the need for writing 'enum' everywhere.",
+    "Capitalize all enum constant names (enumerators) to distinguish them from standard variables, adhering to classic constant naming guidelines.",
+    "In switch statements that handle enums, avoid using the 'default' case if you want the compiler to warn you when a new enum value is added but not handled in the switch.",
+    "Prefix your enumerator constants with a logical abbreviation (e.g., SYS_OK, SYS_FAIL) to prevent namespace pollution and avoid collisions.",
+    "Use enums instead of #define for sequences of related numeric constants to enable better compiler diagnostic messages and symbolic debugging."
+  ],
+  "faqs": [
+    {
+      "question": "Can I have negative values in an enum?",
+      "answer": "Yes, enums are represented as signed integers by default on most C compilers, so assigning negative integers to enumerators (e.g., CONST = -5) is perfectly legal and supported."
+    },
+    {
+      "question": "How can I convert an enum variable into its string representation?",
+      "answer": "C does not natively support enum reflection. To print an enum as a string, you must write a custom lookup helper function (using a switch statement or an array of string pointers indexed by the enum values)."
+    },
+    {
+      "question": "Are enums always the size of a standard integer?",
+      "answer": "Generally, yes (typically 4 bytes). However, compilers are permitted by the C standard to optimize storage and select smaller types (like char or short) if all enum values can fit within those bounds, especially when specific compiler optimization flags (such as gcc's -fshort-enums) are active."
+    }
+  ],
+  "summary": "Enumerations (enums) provide an exceptionally clean way to handle sequences of named integer constants in C. They enhance code safety and readability by replacing cryptic magic numbers with self-documenting tokens. When coupled with typedef and switch statements, enums form the foundational building blocks of robust state machines and modular configuration layers in professional C software development.",
+  "keyTakeaways": [
+    "Enums map clear human-readable names to integer values at compile-time.",
+    "Enums default to a 0-indexed sequence but can be manually overridden with specific values.",
+    "Unlike #define, enums provide full compiler symbol support, which guarantees visibility in code debuggers.",
+    "Enums do not carry extra memory overhead; they are treated as primitive integers.",
+    "Mapping enums to strings requires manual code mapping structures (such as helper functions or lookup arrays)."
+  ],
+  "nextTopicPreview": "Our next logical step is to delve into Structs (Structures), which allow us to group variables of different data types together to build complex data objects.",
+  "questionsAndAnswers": [
+    {
+      "id": "Q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What is an enumeration in C, and what is its default starting value?",
+      "answer": "An enumeration (enum) is a user-defined data type comprising named integer constants. The default starting value of the first item in an enumeration is 0, with each subsequent constant auto-incrementing by 1.",
+      "explanation": "Enums are declared using the 'enum' keyword. Unless explicitly initialized, the sequence always starts at 0. For example, in 'enum Colors { RED, GREEN, BLUE };', RED is 0, GREEN is 1, and BLUE is 2."
+    },
+    {
+      "id": "Q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Contrast '#define' macros and 'enum' in C. Why is 'enum' preferred for defining a group of related constants?",
+      "answer": "While both declare constants, '#define' is a simple preprocessor text-replacement directive that lacks type checking, scope boundaries, and debugging visibility. 'enum' creates a distinct type enforced by the compiler, respects scoping, and retains symbolic representation within debugging environments.",
+      "explanation": "Because enums exist in the compiler's symbol table, if your program crashes or hits a breakpoint, your debugger can display 'STATE_SUSPENDED' instead of a cryptic raw integer like '4'. This is impossible with '#define' as the name is discarded before compilation."
+    },
+    {
+      "id": "Q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a typedef enum representing HTTP status codes (OK = 200, CREATED = 201, BAD_REQUEST = 400, UNAUTHORIZED = 401, NOT_FOUND = 404). Show how to declare a variable of this type.",
+      "answer": "Below is the declaration and usage:\n\ntypedef enum {\n    HTTP_OK = 200,\n    HTTP_CREATED = 201,\n    HTTP_BAD_REQUEST = 400,\n    HTTP_UNAUTHORIZED = 401,\n    HTTP_NOT_FOUND = 404\n} HTTPStatus;\n\nHTTPStatus response = HTTP_OK;",
+      "explanation": "Using 'typedef enum' allows you to omit the 'enum' keyword when declaring variables. Specifying values explicitly ensures the constants map exactly to their protocol standards."
+    },
+    {
+      "id": "Q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "How can you implement a safe string lookup helper function for an enum type? Provide a working implementation.",
+      "answer": "To map numeric enums to strings, implement a translation function returning a 'const char*'. Here is a robust approach:\n\n```c\n#include <stdio.h>\ntypedef enum { DEV_OFFLINE, DEV_ONLINE, DEV_MAINTENANCE } DeviceState;\n\nconst char* get_device_state_string(DeviceState state) {\n    switch(state) {\n        case DEV_OFFLINE:     return \"Offline\";\n        case DEV_ONLINE:      return \"Online\";\n        case DEV_MAINTENANCE: return \"Maintenance\";\n        default:              return \"Unknown State\";\n    }\n}\n```",
+      "explanation": "Since C enums do not natively track their string representations, using a switch-based translation function with a default recovery case is the standard, safest way to handle conversion without risking buffer overflows or out-of-bounds pointer reads."
+    },
+    {
+      "id": "Q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "What is wrong with the following code snippet, and how do you resolve the compilation error?\n\nenum PrimaryColor { RED, GREEN, BLUE };\nenum TrafficColor { GREEN, YELLOW, RED };",
+      "answer": "The compiler will flag an error because the identifiers 'RED' and 'GREEN' are defined twice within the same scope. Enums share the same scope block (usually global) in which they are declared.",
+      "explanation": "To resolve this, you must prefix the constants to make them unique. For example, use 'COLOR_RED', 'COLOR_GREEN' for the first enum, and 'TRAFFIC_RED', 'TRAFFIC_GREEN' for the second enum."
+    },
+    {
+      "id": "Q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Consider an enum variable of type 'Direction' defined with values UP=1, DOWN=2. What occurs if a developer assigns '15' to this variable at runtime? Does the compiler block this?",
+      "answer": "In standard C, the compiler will not block this assignment. An enum variable is treated fundamentally as an integer type, meaning any value that fits within a standard 'int' can be assigned to it without throwing compile errors.",
+      "explanation": "This is a key vulnerability of enums in C. To ensure safety, you must manually validate variables before processing them, using boundary checks or assertions to verify the value sits within defined enum limits."
+    },
+    {
+      "id": "Q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Develop a state machine controller using an enum and a switch statement that tracks and updates a Simple Oven State (OFF, PREHEATING, READY, BAKING). Transitions happen via a mock function.",
+      "answer": "```c\n#include <stdio.h>\n\ntypedef enum { OVEN_OFF, OVEN_PREHEATING, OVEN_READY, OVEN_BAKING } OvenState;\n\nOvenState update_oven(OvenState current) {\n    switch(current) {\n        case OVEN_OFF:\n            printf(\"Turning on oven... Preheating started.\\n\");\n            return OVEN_PREHEATING;\n        case OVEN_PREHEATING:\n            printf(\"Target temperature reached! Oven Ready.\\n\");\n            return OVEN_READY;\n        case OVEN_READY:\n            printf(\"Food inserted! Baking started.\\n\");\n            return OVEN_BAKING;\n        case OVEN_BAKING:\n            printf(\"Baking complete! Shutting down.\\n\");\n            return OVEN_OFF;\n        default:\n            return OVEN_OFF;\n    }\n}\n\nint main() {\n    OvenState state = OVEN_OFF;\n    state = update_oven(state);\n    state = update_oven(state);\n    return 0;\n}\n```",
+      "explanation": "This encapsulates control logic inside a state-updating function. Coupling the enum state directly with switch cases creates clear, self-documenting control loops."
+    },
+    {
+      "id": "Q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Design a lookup array pattern for mapping sequential enums directly to strings. Why is this more efficient than a switch statement, and what is its limitation?",
+      "answer": "A lookup array maps enum values directly to string pointers using index offsets. Example:\n\n```c\ntypedef enum { ERR_SUCCESS, ERR_NOT_FOUND, ERR_TIMEOUT, ERR_MAX_VAL } ErrorCode;\n\nconst char* ErrorStrings[] = {\n    [ERR_SUCCESS] = \"Success\",\n    [ERR_NOT_FOUND] = \"Not Found\",\n    [ERR_TIMEOUT] = \"Timeout\"\n};\n```\nThis operates at constant O(1) time complexity directly via pointer offsets, bypassing conditional switch branches. However, its main limitation is that it requires sequential enum values starting at 0. If there are huge gaps in enum numbers (e.g., 100 to 400), the array will be extremely sparse and waste considerable memory.",
+      "explanation": "Using designated initializers `[ERR_SUCCESS] = \"...\"` ensures that even if you reorder the enum constants, the array indexes remain aligned, reducing index errors in production code."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "MCQ1",
+      "category": "Theory",
+      "question": "What is the primary memory and performance penalty incurred by replacing standard integers with C enums?",
+      "options": {
+        "A": "Enums require 8 additional bytes of overhead for symbolic string resolution.",
+        "B": "Enums cause a lookup delay at runtime because the CPU must read compiling symbol tables.",
+        "C": "There is no penalty; compilers optimize enums directly into standard integer constants.",
+        "D": "Enums require heap allocation, increasing stack fragment risks."
+      },
+      "correctOption": "C",
+      "explanation": "Enums are fully resolved to integer constants during compilation. They do not exist as symbols at runtime and carry zero performance or memory overhead."
+    },
+    {
+      "id": "MCQ2",
+      "category": "Theory",
+      "question": "Why are enums preferred over preprocessor '#define' macros for grouping constant variables?",
+      "options": {
+        "A": "Enums can be garbage collected at runtime.",
+        "B": "Enums are scoped, checked by the compiler, and visible in debuggers.",
+        "C": "Enums support float and double constants, whereas macros only support integers.",
+        "D": "Enums compile significantly faster than preprocessor macros."
+      },
+      "correctOption": "B",
+      "explanation": "Unlike macros, which are pre-processed out of the source code, enums are compiler structures. This means they obey scope rules, can issue compiler type warnings, and remain visible as variable names in debuggers."
+    },
+    {
+      "id": "MCQ3",
+      "category": "Output Prediction",
+      "question": "What is the output of the following C code?\n\n```c\n#include <stdio.h>\nenum Metrics { SCORE = 5, MULTIPLIER, HIGHSCORE = 12, ATTEMPTS };\nint main() {\n    printf(\"%d, %d\", MULTIPLIER, ATTEMPTS);\n    return 0;\n}\n```",
+      "options": {
+        "A": "6, 13",
+        "B": "5, 12",
+        "C": "6, 12",
+        "D": "0, 1"
+      },
+      "correctOption": "A",
+      "explanation": "By default, enumerator constants increment by 1 from the preceding constant. Since SCORE is 5, MULTIPLIER becomes 6. Since HIGHSCORE is 12, ATTEMPTS becomes 13."
+    },
+    {
+      "id": "MCQ4",
+      "category": "Output Prediction",
+      "question": "What is the expected printed output of the following block?\n\n```c\n#include <stdio.h>\ntypedef enum {\n    FLAG_A = 0,\n    FLAG_B = 0,\n    FLAG_C = 1\n} Flag;\nint main() {\n    printf(\"%d\", FLAG_A == FLAG_B);\n    return 0;\n}\n```",
+      "options": {
+        "A": "0 (False, because identifiers must be unique)",
+        "B": "1 (True, since they share the same evaluated integer value)",
+        "C": "It triggers a compilation error due to duplicate values",
+        "D": "Undefined behavior"
+      },
+      "correctOption": "B",
+      "explanation": "Multiple enumerator names can share the same underlying value. In this case, FLAG_A and FLAG_B both map to 0, meaning the equality comparison evaluates to true (1)."
+    },
+    {
+      "id": "MCQ5",
+      "category": "Output Prediction",
+      "question": "What will the following code print on a standard 64-bit platform?\n\n```c\n#include <stdio.h>\ntypedef enum {\n    LVL_EASY, \n    LVL_MEDIUM, \n    LVL_HARD\n} GameLevel;\nint main() {\n    GameLevel lvl = LVL_MEDIUM;\n    printf(\"%zu\", sizeof(lvl));\n    return 0;\n}\n```",
+      "options": {
+        "A": "1",
+        "B": "2",
+        "C": "4",
+        "D": "8"
+      },
+      "correctOption": "C",
+      "explanation": "In standard C, enums are represented internally as integers. On a standard modern system, a normal 'int' is 4 bytes, so sizeof(lvl) evaluates to 4."
+    },
+    {
+      "id": "MCQ6",
+      "category": "Find the Bug",
+      "question": "Identify the primary source of the compilation failure in the code below:\n\n```c\n#include <stdio.h>\ntypedef enum {\n    STATUS_ACTIVE,\n    STATUS_INACTIVE\n} State;\n\nint main() {\n    State state = STATUS_ACTIVE;\n    STATUS_ACTIVE = 5;\n    printf(\"%d\", state);\n    return 0;\n}\n```",
+      "options": {
+        "A": "The state variable cannot be assigned to STATUS_ACTIVE.",
+        "B": "STATUS_ACTIVE is a constant; it cannot be assigned a value at runtime.",
+        "C": "An enum must be defined outside the main function.",
+        "D": "State is not a valid typedef name."
+      },
+      "correctOption": "B",
+      "explanation": "Enum constants (like STATUS_ACTIVE) are compile-time constants (r-values), not variables. Assigning a value to them at runtime like 'STATUS_ACTIVE = 5;' is illegal and will result in a compile error."
+    },
+    {
+      "id": "MCQ7",
+      "category": "Find the Bug",
+      "question": "Why will the compiler throw an error on the following source code?\n\n```c\n#include <stdio.h>\nenum Status { OK, ERROR };\nenum Signal { ERROR, DISCONNECT };\nint main() {\n    printf(\"Success\");\n    return 0;\n}\n```",
+      "options": {
+        "A": "The word 'OK' is a restricted preprocessor keyword.",
+        "B": "Enum declarations cannot end with semicolons.",
+        "C": "The identifier 'ERROR' is declared twice in the same scope block.",
+        "D": "Status and Signal enums are empty."
+      },
+      "correctOption": "C",
+      "explanation": "Enum identifiers share the namespace of their parent scope block. Having the constant 'ERROR' in both 'Status' and 'Signal' within the global scope causes an identifier collision."
+    },
+    {
+      "id": "MCQ8",
+      "category": "Complete the Code",
+      "question": "Fill in the blank to assign a safe type alias to the enum below so that 'TaskState' can be used as a standalone type name:\n\n```c\n______ enum {\n    TASK_PENDING,\n    TASK_RUNNING,\n    TASK_DONE\n} TaskState;\n```",
+      "options": {
+        "A": "define",
+        "B": "struct",
+        "C": "typedef",
+        "D": "typealias"
+      },
+      "correctOption": "C",
+      "explanation": "The 'typedef' keyword in C is used to define aliases for custom data structures, which allows declaring 'TaskState myVar;' directly."
+    },
+    {
+      "id": "MCQ9",
+      "category": "Complete the Code",
+      "question": "Complete the print block of the following program so it prints 'Offline' if the variable equals DEV_OFFLINE:\n\n```c\n#include <stdio.h>\ntypedef enum { DEV_OFFLINE, DEV_ONLINE } DevState;\nint main() {\n    DevState current = DEV_OFFLINE;\n    printf(\"Device is: %s\\n\", _______________________);\n    return 0;\n}\n```",
+      "options": {
+        "A": "(current == DEV_OFFLINE) ? \"Offline\" : \"Online\"",
+        "B": "current",
+        "C": "stringof(current)",
+        "D": "DEV_OFFLINE.toString()"
+      },
+      "correctOption": "A",
+      "explanation": "Because C enums do not store their text names at runtime, you must use conditional statements (like the ternary operator) to map the numeric value (0) to a displayable string literal."
+    },
+    {
+      "id": "MCQ10",
+      "category": "Best Approach",
+      "question": "When defining flags representing powers of 2 (e.g., bitwise flags: 1, 2, 4, 8), what is the most robust way to declare them in an enum?",
+      "options": {
+        "A": "Rely completely on the compiler's default auto-increment sequence.",
+        "B": "Explicitly assign values using bit-shift operators inside the enum.",
+        "C": "#define macros must be used because enums cannot process bitwise values.",
+        "D": "Enums can only store sequential indices, so this is impossible."
+      },
+      "correctOption": "B",
+      "explanation": "Using explicit assignments with bit-shifts (e.g., `FLAG_A = 1 << 0, FLAG_B = 1 << 1, FLAG_C = 1 << 2`) is the standard, cleanest, and most readable way to define bitwise constants within an enum."
+    }
+  ]
+}

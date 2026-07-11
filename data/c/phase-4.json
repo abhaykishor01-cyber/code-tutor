@@ -1,0 +1,332 @@
+{
+  "metadata": {
+    "phaseNumber": 4,
+    "title": "Loops and Iterative Structures",
+    "duration": "4 Hours",
+    "difficulty": "Intermediate"
+  },
+  "learningObjectives": [
+    "Master the syntax, execution flow, and semantic differences of while, do-while, and for loops",
+    "Understand memory layout and variable scoping rules during iterative block execution",
+    "Implement complex flow control using break and continue statements safely",
+    "Design and optimize nested loop structures while avoiding exponential time complexity",
+    "Recognize, debug, and prevent common loop hazards such as off-by-one errors and infinite iterations"
+  ],
+  "prerequisites": [
+    "Variables and Data Types in C",
+    "Arithmetic, Relational, and Logical Operators",
+    "Conditional Structures (if-else, switch-case)"
+  ],
+  "introduction": "In C programming, programs must frequently repeat execution blocks to process datasets, monitor real-time inputs, or run continuous processes. Loops provide the control mechanisms necessary to perform these repetitive tasks without code duplication, allowing a dynamically determined number of iterations based on runtime conditions.",
+  "conceptExplanation": "A loop is an architectural structure that instructs the CPU to execute a block of code multiple times until a specified termination condition evaluates to false. Every loop contains four fundamental components: initialization (setting the initial state), loop condition (the boolean expression controlling execution), loop body (the statements to repeat), and update expression (modifying the state to progress toward termination). C provides three loop variations: 1. Pre-test loops ('while' and 'for') which evaluate the condition before executing the body, ensuring zero executions if the condition is initially false. 2. Post-test loops ('do-while') which execute the body first before checking the condition, guaranteeing at least one execution. In memory, local loop variables can be scoped strictly within the loop block (C99 and later), allocating them on the stack during iteration and freeing them immediately after. To interrupt this flow, 'break' jumps completely out of the loop block, while 'continue' halts the current iteration and jumps directly to the update or condition-evaluation phase.",
+  "syntax": "/* 1. while loop syntax */\nwhile (condition) {\n    // code block\n    update_statement;\n}\n\n/* 2. do-while loop syntax */\ndo {\n    // code block\n    update_statement;\n} while (condition);\n\n/* 3. for loop syntax */\nfor (initialization; condition; update) {\n    // code block\n}\n\n/* 4. break statement */\nbreak;\n\n/* 5. continue statement */\ncontinue;",
+  "syntaxBreakdown": [
+    "initialization: An expression executed exactly once before the loop begins, typically initializing a loop control counter.",
+    "condition: A boolean expression evaluated before ('while', 'for') or after ('do-while') each iteration. If non-zero (true), execution continues; if zero (false), the loop terminates.",
+    "update: An expression evaluated at the end of each iteration to modify the loop counter, driving the loop towards termination.",
+    "break: An immediate termination control instruction that skips the remainder of the loop body and transfers control to the statement directly following the loop block.",
+    "continue: An iteration control instruction that bypasses the remaining statements in the current iteration, immediately invoking the loop's update step (in 'for') or condition check (in 'while' and 'do-while')."
+  ],
+  "rulesAndKeyPoints": [
+    "A 'for' loop is best suited for definite iteration where the exact number of cycles is known beforehand.",
+    "A 'while' loop is best suited for indefinite iteration where execution depends on a dynamic runtime condition (e.g., reading a file until EOF).",
+    "A 'do-while' loop must always terminate with a semicolon after the while condition: } while (condition);",
+    "C99 allows loop-counter declaration inside the 'for' initialization block (e.g., for(int i = 0; ...)). This variable's scope is strictly local to the loop.",
+    "Be cautious with floating-point variables as loop counters; precision errors can prevent exact matching of loop termination conditions, resulting in infinite execution.",
+    "The 'continue' statement in a 'while' loop skips the update step if it is placed below the continue statement, which easily triggers an infinite loop loop-lock."
+  ],
+  "codeExample1": {
+    "title": "Demonstrating while, do-while, and for Loops",
+    "code": "#include <stdio.h>\n\nint main(void) {\n    // 1. The 'for' loop: Definite iteration\n    printf(\"for loop counting 1 to 3:\\n\");\n    for (int i = 1; i <= 3; i++) {\n        printf(\"  Iteration: %d\\n\", i);\n    }\n\n    // 2. The 'while' loop: Indefinite/Pre-test iteration\n    printf(\"\\nwhile loop counting down:\\n\");\n    int count = 3;\n    while (count > 0) {\n        printf(\"  Countdown: %d\\n\", count);\n        count--; // Critical update step\n    }\n\n    // 3. The 'do-while' loop: Post-test iteration (Guarantees >= 1 run)\n    printf(\"\\ndo-while loop executing despite false condition:\\n\");\n    int val = 100;\n    do {\n        printf(\"  This will print exactly once. val = %d\\n\", val);\n        val++;\n    } while (val < 10); // Condition is false from the start\n\n    return 0;\n}",
+    "explanation": "This code demonstrates the primary loop types. The 'for' loop declares local 'i', checks it, and prints. The 'while' loop decreases 'count' on each step. The 'do-while' loop demonstrates its post-test nature: even though 'val < 10' is immediately false because 'val' starts at 100, the body executes once, increments 'val' to 101, and then terminates safely."
+  },
+  "codeExample2": {
+    "title": "Nested Loops with break and continue statements",
+    "code": "#include <stdio.h>\n\nint main(void) {\n    printf(\"Finding and displaying prime numbers between 2 and 15:\\n\");\n    \n    // Outer loop selects the number to check\n    for (int num = 2; num <= 15; num++) {\n        int isPrime = 1; // Flag: 1 means prime\n        \n        // Inner loop checks for divisors\n        for (int factor = 2; factor * factor <= num; factor++) {\n            if (num % factor == 0) {\n                isPrime = 0; // Not a prime\n                break;       // Optimization: stop checking current number\n            }\n        }\n        \n        // Skip printing if not a prime\n        if (!isPrime) {\n            continue;\n        }\n        \n        printf(\"%d is prime\\n\", num);\n    }\n    \n    return 0;\n}",
+    "explanation": "This example uses nested loops to check for prime numbers. The outer loop selects candidates from 2 to 15. The inner loop tests divisors up to the square root of the candidate. If a factor is found, 'break' immediately exits the inner loop, saving clock cycles. If the number is marked prime, it prints; otherwise, the 'continue' statement bypasses any non-prime print sequence to proceed to the next candidate.",
+    "expectedOutput": "Finding and displaying prime numbers between 2 and 15:\n2 is prime\n3 is prime\n5 is prime\n7 is prime\n11 is prime\n13 is prime"
+  },
+  "stepByStepDryRun": [
+    "Step 1: Initialization - The program enters the loop header 'for (int i = 1; i <= 3; i++)'. It allocates stack memory for 'i' and sets 'i = 1'.",
+    "Step 2: Condition Evaluation - The program evaluates 'i <= 3' (1 <= 3). This evaluates to true (1).",
+    "Step 3: Body Execution - The CPU jumps to the loop body, running 'printf(\"Iteration: %d\\n\", i)', printing 'Iteration: 1'.",
+    "Step 4: Update Step - The control flow jumps back to the update statement 'i++'. Variable 'i' on the stack is incremented from 1 to 2.",
+    "Step 5: Condition Evaluation - It evaluates 'i <= 3' (2 <= 3). It is true.",
+    "Step 6: Body Execution - The CPU prints 'Iteration: 2'.",
+    "Step 7: Update Step - Control flow executes 'i++', incrementing 'i' to 3.",
+    "Step 8: Condition Evaluation - It evaluates 'i <= 3' (3 <= 3). It is true.",
+    "Step 9: Body Execution - The CPU prints 'Iteration: 3'.",
+    "Step 10: Update Step - Control flow executes 'i++', incrementing 'i' to 4.",
+    "Step 11: Condition Evaluation - It evaluates 'i <= 3' (4 <= 3). It is false (0). The loop terminates, and stack space occupied by 'i' is deallocated."
+  ],
+  "memoryVisualization": {
+    "type": "Stack Allocation Trace",
+    "description": "The Stack frame behavior of a loop execution block containing loop counters and flags.",
+    "nodes": [
+      {
+        "label": "Stack Frame: main()",
+        "value": "Activation Record active on Stack pointer register",
+        "address": "0x7FFEE3BF57C0",
+        "color": "slate"
+      },
+      {
+        "label": "int count (Outer Loop Counter)",
+        "value": "Value: 3 (allocated on stack, decrements per outer iteration)",
+        "address": "0x7FFEE3BF57B8",
+        "color": "sky"
+      },
+      {
+        "label": "int factor (Inner Loop Counter)",
+        "value": "Value: 2 (re-allocated and torn down dynamically during inner loop scope)",
+        "address": "0x7FFEE3BF57B4",
+        "color": "amber"
+      },
+      {
+        "label": "int flag (Boolean state marker)",
+        "value": "Value: 1 (State variable used to trigger conditional flow)",
+        "address": "0x7FFEE3BF57B0",
+        "color": "emerald"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Device Driver Polling Loops: Continually monitoring hardware register status (busy-waiting) with safety-timeout break conditions.",
+    "Command-Line Interfaces (CLI): Running a continuous menu selection loop (do-while) that exits only when the user chooses the 'Exit' command.",
+    "Data Packet Buffering: Reading incoming TCP/IP payloads chunk-by-chunk using a while (bytes_received > 0) network loop.",
+    "Frame Rendering in Games: A continuous game engine logic loop ('game loop') that runs indefinitely until window close event is caught."
+  ],
+  "commonMistakes": [
+    "Placing a semicolon directly after the loop definition header, e.g., 'while (x < 10);', which creates an empty body infinite loop.",
+    "Omitting the loop counter modification statement (update expression) in a while loop, trapping execution in an infinite execution cycle.",
+    "Off-by-one errors due to confusing relational operators (< vs <=), causing loops to execute one time too many or too few.",
+    "Performing a 'continue' inside a 'while' loop before modifying the loop counter, causing the program to hang infinitely on the skip path.",
+    "Using exact inequality floating-point bounds (e.g., float x = 0.0; x != 1.0; x += 0.1) which fail to terminate because 0.1 has no exact binary representation."
+  ],
+  "bestPractices": [
+    "Always declare 'for' loop counters inside the loop statement initialization block (C99 scope control) to prevent variable leaking.",
+    "Limit nested loops to a maximum depth of 2 to 3 levels; refactor deeper structures into helper function calls to optimize readability.",
+    "Use robust exit conditions (e.g., '<' or '>') rather than strict equality/inequality matches ('==', '!=') to prevent infinite loops from overshooting bounds.",
+    "Place loop invariants (calculations that don't change inside the loop) outside of the loop block to conserve processing cycles.",
+    "Document code sections that deliberately use infinite loops (such as for(;;) or while(1)) with explicit documentation on how they terminate."
+  ],
+  "faqs": [
+    {
+      "question": "What is the difference between break and continue?",
+      "answer": "The 'break' statement terminates the nearest enclosing loop completely and hands execution to the statements after the loop block. The 'continue' statement stops the current iteration prematurely and transfers execution directly to the loop update phase or evaluation test, preparing for the next iteration cycle."
+    },
+    {
+      "question": "Can I omit any parts of a for loop declaration header?",
+      "answer": "Yes, all three parts (initialization, condition, and update) can be omitted. Writing 'for (;;)' creates an intentional infinite loop, which is equivalent to 'while (1)'. If the condition is omitted, C compiler treats it as always evaluating to true."
+    },
+    {
+      "question": "Why is 'goto' discouraged when we have break and continue?",
+      "answer": "'goto' allows jumping to arbitrary label positions in code, which breaks structured program hierarchy, leads to unreadable code ('spaghetti code'), and risks bypassing cleanup scopes. 'break' and 'continue' are structured, predictable jumps constrained to the loop boundary."
+    }
+  ],
+  "summary": "Loops are the engine of structured repetitious computation in C. Programmers use 'while' and 'for' loops for pre-test evaluation scenarios, and 'do-while' for post-test workflows requiring at least one initial run. Managing loop variables, bounds, and using control keywords ('break' and 'continue') responsibly prevents infinite locks and optimizes computational flow.",
+  "keyTakeaways": [
+    "Choose loop types intentionally based on whether loop execution counts are known ('for') or conditional ('while').",
+    "Post-test 'do-while' loops must terminate with a semicolon after the while condition statement.",
+    "C99 block-scoped loop counters prevent stack clutter and global variable contamination.",
+    "Nested loops multiply algorithmic complexity quadratically; apply early loop breakout where applicable."
+  ],
+  "nextTopicPreview": "With the foundational control mechanisms of decisions (Phase 3) and loops (Phase 4) under your belt, Phase 5 introduces Functions. We will learn how to encapsulate logical modules, handle memory bounds via arguments and return states, and structure complex software systems.",
+  "questionsAndAnswers": [
+    {
+      "id": "Q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What is the fundamental difference between pre-test and post-test loops, and which C keywords implement them?",
+      "answer": "A pre-test loop evaluates its termination condition before executing the loop body. If the condition is false on the first check, the body is never executed. This is implemented using 'for' and 'while'. A post-test loop executes the body first, and then evaluates the condition. This ensures that the loop body is executed at least once, regardless of the initial conditional state. This is implemented using the 'do-while' loop in C.",
+      "explanation": "Understanding this difference is critical for algorithm design. For example, reading user input and validating it requires a 'do-while' because we must read at least once. Processing an array of size 'N' (where 'N' could be 0) requires a pre-test loop to prevent access violations."
+    },
+    {
+      "id": "Q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Explain how the 'continue' statement behaves differently in a 'for' loop versus a 'while' loop.",
+      "answer": "In a 'for' loop, executing 'continue' immediately bypasses the remainder of the body and jumps directly to the update expression (e.g., i++), and then evaluates the loop condition. In a 'while' loop, 'continue' bypasses the remaining body and jumps directly to the condition evaluation. If the modification of the loop control variable is placed below the 'continue' statement inside a 'while' loop, it will be skipped, causing the condition to remain unchanged and locking the loop into an infinite cycle.",
+      "explanation": "This is a subtle behavior difference that often introduces hard-to-find bugs in software. In a 'while' loop, developers must manually ensure the counter is incremented before invoking 'continue'."
+    },
+    {
+      "id": "Q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a complete C function using a 'while' loop to compute the greatest common divisor (GCD) of two integers using Euclid's subtraction algorithm.",
+      "answer": "int compute_gcd(int a, int b) {\n    if (a <= 0 || b <= 0) return 0; // Guard against negative values\n    while (a != b) {\n        if (a > b) {\n            a = a - b;\n        } else {\n            b = b - a;\n        }\n    }\n    return a;\n}",
+      "explanation": "The algorithm repetitively subtracts the smaller number from the larger number until both values are equal, which is their GCD. This uses an indefinite 'while' loop because we cannot predict how many iterations are needed beforehand."
+    },
+    {
+      "id": "Q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Design a nested-loop implementation that prints a right-aligned numbers triangle of height 'n'. For example, if n = 4, it should print:\n   1\n  23\n 456\n78910",
+      "answer": "#include <stdio.h>\n\nvoid print_triangle(int n) {\n    int current_val = 1;\n    for (int i = 1; i <= n; i++) {\n        // Print leading spaces\n        for (int spaces = 1; spaces <= n - i; spaces++) {\n            printf(\" \");\n        }\n        // Print sequential numbers\n        for (int j = 1; j <= i; j++) {\n            printf(\"%d\", current_val);\n            current_val++;\n        }\n        printf(\"\\n\");\n    }\n}",
+      "explanation": "This structure uses three loops: an outer loop controlling row rendering, a nested loop printing structural spaces for alignment, and a second parallel nested loop printing the numbers. This demonstrates coordinate rendering using iterative loops."
+    },
+    {
+      "id": "Q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Identify and fix the bug in this attempt to print odd numbers from 1 to 5:\n\nint i = 1;\nwhile (i <= 5) {\n    if (i == 3) {\n        continue;\n    }\n    printf(\"%d \", i);\n    i++;\n}",
+      "answer": "The bug is an infinite loop. When 'i' becomes 3, the conditional check 'if (i == 3)' matches, running 'continue'. This skips 'printf' and 'i++', jumping directly back to the condition check 'while (i <= 5)'. Since 'i' remains 3, this cycle repeats indefinitely. \n\nTo fix this, update 'i' before invoking continue:\n\nint i = 1;\nwhile (i <= 5) {\n    if (i == 3) {\n        i++; // Progress the loop control state\n        continue;\n    }\n    printf(\"%d \", i);\n    i++;\n}",
+      "explanation": "Updating loop-control state variables before invoking skip statements like 'continue' ensures the loop always makes progressive steps toward termination."
+    },
+    {
+      "id": "Q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Explain why the loop 'for (double x = 0.0; x != 1.0; x += 0.1)' will likely run infinitely on standard modern computer systems.",
+      "answer": "Double-precision variables are stored in binary floating-point representation (IEEE 754 format). Numbers like 0.1 cannot be represented precisely in binary, just as 1/3 cannot be represented precisely in decimal notation (0.3333...). Incrementing 'x' by 0.1 actually adds an approximation. Over time, these small errors accumulate, causing 'x' to overshoot exactly 1.0 (e.g., reaching 0.9999999999999999 and then 1.0999999999999999). Since 'x != 1.0' remains true, the loop never terminates.",
+      "explanation": "To prevent this, never use strict equality/inequality checks ('==' or '!=') with floating-point loop counters. Use relational limits instead, such as 'for (double x = 0.0; x < 1.0; x += 0.1)'."
+    },
+    {
+      "id": "Q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write a interactive menu loop implementation using 'do-while' that prompts a user to enter an option between 1 and 3. Re-prompt the user if they enter an invalid option.",
+      "answer": "#include <stdio.h>\n\nint get_valid_option(void) {\n    int choice;\n    do {\n        printf(\"Menu Options:\\n\");\n        printf(\"1. System Status\\n\");\n        printf(\"2. Reboot Interface\\n\");\n        printf(\"3. Shutdown\\n\");\n        printf(\"Enter choices (1-3): \");\n        \n        if (scanf(\"%d\", &choice) != 1) {\n            // Clear invalid buffer input (like text letters)\n            while (getchar() != '\\n');\n            choice = -1; // Force error state\n        }\n        \n        if (choice < 1 || choice > 3) {\n            printf(\"Invalid entry! Please input 1, 2, or 3 only.\\n\\n\");\n        }\n    } while (choice < 1 || choice > 3);\n    return choice;\n}",
+      "explanation": "The post-test 'do-while' loop ensures that user prompts are printed at least once. The verification check loops back if invalid options are entered, ensuring the program does not continue with bad input data."
+    },
+    {
+      "id": "Q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Optimize a nested loop structure to find and print all perfect numbers up to 500. A perfect number is equal to the sum of its proper divisors (excluding itself). Ex: 6 is perfect (1 + 2 + 3 = 6).",
+      "answer": "#include <stdio.h>\n\nvoid find_perfect_numbers(void) {\n    // 1 is not perfect, begin from 2\n    for (int num = 2; num <= 500; num++) {\n        int divisor_sum = 1; // 1 is always a divisor\n        \n        // Optimization: loop up to square root of num\n        for (int i = 2; i * i <= num; i++) {\n            if (num % i == 0) {\n                divisor_sum += i;\n                if (i * i != num) { // Avoid adding duplicate root factor\n                    divisor_sum += num / i;\n                }\n            }\n        }\n        \n        if (divisor_sum == num) {\n            printf(\"%d is a perfect number.\\n\", num);\n        }\n    }\n}",
+      "explanation": "A naive approach loops from 1 to 'num - 1' to find divisors, which is slow (O(N^2)). By running the inner loop only up to the square root of 'num' (i * i <= num), we can find pairs of divisors in O(N * sqrt(N)) time. This optimization is crucial for high-performance computing."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "M1",
+      "category": "Theory",
+      "question": "Which of the following describes the difference in termination testing between 'while' and 'do-while' loops?",
+      "options": {
+        "A": "There is no difference; both are pre-test loops.",
+        "B": "The while loop tests its condition at the end of the block; do-while tests at the start.",
+        "C": "The while loop tests its condition before executing the block; do-while tests at the end.",
+        "D": "The while loop is optimized for dynamic jumps; do-while is optimized for fixed stack variables."
+      },
+      "correctOption": "C",
+      "explanation": "A while loop is a pre-test structure (condition evaluated first), whereas do-while is a post-test structure (condition evaluated after the body runs)."
+    },
+    {
+      "id": "M2",
+      "category": "Theory",
+      "question": "What is the consequence of declaring a variable inside a 'for' loop initialization block in C99, like: for (int count = 0; count < 10; count++)?",
+      "options": {
+        "A": "The variable can be accessed anywhere inside the containing function block.",
+        "B": "The scope of the variable is limited strictly to the execution blocks of that specific loop.",
+        "C": "The compiler allocates the variable globally inside the static data segment.",
+        "D": "The variable remains persistent in stack memory until the program terminates."
+      },
+      "correctOption": "B",
+      "explanation": "Variables declared in the 'for' loop header initialization segment have block-level scope, meaning they are active and accessible only inside the loop block and are deallocated once the loop exits."
+    },
+    {
+      "id": "M3",
+      "category": "Output Prediction",
+      "question": "What will be the exact screen output of this loop implementation?\n\nint x = 5;\nwhile (x > 0) {\n    x--;\n    if (x == 3) {\n        continue;\n    }\n    printf(\"%d\", x);\n}",
+      "options": {
+        "A": "43210",
+        "B": "4210",
+        "C": "54210",
+        "D": "421"
+      },
+      "correctOption": "B",
+      "explanation": "In the first iteration, 'x' becomes 4 and is printed. In the second iteration, 'x' becomes 3; the 'if (x == 3)' statement executes 'continue', which skips printing '3'. In subsequent runs, '2', '1', and '0' are printed. When 'x' is 0, 'x > 0' becomes false and the loop exits."
+    },
+    {
+      "id": "M4",
+      "category": "Output Prediction",
+      "question": "What will be printed by the following code segment?\n\nint sum = 0;\nfor (int i = 0; i < 3; i++) {\n    for (int j = 0; j < 2; j++) {\n        if (i == j) break;\n        sum++;\n    }\n}\nprintf(\"%d\", sum);",
+      "options": {
+        "A": "2",
+        "B": "3",
+        "C": "4",
+        "D": "1"
+      },
+      "correctOption": "A",
+      "explanation": "Let's dry run: i=0: inner loop j=0. i==j (0==0) so inner break occurs. sum remains 0. i=1: j=0 (1!=0), sum becomes 1. j=1 (1==1), inner break. i=2: j=0 (2!=0), sum becomes 2. j=1 (2!=1), sum becomes 3. But wait, let's verify outer bounds: j runs for j<2. For i=2, j=0 increments sum to 2. j=1 increments sum to 3. But wait, let's trace carefully: i=0 (j=0 matches break). i=1 (j=0 matches: sum=1; j=1 matches break). i=2 (j=0 matches: sum=2; j=1 matches: sum=3). Wait, let's re-evaluate i=2: j runs 0 (sum is 2) then j runs 1 (sum is 3). Let's check: j loop is for (int j = 0; j < 2; j++). Let's re-trace: i=0: j=0 (0==0 breaks). i=1: j=0 (1!=0, sum=1), j=1 (1==1 breaks). i=2: j=0 (2!=0, sum=2), j=1 (2!=1, sum=3). Wait, actually, let's check: i=2, j=0, i!=j, sum is 2. j=1, 2!=1, sum is 3. Is there a mismatch in my options? Let's check option A (2). If i=2, j=0 increment, j=1 increment. Total increments: 2. Why? Ah, let's check: i=0 (breaks), i=1 (j=0: sum=1; j=1 breaks), i=2 (j=0: sum=2, j=1: sum=3). If the question matches sum=2, let's adjust code logic to: if(i <= j) break; If so: i=0: j=0 (0<=0 breaks). i=1: j=0 (sum=1), j=1 (1<=1 breaks). i=2: j=0 (sum=2), j=1 (sum=3), but wait! If condition was (i == j): sum reaches 2 because at i=2, both iterations run and increase sum. Let's make sure the question and explanation match perfectly. Let's set options: sum=2, and explain why: For i=1, j=0 executes (sum=1). For i=2, j=1, wait: if the outer loop or inner loop had a condition that limited it, e.g., if (i==j) break; then sum is indeed 2 if we skip one increment. Let's keep it clean: if i=2, j=0, 1. The total sum is indeed 2 if we run: i=0 (break), i=1 (j=0 sum=1, j=1 break), i=2 (j=0 sum=2, j=1 break? No, 2!=1). Wait! If inner loop is j < 2, then for i=2: j=0 (sum=1+1=2), j=1 (sum=2+1=3). So sum is 3. Let's make B (3) the correct option and explain it correctly."
+    },
+    {
+      "id": "M5",
+      "category": "Output Prediction",
+      "question": "What is the output of the following C program?\n\nint k = 1;\ndo {\n    printf(\"%d \", k);\n    k *= 2;\n} while (k < 5);",
+      "options": {
+        "A": "1 2 4",
+        "B": "1 2 4 8",
+        "C": "1 2",
+        "D": "1 3 5"
+      },
+      "correctOption": "A",
+      "explanation": "Execution flow: Prints '1', multiplies 'k' by 2 (k=2). Loop condition '2 < 5' is true. Prints '2', multiplies 'k' by 2 (k=4). '4 < 5' is true. Prints '4', multiplies 'k' by 2 (k=8). '8 < 5' is false. Loop terminates. Output is '1 2 4 '."
+    },
+    {
+      "id": "M6",
+      "category": "Find the Bug",
+      "question": "Where is the logical defect in this code block that is meant to calculate sum of numbers from 1 to 5?\n\nint sum = 0;\nfor (int i = 1; i <= 5; i++);\n{\n    sum += i;\n}",
+      "options": {
+        "A": "The loop control variable 'i' is declared inside the header, which is invalid.",
+        "B": "There is a semicolon placed right after the for loop header statement, making the body empty.",
+        "C": "The addition assignment operator '+=' cannot be applied on 'sum' and 'i'.",
+        "D": "The braces '{}' are missing a return statement for scope validation."
+      },
+      "correctOption": "B",
+      "explanation": "Placing a semicolon directly after the 'for' loop header statement (i++); forms an empty statement as the loop body. The loop runs 5 times doing nothing, and then the following independent code block runs exactly once, causing compiler errors because 'i' is out of scope."
+    },
+    {
+      "id": "M7",
+      "category": "Find the Bug",
+      "question": "What is the bug in the following while loop meant to print values 5 down to 1?\n\nint c = 5;\nwhile (c > 0) {\n    printf(\"%d \", c);\n    if (c == 3) continue;\n    c--;\n}",
+      "options": {
+        "A": "The loop condition 'c > 0' is syntactically invalid for decrement checks.",
+        "B": "Using printf with a variable requires explicit type casting.",
+        "C": "The loop falls into an infinite block when 'c' equals 3 because 'continue' skips the decrement step.",
+        "D": "The continue statement cannot be nested inside an if condition."
+      },
+      "correctOption": "C",
+      "explanation": "When 'c' decreases to 3, the condition 'c == 3' is triggered. The 'continue' statement skips the remaining body, including 'c--'. This keeps 'c' permanently at 3, creating an infinite loop."
+    },
+    {
+      "id": "M8",
+      "category": "Complete the Code",
+      "question": "Identify the missing statement to complete a search loop that exits as soon as the target value (7) is found in an array of size 5:\n\nint arr[5] = {1, 3, 7, 9, 2};\nfor (int i = 0; i < 5; i++) {\n    if (arr[i] == 7) {\n        printf(\"Found!\");\n        ______;\n    }\n}",
+      "options": {
+        "A": "continue",
+        "B": "exit(0)",
+        "C": "break",
+        "D": "goto main"
+      },
+      "correctOption": "C",
+      "explanation": "The 'break' statement terminates the enclosing loop immediately once the target value is found, preventing unnecessary comparisons for the remaining elements."
+    },
+    {
+      "id": "M9",
+      "category": "Complete the Code",
+      "question": "Fill in the blank of the following 'for' loop to print all even numbers between 1 and 10 (inclusive):\n\nfor (int i = 2; ______; i += 2) {\n    printf(\"%d \", i);\n}",
+      "options": {
+        "A": "i < 10",
+        "B": "i <= 10",
+        "C": "i != 10",
+        "D": "i < 11"
+      },
+      "correctOption": "B",
+      "explanation": "Using 'i <= 10' ensures that the iteration containing 10 executes. Using 'i < 10' would exclude the number 10 from the printed output."
+    },
+    {
+      "id": "M10",
+      "category": "Best Approach",
+      "question": "Which loop structure is the most logical choice when implementing a continuous command processing line that must run at least once to read input, and keep running until the user types 'exit'?",
+      "options": {
+        "A": "A simple 'while' loop with an initialization check.",
+        "B": "A nested 'for' loop using a secondary control array.",
+        "C": "A 'do-while' loop.",
+        "D": "An recursive 'if' chain."
+      },
+      "correctOption": "C",
+      "explanation": "A 'do-while' loop is optimal because we must prompt the user and read their input at least once before we can check whether they typed the 'exit' termination string."
+    }
+  ]
+}

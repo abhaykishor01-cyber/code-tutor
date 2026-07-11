@@ -1,0 +1,342 @@
+{
+  "metadata": {
+    "phaseNumber": 12,
+    "title": "Preprocessor Directives and Macro Compilation",
+    "duration": "4 Hours",
+    "difficulty": "Intermediate"
+  },
+  "learningObjectives": [
+    "Understand the phases of compilation and the role of the C Preprocessor as a text-substitution tool.",
+    "Define, use, and distinguish between object-like and function-like macros.",
+    "Master conditional compilation directives (#if, #ifdef, #ifndef, #else, #elif, #endif) for building platform-independent and debuggable software.",
+    "Implement bulletproof custom header files with include guards (#ifndef pattern) and #pragma once.",
+    "Leverage preprocessor operators such as stringification (#) and token-pasting (##).",
+    "Analyze structure packing modifications using #pragma pack directives."
+  ],
+  "prerequisites": [
+    "Solid understanding of standard variable declarations, structures, and function definitions.",
+    "Basic knowledge of the compilation pipeline (source to machine executable)."
+  ],
+  "introduction": "Before the C compiler parses your code's grammar, analyzes types, or generates assembly, the C Preprocessor (cpp) sweeps through your source files. The preprocessor is a pure, zero-cost, source-to-source text-substitution tool. It doesn't understand C types, scopes, or variables; it simply processes 'directives' marked by a leading hash symbol (#). By manipulating text, the preprocessor lets us create reusable macro functions, configuration flags, header modularity, and compile-time optimizations that would otherwise incur performance overhead at runtime. Mastering this phase is crucial for system-level programming, writing robust library APIs, and creating cross-platform codebases.",
+  "conceptExplanation": "The preprocessor operates during Phase 4 of the translation process. Key concepts include:\n\n1. File Inclusion (#include):\nDirects the preprocessor to pull the entire contents of a specified file and insert it directly at the line where the directive is declared. If `<filename>` is used, the preprocessor searches standard system library directories. If `\"filename\"` is used, it first searches the user's local directory path, falling back to standard paths.\n\n2. Macro Substitution (#define):\nAssociates an identifier (macro name) with a replacement token sequence. Whenever that identifier is encountered in the source code after its declaration, it is replaced with its defined tokens. \n- Object-like macros define constant values.\n- Function-like macros accept arguments and expand into custom inline logic. Unlike real C functions, function-like macros bypass argument type-checking and function-call stack overhead.\n\n3. Conditional Compilation:\nAllows you to selectively compile blocks of code. If a given preprocessor condition is met, the code block is sent to the compiler; otherwise, it is stripped entirely. This is used extensively to support different OS APIs, handle diagnostic debug blocks, or avoid multiple-definition errors during link time.\n\n4. Header Guards and #pragma once:\nWhen headers include other headers, it is easy to accidentally include the same file multiple times in a single compilation unit, violating the 'one-definition rule'. Include guards prevent duplicate inclusions using conditional logic around the entire header content.",
+  "syntax": "/* 1. Header Inclusion */\n#include <system_header.h>\n#include \"custom_header.h\"\n\n/* 2. Macro Definition */\n#define CONSTANT_NAME value\n#define MACRO_NAME(arg1, arg2) ((arg1) + (arg2))\n\n/* 3. Preprocessor Stringification & Concatenation */\n#define TO_STR(x) #x\n#define CONCAT(a, b) a##b\n\n/* 4. Conditional Compilation */\n#ifdef SYMBOL_NAME\n    // Compiled if SYMBOL_NAME is defined\n#elif defined(OTHER_SYMBOL)\n    // Compiled if OTHER_SYMBOL is defined\n#else\n    // Compiled otherwise\n#endif\n\n/* 5. Pragma Compiler Instructions */\n#pragma pack(push, 1)\n#pragma pack(pop)",
+  "syntaxBreakdown": [
+    "\"#include <header_name.h>\" - Instructs the preprocessor to search standard library paths for the specified system header file.",
+    "\"#include \\\"header_name.h\\\"\" - Instructs the preprocessor to search the current source file's directory first, and then default search paths.",
+    "\"#define IDENTIFIER replacement\" - Declares an object-like macro. The preprocessor replaces every occurrence of 'IDENTIFIER' with 'replacement'.",
+    "\"#define MACRO(arg) ((arg) * (arg))\" - Declares a function-like macro. Every call to MACRO(val) is replaced textually with ((val) * (val)). Parentheses around arguments and the whole expression are mandatory to avoid precedence bugs.",
+    "\"#\" operator (Stringification) - Converts a macro parameter into a double-quoted string literal.",
+    "\"##\" operator (Token-Pasting) - Merges two independent tokens into a single valid C compiler token.",
+    "\"#ifndef / #define / #endif\" - Traditional Header Guard block preventing multiple inclusions of the same header declaration.",
+    "\"#pragma once\" - Modern compiler directive that optimizes compilation by instructing the preprocessor to include the file exactly once per compilation unit.",
+    "\"#pragma pack(push, 1)\" - Directs the compiler to align structures on 1-byte boundaries, eliminating structural padding at the cost of memory alignment access penalties."
+  ],
+  "rulesAndKeyPoints": [
+    "Preprocessor directives always start with a '#' character and must be the first non-whitespace character on the line.",
+    "Directives do not end with a semicolon (;). Placing a semicolon at the end of a #define results in that semicolon being included in the text replacement, leading to compilation syntax errors.",
+    "Always parenthesize macro arguments and the overall macro expression to preserve correct mathematical operator precedence.",
+    "Function-like macro arguments are evaluated every time they are referenced within the macro expansion. Never pass variables with side-effects (e.g., post-increments like x++) to function-like macros.",
+    "Header guards are mandatory for every user-created header file to avoid compiler errors regarding duplicate structure, enum, or inline function definitions.",
+    "#pragma is compiler-specific. Unrecognized pragmas are safely ignored by compilers, but standard pragmas like 'pack' are widely supported across major platforms (GCC, Clang, MSVC)."
+  ],
+  "codeExample1": {
+    "title": "Custom Header File with Include Guards and Safe Macros",
+    "code": "/* file: math_utils.h */\n#ifndef MATH_UTILS_H\n#define MATH_UTILS_H\n\n/* Define mathematical constants */\n#define PI 3.14159265358979323846\n\n/* Function-like macro: Safely compute the square of an expression */\n#define SAFE_SQUARE(x) ((x) * (x))\n\n/* Function-like macro: Get maximum value safely */\n#define MAX_VAL(a, b) (((a) > (b)) ? (a) : (b))\n\n#endif /* MATH_UTILS_H */\n\n/* file: main.c */\n#include <stdio.h>\n#include \"math_utils.h\"\n#include \"math_utils.h\" /* Re-include to prove the Header Guard works */\n\nint main(void) {\n    int num = 5;\n    /* Test basic macro expansion */\n    printf(\"Square of %d is: %d\\n\", num, SAFE_SQUARE(num));\n\n    /* Illustrate correct operator precedence preservation */\n    /* Expands to: ((num + 1) * (num + 1)) -> (6 * 6) = 36 */\n    printf(\"Square of (%d + 1) is: %d\\n\", num, SAFE_SQUARE(num + 1));\n\n    /* Get maximum of two numbers */\n    printf(\"Max of 10 and 20 is: %d\\n\", MAX_VAL(10, 20));\n    return 0;\n}",
+    "explanation": "This example showcases modular engineering in C. The file 'math_utils.h' represents a custom header file protected by a header guard (#ifndef MATH_UTILS_H). This guard prevents syntax/redefinition errors when 'math_utils.h' is recursively or twice included in 'main.c'. The macro 'SAFE_SQUARE(x)' uses deep parenthesization: ((x) * (x)). If we passed (num + 1) to an unprotected macro like '#define BAD_SQUARE(x) x * x', it would expand to 'num + 1 * num + 1', which evaluates to '5 + 5 + 1 = 11' due to operator precedence rules. With parenthesization, it expands to ((num + 1) * (num + 1)) which correctly outputs 36."
+  },
+  "codeExample2": {
+    "title": "Conditional Compilation and Struct Packing Control",
+    "code": "#include <stdio.h>\n\n/* Define configuration level */\n#define DEBUG_LEVEL 2\n\n/* Platform check */\n#if defined(_WIN32)\n    #define PLATFORM_NAME \"Windows OS\"\n#elif defined(__linux__)\n    #define PLATFORM_NAME \"Linux OS\"\n#else\n    #define PLATFORM_NAME \"Unknown OS\"\n#endif\n\n/* Struct alignment using Pragma Pack */\n#pragma pack(push, 1) /* Force structural alignment of 1 byte (remove padding) */\ntypedef struct {\n    char identifier;\n    int network_address;\n} PackedPacket;\n#pragma pack(pop) /* Restore default alignment settings */\n\ntypedef struct {\n    char identifier;\n    int network_address;\n} StandardPacket;\n\nint main(void) {\n    /* 1. Print conditional compilation output */\n    printf(\"Platform identified: %s\\n\", PLATFORM_NAME);\n\n    /* Conditional execution block */\n    #if (DEBUG_LEVEL >= 2)\n        printf(\"[VERBOSE DEBUG] Verbose compilation mode is enabled.\\n\");\n    #elif (DEBUG_LEVEL == 1)\n        printf(\"[INFO DEBUG] Basic debugging active.\\n\");\n    #else\n        printf(\"[PRODUCTION] No debug assertions active.\\n\");\n    #endif\n\n    /* 2. Compare Packed vs Standard Struct alignment sizes */\n    printf(\"Size of PackedPacket: %zu bytes\\n\", sizeof(PackedPacket));\n    printf(\"Size of StandardPacket: %zu bytes\\n\", sizeof(StandardPacket));\n\n    return 0;\n}",
+    "explanation": "This system-level code highlights conditional compilation and memory layouts. The preprocessor inspects defined environment macros to auto-assign a PLATFORM_NAME. It evaluates the 'DEBUG_LEVEL' numerical value at pre-compilation time and discards inactive code blocks, keeping the binary clean. Additionally, `#pragma pack(push, 1)` overrides natural compiler alignment rules. While a StandardPacket structure is padded to 8 bytes (due to 4-byte natural int alignment constraints on standard 64-bit systems), the PackedPacket is compiled to use exactly 5 bytes. This is incredibly useful for writing straight to network sockets or binary files.",
+    "expectedOutput": "Platform identified: Linux OS\n[VERBOSE DEBUG] Verbose compilation mode is enabled.\nSize of PackedPacket: 5 bytes\nSize of StandardPacket: 8 bytes"
+  },
+  "stepByStepDryRun": [
+    "Step 1: The programmer runs a compiler command (e.g., 'gcc -E main.c'). This triggers ONLY the preprocessor stage.",
+    "Step 2: The preprocessor encounters '#include <stdio.h>'. It opens the standard library file 'stdio.h' and replaces this direct line with thousands of lines containing system declarations.",
+    "Step 3: The preprocessor evaluates '#define DEBUG_LEVEL 2' and stores 'DEBUG_LEVEL' as a replacement key with value '2' in its internal tracking table.",
+    "Step 4: It encounters the conditional block '#if (DEBUG_LEVEL >= 2)'. Since 2 >= 2 evaluates to true, the preprocessor preserves the printf(\"[VERBOSE DEBUG]...\") statement.",
+    "Step 5: It strips the entire code blocks belonging to #elif (DEBUG_LEVEL == 1) and #else, completely deleting those characters from the stream passed to the main compiler.",
+    "Step 6: It replaces 'sizeof(PackedPacket)' and 'sizeof(StandardPacket)' syntax arguments with their actual pre-evaluated integer token expressions during structural compilation.",
+    "Step 7: The preprocessor emits clean, expanded pure C code (without any # directives) directly to the main syntax parser/assembler."
+  ],
+  "memoryVisualization": {
+    "type": "Struct Padding vs Packing Layout",
+    "description": "This diagram displays the structural layout difference in Memory when using `#pragma pack(1)` vs default alignment settings. Standard systems use natural alignment boundaries, creating performance padding buffers.",
+    "nodes": [
+      {
+        "label": "StandardPacket.identifier",
+        "value": "char (1 byte)",
+        "address": "0x7FFEE33C24E0",
+        "color": "emerald"
+      },
+      {
+        "label": "StandardPacket (PADDING)",
+        "value": "Unused (3 bytes)",
+        "address": "0x7FFEE33C24E1",
+        "color": "rose"
+      },
+      {
+        "label": "StandardPacket.network_address",
+        "value": "int (4 bytes)",
+        "address": "0x7FFEE33C24E4",
+        "color": "sky"
+      },
+      {
+        "label": "PackedPacket.identifier",
+        "value": "char (1 byte)",
+        "address": "0x7FFEE33C24F0",
+        "color": "emerald"
+      },
+      {
+        "label": "PackedPacket.network_address",
+        "value": "int (4 bytes - starts with NO padding immediately)",
+        "address": "0x7FFEE33C24F1",
+        "color": "sky"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Header File Include Guards: Standard industry-wide practice for structure encapsulation in multi-module libraries.",
+    "Platform Portability Layers: Custom OS-specific implementations for embedded systems, game consoles, and desktop systems under unified platform-neutral APIs.",
+    "Assertion/Debug Logging Frameworks: Removing trace-logging infrastructure code from high-performance production builds seamlessly via compile-time variables.",
+    "Direct Binary Protocol Communication: Formatting precise 1-byte aligned data packets using #pragma pack to read/write structure blocks directly from network card buffers."
+  ],
+  "commonMistakes": [
+    "Placing a semicolon (;) at the end of macro definitions. For example: '#define MAX_VAL 100;' will result in 'int arr[MAX_VAL];' expanding to 'int arr[100;];' which is invalid.",
+    "Under-parenthesizing function-like macros, leading to compilation issues and hard-to-track mathematical precedence bugs when sending operations (e.g. x + 1) as arguments.",
+    "Double evaluation side-effects in macros, such as passing auto-increment actions like 'MAX_VAL(i++, j)' which increments 'i' twice inside the expansion logic.",
+    "Relying on macros for types instead of standard typedef directives (which are evaluated by the compiler and respect syntax scopes properly)."
+  ],
+  "bestPractices": [
+    "Always wrap every parameter inside a function-like macro with individual parentheses, and wrap the entire expression as a whole.",
+    "Capitalize all macro constant and function names completely (e.g. UPPER_CASE) to instantly distinguish them from normal C variables and functions.",
+    "Prefer traditional #ifndef HEADER_GUARD patterns for strict ANSI compliance, or use #pragma once for cleaner, modern, faster build times across systems.",
+    "Avoid using complex function macros when static inline functions are a viable option; inline functions offer strict compile-time type-safety.",
+    "Limit the scope of helper macro overrides using '#undef' directives to prevent macro leaks across multi-source file boundaries."
+  ],
+  "faqs": [
+    {
+      "question": "What is the difference between '#include <header.h>' and '#include \"header.h\"'?",
+      "answer": "Angle brackets (<...>) tell the compiler to search exclusively inside the standard system compiler include directories (like /usr/include/ or GCC standard library paths). Double quotes (\"...\") tell the compiler to search the local workspace directory where the source file resides first, before falling back to system search directories."
+    },
+    {
+      "question": "Can preprocessor macros be recursively defined?",
+      "answer": "No, the C preprocessor does not expand macros recursively. If a macro expands to contain its own name as a token, that token is skipped and treated as normal text to prevent infinite loops during translation phases."
+    },
+    {
+      "question": "Does using macros speed up program execution?",
+      "answer": "Yes, function-like macros do not experience standard assembly-level stack-frame operations (pushing/popping variables on/off local stacks), thus saving execution cycles. However, modern compilers auto-optimize standard static inline functions to achieve identical speeds while maintaining type-safety, which is generally preferred."
+    },
+    {
+      "question": "What is the physical size of macros in memory?",
+      "answer": "Macros do not occupy any space in active RAM at runtime. They exist purely as textual modifications in source code. However, expanding extremely large macros multiple times in code can inflate the final generated machine-code binary size on disk."
+    }
+  ],
+  "summary": "The preprocessor operates as an important first step in the compilation pipeline, translating custom, highly readable system patterns into raw, linear code streams. By using macros, header guards, and conditional compilation logic, engineers can create high-performance architectures that adapt dynamically to any hardware configuration or execution profile.",
+  "keyTakeaways": [
+    "The preprocessor is a pure text-substitution tool; it handles compilation logic before syntax verification or code execution.",
+    "Proper parenthesization of macro arguments is absolutely necessary to avoid operator precedence errors.",
+    "Header guards and `#pragma once` protect custom structures from redefinition conflicts across complex file dependencies.",
+    "`#pragma pack` provides control over structural padding layouts, trading data alignment performance for optimized memory consumption.",
+    "Use static inline functions in place of complex, logic-heavy macros whenever possible to enjoy C's standard type-safety systems."
+  ],
+  "nextTopicPreview": "Next, we will transition into Phase 13: File Handling, where we will build on modular file structures to open, write, read, and manage persistent binaries and sequential documents stored directly on persistent disk storage structures.",
+  "questionsAndAnswers": [
+    {
+      "id": "q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What are the structural differences between using #include <header.h> and #include \"header.h\"?",
+      "answer": "The structural difference is the search path used by the preprocessor. #include <header.h> searches the standard system library include directories first. #include \"header.h\" searches the local directory where the parent source code file resides first. If it cannot find the file in the local workspace directory, it then searches the standard system library directories. Use standard headers (<...>) for system APIs like stdio.h and double quotes (\"...\") for headers you write yourself.",
+      "explanation": "This tells the compiler where to look. Using local quotes prevents directory reference errors, making projects self-contained and portable."
+    },
+    {
+      "id": "q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Explain how a Header Guard prevents structural redefinition compilation errors in complex projects.",
+      "answer": "If a header contains structured type definitions (like struct declarations), and that header is included multiple times within the same compilation unit, the compiler generates a multiple definition error. Header guards use preprocessor conditionals (#ifndef GUARD_NAME, #define GUARD_NAME) surrounding the file content. When the file is processed the first time, GUARD_NAME is defined and code is included. On subsequent inclusions, #ifndef returns false, skipping the contents completely, ensuring declarations are parsed exactly once.",
+      "explanation": "Include guards provide an elegant, compiler-neutral system to enforce the One Definition Rule (ODR) across multi-file architectures."
+    },
+    {
+      "id": "q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a function-like macro named SAFE_MULTIPLY(a, b) that is immune to operator precedence bugs when arguments contain addition or subtraction.",
+      "answer": "#define SAFE_MULTIPLY(a, b) ((a) * (b))\n\n/* Example of usage in code */\nint result = SAFE_MULTIPLY(5 + 2, 10 - 3);\n/* Expands to: ((5 + 2) * (10 - 3)) -> 7 * 7 -> 49 */",
+      "explanation": "Without surrounding both the outer macro and individual elements with brackets, '5 + 2 * 10 - 3' would compile to '5 + 20 - 3' which is 22 instead of the expected 49."
+    },
+    {
+      "id": "q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Write a multi-line, debug-only log macro, PRINT_DEBUG_INFO(msg, code), that evaluates to nothing if DEBUG is not defined, but displays formatted message details using the preprocessor's predefined macros __FILE__ and __LINE__.",
+      "answer": "#ifdef DEBUG\n    #define PRINT_DEBUG_INFO(msg, code) \\\n        do { \\\n            printf(\"DEBUG: %s | Error Code: %d | File: %s | Line: %d\\n\", \\\n                   (msg), (code), __FILE__, __LINE__); \\\n        } while(0)\n#else\n    #define PRINT_DEBUG_INFO(msg, code) /* Evaluates to completely empty space */\n#endif",
+      "explanation": "Using a do-while(0) loop inside multi-line macros is an industry best practice. It wraps the statements into a block that behaves as a single C statement, enabling the macro to be used safely inside if-else blocks without breaking semicolons."
+    },
+    {
+      "id": "q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Identify and explain the bug in: #define SQUARE(x) x * x when used in 'int val = 100 / SQUARE(5);'. What is the actual value computed?",
+      "answer": "The actual value computed is 100, instead of 4. \nExplanation: '100 / SQUARE(5)' expands directly to '100 / 5 * 5'. Under standard C operator precedence, division and multiplication have the same precedence, so they are evaluated left-to-right: '(100 / 5) * 5' -> '20 * 5' -> 100. This bug occurs because the macro parameters and outer expression are not parenthesized.",
+      "explanation": "To fix this issue, rewrite the macro definition as: #define SQUARE(x) ((x) * (x))"
+    },
+    {
+      "id": "q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Analyze what occurs when you run: #define MAX(a, b) ((a) > (b) ? (a) : (b)) with the call: MAX(x++, y) when x is 10 and y is 5.",
+      "answer": "When evaluated, the preprocessor expands the expression to: ((x++) > (y) ? (x++) : (y)). Since 'x' is 10, which is greater than 'y' (5), the conditional test returns true. This triggers the evaluated path (x++). Consequently, 'x' is incremented a second time. After the line completes execution, x is incremented twice and becomes 12 instead of 11. This side-effect issue is a major disadvantage of function-like macros compared to inline functions.",
+      "explanation": "Never pass arguments with postfix operators or functions that change states directly into preprocessor macros."
+    },
+    {
+      "id": "q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Create a robust system configuration header skeleton containing conditional checks that forces compilation to fail with a custom error message if neither USE_SSL nor USE_CLEAR_TEXT is defined.",
+      "answer": "#if !defined(USE_SSL) && !defined(USE_CLEAR_TEXT)\n    #error \"Security Error: You must define either USE_SSL or USE_CLEAR_TEXT configuration flag!\"\n#endif\n\n#if defined(USE_SSL) && defined(USE_CLEAR_TEXT)\n    #error \"Configuration Conflict: Both USE_SSL and USE_CLEAR_TEXT cannot be active at the same time.\"\n#endif",
+      "explanation": "The #error directive stops compilation immediately and prints the defined message. This helps prevent invalid program builds."
+    },
+    {
+      "id": "q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Write a complete C demonstration showcasing how to use `#pragma pack` to define a telemetry frame structure exactly 6 bytes wide, consisting of a char, short, and a float array of 3 elements. If standard alignment was active, what would the size be?",
+      "answer": "#include <stdio.h>\n\n#pragma pack(push, 1)\ntypedef struct {\n    char category;\n    short level;\n    char version;\n    short checksum;\n} TelemetryFrame; \n#pragma pack(pop)\n\nint main(void) {\n    printf(\"Size of TelemetryFrame: %zu\\n\", sizeof(TelemetryFrame));\n    return 0;\n}\n\n/* Output is exactly 6 bytes. Under natural 32-bit alignment: \n   char (1) + padding (1) + short (2) + char (1) + padding (1) + short (2) = 8 bytes. */",
+      "explanation": "Using `#pragma pack(push, 1)` overrides compiler-specific optimization packing buffers, aligning structs to 1-byte boundaries. This is ideal for network packets."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "category": "Theory",
+      "question": "At which phase of the compilation process is the C Preprocessor executed?",
+      "options": {
+        "A": "During lexical analysis of the assembler",
+        "B": "Before actual compilation of source code begins",
+        "C": "Immediately after code generation",
+        "D": "During the final execution linking phase"
+      },
+      "correctOption": "B",
+      "explanation": "The C Preprocessor is an initial pass that cleans and prepares source files for compilation by stripping comments, expanding macros, and resolving include files."
+    },
+    {
+      "id": "m2",
+      "category": "Theory",
+      "question": "What is the key advantage of using modern '#pragma once' over traditional Header Guards (#ifndef / #define)?",
+      "options": {
+        "A": "It allows macros to have multiple, different definitions simultaneously",
+        "B": "It operates at runtime, saving memory within the compiled code stack",
+        "C": "It is less error-prone and can speed up compilation times by avoiding redundant file opening operations",
+        "D": "It forces structures to naturally align to odd-numbered boundaries"
+      },
+      "correctOption": "C",
+      "explanation": "#pragma once is evaluated internally by the compiler directly, preventing the preprocessor from having to re-read and parse header guard macros over and over."
+    },
+    {
+      "id": "m3",
+      "category": "Output Prediction",
+      "question": "What will be the exact console output of the following preprocessor-driven program?\n\n#define VAL 5 + 5\nint main() {\n    int ans = VAL * VAL;\n    printf(\"%d\", ans);\n    return 0;\n}",
+      "options": {
+        "A": "100",
+        "B": "50",
+        "C": "35",
+        "D": "25"
+      },
+      "correctOption": "C",
+      "explanation": "Because 'VAL' is not parenthesized, the statement expands to: 'int ans = 5 + 5 * 5 + 5;'. Since multiplication has higher precedence than addition, this is evaluated as: '5 + 25 + 5 = 35'."
+    },
+    {
+      "id": "m4",
+      "category": "Output Prediction",
+      "question": "What does the following preprocessor construct output?\n\n#define STR(x) #x\n#define CONCAT(a, b) a##b\nint main() {\n    printf(\"%s\", STR(CONCAT(1, 2)));\n    return 0;\n}",
+      "options": {
+        "A": "12",
+        "B": "CONCAT(1, 2)",
+        "C": "\"12\"",
+        "D": "1"
+      },
+      "correctOption": "B",
+      "explanation": "The stringification macro STR(x) immediately converts its argument into a string literal without expanding it first. Therefore, STR(CONCAT(1, 2)) evaluates directly to the string literal \"CONCAT(1, 2)\"."
+    },
+    {
+      "id": "m5",
+      "category": "Output Prediction",
+      "question": "Analyze the output of the following code:\n\n#define OPTION 1\nint main() {\n    int state = 0;\n    #if OPTION == 0\n        state = 100;\n    #elif OPTION == 1\n        state = 200;\n    #else\n        state = 300;\n    #endif\n    printf(\"%d\", state);\n    return 0;\n}",
+      "options": {
+        "A": "0",
+        "B": "100",
+        "C": "200",
+        "D": "300"
+      },
+      "correctOption": "C",
+      "explanation": "Since OPTION is defined as 1, the condition '#elif OPTION == 1' evaluates to true. The preprocessor outputs 'state = 200;' and strips the remaining branches."
+    },
+    {
+      "id": "m6",
+      "category": "Find the Bug",
+      "question": "Identify the compiler error in the following program block:\n\n#define SET_VAL(x) x = 50;\nint main() {\n    int num = 10;\n    if (num == 10)\n        SET_VAL(num)\n    else\n        num = 0;\n    return 0;\n}",
+      "options": {
+        "A": "The macro cannot be called without a trailing semicolon inside the if block",
+        "B": "The macro expansion introduces an extra semicolon, separating the if statement from the else statement",
+        "C": "Variables cannot be modified inside preprocessor defines",
+        "D": "The compiler cannot evaluate nested logic inside the conditional define block"
+      },
+      "correctOption": "B",
+      "explanation": "The expression expands to: 'if (num == 10) num = 50;; else num = 0;'. The extra semicolon acts as an empty statement, closing the if block. This leaves the 'else' isolated, triggering an 'else without a previous if' compilation error."
+    },
+    {
+      "id": "m7",
+      "category": "Find the Bug",
+      "question": "What is the critical structural bug in the following macro definition?\n\n#define MIN(A, B) ((A) < (B) ? (A) : (B))\n\nint run() {\n    int x = 5, y = 10;\n    return MIN(x++, y);\n}",
+      "options": {
+        "A": "The comparative ternary syntax cannot be resolved in return statements",
+        "B": "Macro parameters cannot handle increment operations; it is a compilation error",
+        "C": "'x++' is evaluated twice due to the conditional check, resulting in an unexpected final value for 'x'",
+        "D": "The compiler will fail to compile the file because MIN is already defined as a system library keyword"
+      },
+      "correctOption": "C",
+      "explanation": "The macro expansion is: '((x++) < (y) ? (x++) : (y))'. Because 'x' is less than 'y', the true expression (x++) is evaluated. This increments 'x' a second time."
+    },
+    {
+      "id": "m8",
+      "category": "Complete the Code",
+      "question": "Fill in the blank to ensure that debug messaging statements are only compiled when the symbol CONFIG_DEBUG is defined.\n\n______ CONFIG_DEBUG\n    printf(\"Debug message\\n\");\n#endif",
+      "options": {
+        "A": "#ifdefined",
+        "B": "#ifdef",
+        "C": "#ifndef",
+        "D": "#ifundef"
+      },
+      "correctOption": "B",
+      "explanation": "The '#ifdef' directive checks if the symbol is defined. If it is defined, the preprocessor compiles the following code block up to the '#endif'."
+    },
+    {
+      "id": "m9",
+      "category": "Complete the Code",
+      "question": "Complete the code to prevent multiple header inclusions using standard ANSI guards:\n\n#ifndef FILE_H\n________ FILE_H\n/* Struct declaration block */\n#endif",
+      "options": {
+        "A": "#set",
+        "B": "#define",
+        "C": "#include",
+        "D": "#pragma"
+      },
+      "correctOption": "B",
+      "explanation": "The correct sequence for standard include guards is: #ifndef H_NAME followed immediately by #define H_NAME on the next line."
+    },
+    {
+      "id": "m10",
+      "category": "Best Approach",
+      "question": "What is the most secure and modern approach to define numeric constants in standard C development?",
+      "options": {
+        "A": "Use '#define CONSTANT_VAL value' because it has zero overhead",
+        "B": "Use 'static const' variables or an enum, which provide strict type checking and respect standard scope rules",
+        "C": "Use global variables and declare them inside local functions via #pragma pack directives",
+        "D": "Declare variables inside custom headers without include guards to ensure they remain universally accessible"
+      },
+      "correctOption": "B",
+      "explanation": "While '#define' is convenient, 'static const' declarations and enums provide type safety, compile-time scope checks, and cleaner debugging experiences."
+    }
+  ]
+}

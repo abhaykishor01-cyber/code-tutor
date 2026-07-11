@@ -1,0 +1,175 @@
+{ "phase_metadata": { "phase_number": 8, "title": "CSS Layout Basics",
+"description": "Mastering the positioning and display behavior of elements,
+understanding the z-axis, and using flexible CSS units.", "estimated_time": "5
+Hours" }, "learning_objectives": [ "Differentiate between block, inline, and
+inline-block display behaviors", "Master the five types of CSS positioning:
+static, relative, absolute, fixed, and sticky", "Control the stacking order of
+elements using z-index", "Understand legacy layout methods like float and
+clear", "Choose appropriate CSS units (px, em, rem, %, vh, vw) for responsive
+design" ], "prerequisites": [ "Completion of Phase 6 (Box Model)", "Completion
+of Phase 7 (Selectors & Specificity)" ], "introduction": "By default, the
+browser stacks elements one after another in what we call the 'Normal Document
+Flow'. However, modern websites require elements to overlap, stay fixed while
+scrolling, or sit side-by-side. This phase teaches you the fundamental tools to
+break the default flow and place elements exactly where they belong.",
+"concept_explanation": { "display_property": "The 'display' property is the most
+important tool for controlling layout. 'block' elements take the full width;
+'inline' elements only take enough width for their content; 'inline-block'
+behaves like an inline element but allows you to set width and height.",
+"positioning": "Positioning allows you to move an element from its normal spot.
+'Relative' moves it relative to its original position. 'Absolute' moves it
+relative to its nearest positioned parent. 'Fixed' sticks it to the screen, and
+'Sticky' toggles between relative and fixed based on scroll.", "z_index": "When
+elements overlap, z-index determines which one stays on top. A higher z-index
+appears 'closer' to the user. It only works on positioned elements.",
+"css_units": "Units are categorized into 'Absolute' (px) which stay the same
+size, and 'Relative' (em, rem, %, vh, vw) which scale based on parent size, root
+font size, or the browser window (viewport)." }, "syntax": { "display_syntax":
+"div { display: inline-block; }", "position_syntax": ".box { position: absolute;
+top: 20px; left: 50px; }", "z_index_syntax": ".modal { z-index: 10; }",
+"units_syntax": "section { width: 50vw; font-size: 2rem; }" },
+"breakdown_of_syntax": { "display_none": "Completely removes the element from
+the page; it takes up no space.", "display_block": "Starts on a new line and
+takes up the full width available.", "top_right_bottom_left": "Offsets used with
+positioned elements to move them.", "relative_position": "Moves an element
+without affecting the space it originally occupied.", "absolute_position":
+"Removes the element from the document flow; other elements act as if it's not
+there.", "viewport_units": "1vh is 1% of the window height; 1vw is 1% of the
+window width." }, "rules_and_key_points": { "rule_1": "Inline elements ignore
+width and height properties.", "rule_2": "Block elements always start on a new
+line.", "rule_3": "Position: absolute only works relative to a parent that has a
+position other than 'static'.", "rule_4": "Z-index requires the element to have
+a position (relative, absolute, fixed, or sticky).", "rule_5": "Fixed elements
+are positioned relative to the browser window (viewport).", "rule_6": "Relative
+positioning keeps the 'ghost' of the element in the document flow (space is
+reserved).", "rule_7": "Use 'rem' for font sizes to ensure accessibility
+(scaling with browser settings).", "rule_8": "Use '%' for widths inside
+containers to make them fluid.", "rule_9": "Floating an element removes it from
+the normal flow but allows text to wrap around it.", "rule_10": "Clear: both is
+used to stop elements from wrapping around floated items." }, "code_example_1":
+{ "title": "Display and Units Comparison", "description": "Visualizing block vs
+inline-block and relative units.", "code": "/* CSS /\n.container {\n width: 80%;
+/ Relative to parent /\n background-color: #eee;\n}\n\n.item {\n display:
+inline-block;\n width: 100px;\n height: 100px;\n margin: 1rem; / Relative to
+root font-size /\n background-color: coral;\n}\n\n/ HTML /\n<div
+class="container">\n <div class="item">1\n <div class="item">2\n <div
+class="item">3\n" }, "code_example_2": { "title": "Mastering Absolute
+Positioning", "description": "Placing a 'badge' inside a card using relative and
+absolute positioning.", "code": "/ CSS /\n.card {\n position: relative; /
+Essential for the child's reference /\n width: 200px;\n height: 250px;\n
+border: 1px solid #ccc;\n}\n\n.badge {\n position: absolute;\n top: 10px;\n
+right: -10px;\n background: red;\n color: white;\n padding: 5px;\n
+z-index: 5;\n}\n\n/ HTML /\n<div class="card">\n <span class="badge">New!\n <img
+src="product.jpg" width="100%">\n" }, "output": "In Example 1, three coral
+squares sit side-by-side inside a gray container. In Example 2, a red 'New!'
+badge is pinned exactly to the top-right corner of the card, slightly hanging
+off the edge due to the negative right value.", "step_by_step_dry_run": [
+"Browser finds .card with position: relative; it creates a 'positioning
+context'.", "Browser finds .badge with position: absolute.", "It looks up the
+parent tree for a non-static parent. It finds .card.", "It places the badge 10px
+from the top edge of .card.", "It places the badge -10px from the right edge
+(moving it outside the right border).", "Because .badge has a z-index of 5, it
+is drawn on top of the image inside the card." ], "memory_visualization":
+"Document Flow Memory:\n[ Static/Relative ] -> Occupies space in the 'list' of
+elements.\n[ Absolute/Fixed ] -> Lifted off the page, floating in a separate
+layer.\n[ Z-Index ] -> Determines the stack order of these layers.",
+"real_world_use_cases": [ "Creating a 'Fixed' navigation bar that stays at the
+top while scrolling.", "Placing a 'Sale' icon over a product image.", "Building
+a modal/popup that covers the entire screen (position: fixed).", "Centering
+elements perfectly using relative units.", "Creating a 'Sticky' table header
+that stays visible while reading long rows." ], "common_mistakes": [ "Using
+position: absolute without setting the parent to position: relative.",
+"Expecting z-index to work on static elements.", "Using px for everything,
+making the website look tiny on mobile screens.", "Forgetting that fixed
+elements overlap other content (you need padding on the body).", "Using display:
+none to hide things you want screen readers to see (use visibility: hidden or
+other techniques instead)." ], "best_practices": [ "Use 'rem' for typography and
+'em' for padding/margins inside components.", "Use 'position: relative' as a
+safe anchor for absolute children.", "Keep z-index values low and organized
+(don't use 999999).", "Avoid using 'float' for layouts; use Flexbox or Grid
+(coming in future phases).", "Use 'vh' and 'vw' for full-screen hero sections."
+], "faqs": [ { "question": "What is the difference between em and rem?",
+"answer": "rem is relative to the root (html) font-size, while em is relative to
+the font-size of its immediate parent." }, { "question": "Why is my element
+disappearing when I set position: absolute?", "answer": "It might be behind
+another element (needs z-index) or its parent has overflow: hidden and you moved
+the element outside the parent's boundaries." } ], "summary": "Phase 8 covered
+the mechanics of layout. You learned how to change element behavior with
+display, how to move them precisely with position, how to layer them with
+z-index, and how to use modern relative units to build flexible designs.",
+"key_takeaways": [ "Block elements take 100% width; Inline elements take content
+width.", "Inline-block allows width/height on inline elements.", "Position:
+relative moves an element without losing its space.", "Position: absolute
+requires a positioned parent.", "Position: fixed is relative to the screen, not
+the page.", "Z-index only works on positioned elements.", "1rem is usually 16px
+(the browser default).", "vh and vw are based on the viewport size.", "Floats
+are for wrapping text around images.", "Position: sticky is a hybrid of relative
+and fixed." ], "preview_next_topic": "In Phase 9, we will learn Flexbox—the
+modern way to align elements and create responsive layouts with ease.",
+"questions_and_answers": [ { "question": "What is the default 'position' value
+for all HTML elements?", "answer": "The default value is 'static'. Static
+elements follow the normal document flow and ignore top, right, bottom, left,
+and z-index properties.", "difficulty": "Easy Concept" }, { "question": "Explain
+how 'rem' units help with website accessibility.", "answer": "rem units are
+based on the user's browser settings. If a visually impaired user increases
+their default font size, a website using rem will scale up proportionally,
+whereas a site using px will remain fixed and potentially unreadable.",
+"difficulty": "Moderate Concept" }, { "question": "Write the CSS to make a  take
+up exactly half the width and half the height of the browser window.", "answer":
+"div {\n width: 50vw;\n height: 50vh;\n}", "difficulty": "Moderate Practical" },
+{ "question": "How do you center a fixed navigation bar that has a width
+of 500px?", "answer": "nav {\n position: fixed;\n width: 500px;\n left: 50%;\n
+margin-left: -250px; / Half of the width */\n}", "difficulty": "Hard Practical"
+}, { "question": "Identify the bug: A student applies z-index: 10 to a paragraph
+to make it appear over an image, but it stays behind the image. Why?", "answer":
+"The paragraph likely has its default position: static. Z-index only works on
+elements that have a position value of relative, absolute, fixed, or sticky.",
+"difficulty": "Moderate Mistake" }, { "question": "Why does a container with
+'height: 100%' often fail to fill the screen?", "answer": "Percentage heights
+are relative to the parent. If the parent (like  or ) doesn't have a defined
+height, 100% of 'nothing' results in 0 height. Use '100vh' for a guaranteed
+full-screen height.", "difficulty": "Hard Mistake" }, { "question": "Create a
+CSS rule for a 'sidebar' that stays fixed on the left side of the screen,
+is 200px wide, and occupies the full height.", "answer": ".sidebar {\n position:
+fixed;\n top: 0;\n left: 0;\n width: 200px;\n height: 100vh;\n}", "difficulty":
+"Moderate Coding" }, { "question": "Write code for a parent 'box' (300px)
+containing a child 'circle'. The circle should be positioned exactly in the
+bottom-right corner, overlapping the parent's border by 20px.", "answer": ".box
+{\n position: relative;\n width: 300px;\n height: 300px;\n border: 1px solid
+black;\n}\n.circle {\n position: absolute;\n bottom: -20px;\n right: -20px;\n
+width: 50px;\n height: 50px;\n border-radius: 50%;\n}", "difficulty": "Hard
+Coding" } ], "multiple_choice_questions": [ { "question": "Which display value
+allows an element to have a width and height but stay on the same line as other
+elements?", "options": { "A": "block", "B": "inline", "C": "inline-block", "D":
+"none" }, "answer": "C", "type": "Theory" }, { "question": "An element with
+'position: absolute' is positioned relative to:", "options": { "A": "The browser
+window", "B": "Its nearest positioned ancestor", "C": "Its immediate parent
+always", "D": "The top of the page" }, "answer": "B", "type": "Theory" }, {
+"question": "If the root font-size is 16px, how many pixels is 2.5rem?",
+"options": { "A": "32px", "B": "40px", "C": "25px", "D": "48px" }, "answer":
+"B", "type": "Output Prediction" }, { "question": "Predict the behavior: An
+element has 'position: fixed; bottom: 0;'.", "options": { "A": "It stays at the
+bottom of the current section", "B": "It stays at the bottom of the browser
+window even when scrolling", "C": "It disappears", "D": "It moves to the bottom
+of the HTML document" }, "answer": "B", "type": "Output Prediction" }, {
+"question": "What happens to the space occupied by an element when you set
+'display: none'?", "options": { "A": "The space is reserved but invisible", "B":
+"The space is removed from the layout", "C": "The space turns red", "D": "The
+layout breaks" }, "answer": "B", "type": "Output Prediction" }, { "question":
+"Find the bug: div { position: static; z-index: 50; }", "options": { "A":
+"Static elements cannot have a z-index", "B": "Z-index is too high", "C":
+"Semicolon is missing", "D": "Static must be capitalized" }, "answer": "A",
+"type": "Find the Bug" }, { "question": "Find the bug: section { width: 100vw;
+height: 100vh; overflow: hidden; }", "options": { "A": "vw and vh cannot be used
+together", "B": "There is no bug, but it might hide content on small screens",
+"C": "Height cannot be 100vh", "D": "Section is not a block element" },
+"answer": "B", "type": "Find the Bug" }, { "question": "Complete the code to
+make an element move relative to itself: .box { position: ____; top: 10px; }",
+"options": { "A": "absolute", "B": "fixed", "C": "relative", "D": "sticky" },
+"answer": "C", "type": "Complete the Code" }, { "question": "Complete the code
+to prevent text from wrapping around a float: .footer { ____: both; }",
+"options": { "A": "stop", "B": "clear", "C": "block", "D": "float-none" },
+"answer": "B", "type": "Complete the Code" }, { "question": "Which unit is best
+for a container that should always be as wide as the screen?", "options": { "A":
+"px", "B": "em", "C": "vw", "D": "rem" }, "answer": "C", "type": "Best Approach"
+} ] }

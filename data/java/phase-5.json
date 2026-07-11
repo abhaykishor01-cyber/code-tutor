@@ -1,0 +1,185 @@
+{ "phase_metadata": { "phase_number": 5, "phase_name": "OOP Basics", "filename":
+"java_phase5_oop_basics.json", "java_version": "21" }, "learning_objectives": [
+"Understand the relationship between Classes and Objects", "Master the use of
+Constructors for object initialization", "Differentiate between Instance and
+Static members", "Correctly apply the 'this' keyword to resolve naming
+conflicts", "Understand Java's memory management and Garbage Collection basics"
+], "prerequisites": [ "Basic knowledge of Java data types", "Understanding of
+variables and methods", "Familiarity with control flow (if/else, loops)" ],
+"introduction": "Object-Oriented Programming (OOP) is a paradigm that organizes
+software design around data, or objects, rather than functions and logic. In
+this phase, we move from writing simple scripts to building modular, reusable
+blueprints called Classes and creating functional entities called Objects. This
+is the foundation of professional Java development.", "concept_explanation": {
+"classes_and_objects": "A Class is a blueprint or template that defines the
+attributes (data) and behaviors (methods) that an object of that type will have.
+An Object is a specific instance of a class. For example, 'Car' is a class, but
+your 'Blue 2023 Tesla Model 3' is an object.", "constructors": "A Constructor is
+a special block of code that is called when an object is instantiated. Its main
+purpose is to initialize the object's state. It has the same name as the class
+and no return type.", "this_keyword": "The 'this' keyword is a reference
+variable that refers to the current object. It is commonly used to distinguish
+between class attributes and parameters with the same name.", "static_keyword":
+"The 'static' keyword means that a member (variable or method) belongs to the
+class itself, rather than to any specific instance. All objects of the class
+share the same static variable.", "garbage_collection": "Java manages memory
+automatically. When an object is no longer reachable (no references point to
+it), the Garbage Collector (GC) marks it for deletion to free up heap memory."
+}, "syntax": { "class_definition": "public class ClassName {\n // Fields
+(Instance Variables)\n // Constructor\n // Methods\n}", "object_instantiation":
+"ClassName objectName = new ClassName();", "constructor_syntax": "public
+ClassName(parameters) {\n this.variable = parameters;\n}", "static_variable":
+"static int count = 0;" }, "breakdown_of_syntax": { "class_keyword": "Used to
+declare a new class structure.", "new_keyword": "Used to allocate memory on the
+Heap for a new object.", "constructor_name": "Must exactly match the class name,
+including case sensitivity.", "instance_variable": "Declared inside a class but
+outside methods; represents the object's state.", "static_modifier": "Indicates
+the member is shared across all instances of the class." },
+"rules_and_key_points": [ "A class can have multiple constructors (Constructor
+Overloading).", "If no constructor is written, Java provides a hidden 'Default
+Constructor'.", "Static methods cannot access instance variables directly
+because they don't belong to an object.", "The 'this' keyword cannot be used in
+a static context.", "Objects are stored in the Heap memory; references are
+stored in the Stack.", "Constructors do not have a return type, not even
+'void'.", "Static variables are initialized only once when the class is
+loaded.", "The 'final' keyword can be used with instance variables to make them
+constants.", "Instance variables have default values (0, false, null), but local
+variables do not.", "Garbage collection is automatic but can be suggested using
+System.gc(), though it's not guaranteed." ], "code_example_1": { "title": "Basic
+Class and Object", "description": "Creating a simple Dog class with attributes
+and a method.", "code": "public class Dog {\n String name;\n int age;\n\n //
+Constructor\n public Dog(String name, int age) {\n this.name = name;\n this.age
+= age;\n }\n\n public void bark() {\n System.out.println(name + " says: Woof!
+Woof!");\n }\n\n public static void main(String[] args) {\n // Creating an
+object\n Dog myDog = new Dog("Buddy", 3);\n myDog.bark();\n
+System.out.println("Age: " + myDog.age);\n }\n}", "output": "Buddy says: Woof!
+Woof!\nAge: 3" }, "code_example_2": { "title": "Static vs Instance Members",
+"description": "A BankAccount class demonstrating shared class data using the
+static keyword.", "code": "public class BankAccount {\n String accountHolder;\n
+double balance;\n static String bankName = "Global Java Bank";\n static int
+totalAccounts = 0;\n\n public BankAccount(String name, double initialDeposit)
+{\n this.accountHolder = name;\n this.balance = initialDeposit;\n
+totalAccounts++; // Shared across all objects\n }\n\n public void displayInfo()
+{\n System.out.println("Holder: " + accountHolder + " | Balance: $" + balance +
+" | Bank: " + bankName);\n }\n\n public static void showTotalAccounts() {\n
+System.out.println("Total accounts in system: " + totalAccounts);\n }\n\n public
+static void main(String[] args) {\n BankAccount acc1 = new
+BankAccount("Alice", 1000.0);\n BankAccount acc2 = new
+BankAccount("Bob", 1500.0);\n\n acc1.displayInfo();\n acc2.displayInfo();\n\n
+BankAccount.showTotalAccounts();\n }\n}", "output": "Holder: Alice | Balance:
+$1000.0 | Bank: Global Java Bank\nHolder: Bob | Balance: $1500.0 | Bank: Global
+Java Bank\nTotal accounts in system: 2" }, "step_by_step_dry_run": { "context":
+"Executing 'Dog myDog = new Dog("Buddy", 3);'", "steps": [ "The JVM encounters
+the 'new' keyword.", "Memory is allocated on the Heap for a new Dog object.",
+"The Dog constructor is called with arguments 'Buddy' and 3.", "Inside the
+constructor, 'this.name' refers to the Heap object's name field, which is
+assigned 'Buddy'.", "The 'this.age' field is assigned the value 3.", "The
+constructor completes, and the memory address (reference) of the object is
+returned.", "The reference is stored in the local variable 'myDog' on the
+Stack." ] }, "memory_visualization": { "stack": "Contains the reference variable
+'myDog' which holds the memory address (e.g., @0x101).", "heap": "Contains the
+actual object data: {name: "Buddy", age: 3} at address @0x101.", "method_area":
+"Contains the 'Dog' class structure and 'static' members shared by all
+instances." }, "real_world_use_cases": [ "User Profile Systems: Using a 'User'
+class to store personal data and settings.", "E-commerce: 'Product' class to
+manage thousands of items with same attributes (price, name, SKU).", "Game
+Development: 'Player' class to manage coordinates, health, and inventory for
+every player instance.", "Banking: 'Transaction' class to record and process
+financial movements." ], "common_mistakes": [ "Trying to use 'this' inside a
+static method.", "Forgetting that static variables are shared (changing it for
+one object changes it for all).", "Writing a return type (like void) for a
+constructor, which turns it into a regular method.", "Not initializing a
+reference object, leading to a NullPointerException.", "Assuming Garbage
+Collection happens immediately when an object is set to null." ],
+"best_practices": [ "Always initialize instance variables through
+constructors.", "Use 'this' keyword in constructors to avoid confusion between
+parameters and fields.", "Keep instance variables private (Encapsulation) and
+use public methods to access them.", "Use static variables for constants or
+shared counters only.", "Follow PascalCase for Class names and camelCase for
+variable/method names." ], "frequently_asked_questions": [ { "question": "Can a
+class have more than one constructor?", "answer": "Yes, this is called
+Constructor Overloading. You can have multiple constructors as long as their
+parameter lists are different." }, { "question": "What is the default value of
+an uninitialized object reference?", "answer": "The default value is 'null',
+meaning it does not point to any object in memory." } ], "summary": "Phase 5
+introduced the core pillars of Java objects. We learned that classes are
+blueprints, objects are instances, and constructors set the initial state. We
+also explored the 'static' keyword for shared data and how Java manages memory
+through the Stack, Heap, and Garbage Collector.", "key_takeaways": [ "Objects
+represent real-world entities.", "Constructors have no return type.", "Static =
+Class-level; Instance = Object-level.", "The 'this' keyword resolves naming
+ambiguity.", "Heap memory stores objects; Stack stores references." ],
+"preview_of_next_topic": "In Phase 6, we will explore 'Inheritance', learning
+how classes can inherit attributes and behaviors from other classes to promote
+code reuse.", "questions_and_answers": [ { "difficulty": "Easy", "question":
+"What is a constructor in Java?", "answer": "A constructor is a special method
+used to initialize objects. It is called automatically when an object is created
+with the 'new' keyword. It must have the same name as the class and cannot have
+a return type." }, { "difficulty": "Easy-Medium", "question": "Explain the
+difference between a static method and an instance method.", "answer": "A static
+method belongs to the class and can be called without creating an object. An
+instance method belongs to an object and requires an instance of the class to be
+invoked. Static methods cannot access instance variables directly." }, {
+"difficulty": "Medium", "question": "Implement a class 'Product' with a
+parameterized constructor and use 'this' to assign values.", "code": "public
+class Product {\n String name;\n double price;\n\n public Product(String name,
+double price) {\n this.name = name;\n this.price = price;\n }\n}" }, {
+"difficulty": "Medium", "question": "What is wrong with this code? \npublic
+class Test { \n int x = 10; \n public static void main(String[] args) { \n
+System.out.println(x); \n } \n}", "answer": "The error is 'non-static variable x
+cannot be referenced from a static context'. Since main is static, it cannot
+access the instance variable 'x' without creating an instance of the Test
+class." }, { "difficulty": "Medium-Hard", "question": "Predict the output:
+\nclass Counter { \n static int count = 0; \n Counter() { count++; } \n} \n// In
+Main: \nCounter c1 = new Counter(); \nCounter c2 = new Counter();
+\nSystem.out.println(Counter.count);", "answer": "The output is 2. Because
+'count' is static, it is shared across all instances. Every time a new Counter
+object is created, the same static variable is incremented." }, { "difficulty":
+"Hard", "question": "Explain and implement a 'Copy Constructor' in Java for a
+class 'Point' with x and y coordinates.", "answer": "A copy constructor is a
+constructor that creates a new object using the values of an existing object of
+the same class.", "code": "public class Point {\n int x, y;\n public Point(int
+x, int y) {\n this.x = x;\n this.y = y;\n }\n // Copy Constructor\n public
+Point(Point other) {\n this.x = other.x;\n this.y = other.y;\n }\n}" }, {
+"difficulty": "Hard", "question": "Write a program that uses a static block to
+initialize a static list of settings.", "code": "public class Config {\n static
+String mode;\n static {\n // Static block runs once when class is loaded\n mode
+= "PRODUCTION";\n System.out.println("System Initialized");\n }\n public static
+void main(String[] args) {\n System.out.println("Mode: " + mode);\n }\n}" }, {
+"difficulty": "Challenge", "question": "Create a 'Student' class where each
+student is automatically assigned a unique ID starting from 1001. Use a static
+variable to track the next ID.", "code": "public class Student {\n static int
+nextId = 1001;\n int studentId;\n String name;\n\n public Student(String name)
+{\n this.name = name;\n this.studentId = nextId++;\n }\n\n public void show()
+{\n System.out.println(name + ": " + studentId);\n }\n\n public static void
+main(String[] args) {\n new Student("John").show();\n new
+Student("Jane").show();\n }\n}" } ], "mcqs": [ { "question": "Which keyword is
+used to create an instance of a class?", "options": { "A": "class", "B": "init",
+"C": "new", "D": "this" }, "answer": "C" }, { "question": "What is the return
+type of a constructor?", "options": { "A": "void", "B": "int", "C": "The class
+type", "D": "None" }, "answer": "D" }, { "question": "What is the output of this
+code? \nclass A { static int i = 0; } \n// In main: \nA obj1 = new A(); obj1.i
+= 5; \nA obj2 = new A(); \nSystem.out.println(obj2.i);", "options": { "A": "0",
+"B": "5", "C": "Null", "D": "Compilation Error" }, "answer": "B" }, {
+"question": "Which area of memory stores the actual object data?", "options": {
+"A": "Stack", "B": "Register", "C": "Heap", "D": "Cache" }, "answer": "C" }, {
+"question": "What happens if you define a constructor with a 'void' return
+type?", "options": { "A": "It remains a valid constructor.", "B": "It becomes a
+regular method and is no longer a constructor.", "C": "Compiler error.", "D":
+"Runtime error." }, "answer": "B" }, { "question": "Find the bug: \npublic class
+MyClass { \n int x; \n static void display() { \n System.out.println(this.x); \n
+} \n}", "options": { "A": "x is not initialized", "B": "this cannot be used in
+static context", "C": "display() must be public", "D": "println syntax is wrong"
+}, "answer": "B" }, { "question": "Which keyword is used to refer to the current
+class instance?", "options": { "A": "current", "B": "this", "C": "super", "D":
+"instance" }, "answer": "B" }, { "question": "Complete the code to call the
+static method 'run' of class 'Machine': \nMachine._______();", "options": { "A":
+"new run", "B": "run", "C": "this.run", "D": "execute run" }, "answer": "B" }, {
+"question": "When is a static block executed?", "options": { "A": "Every time an
+object is created.", "B": "When the main method ends.", "C": "Once, when the
+class is first loaded into memory.", "D": "Only when manually called." },
+"answer": "C" }, { "question": "What is the best approach for managing unique
+serial numbers for objects?", "options": { "A": "Use a local variable in the
+constructor.", "B": "Use a private instance variable.", "C": "Use a static
+variable incremented in the constructor.", "D": "Pass a new number from the main
+method every time." }, "answer": "C" } ] }

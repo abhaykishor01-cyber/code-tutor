@@ -1,22 +1,190 @@
+{ "phase_metadata": { "phase_number": 1, "title": "HTML Basics: The Foundation
+of the Web", "description": "Understanding the core structure of web pages,
+basic text elements, and how browsers interpret HTML code.", "estimated_time":
+"2 Hours" }, "learning_objectives": [ "Understand the role of HTML in web
+development", "Describe how browsers render HTML documents", "Master the
+standard boilerplate structure (DOCTYPE, html, head, body)", "Use headings and
+paragraphs effectively for hierarchy", "Apply text formatting tags like strong,
+em, and special entities", "Organize code using comments for better
+maintainability" ], "prerequisites": [ "Basic computer literacy", "A code editor
+(like VS Code) installed", "A modern web browser (Chrome, Firefox, or Edge)" ],
+"introduction": "Welcome to the world of web development! HTML (HyperText Markup
+Language) is the most fundamental building block of the web. Think of it as the
+skeleton of a building—it provides the structure and defines where everything
+goes. Before we make things look pretty with CSS, we must first learn how to
+build a solid, semantic foundation using HTML tags.", "concept_explanation": {
+"what_is_html": "HTML stands for HyperText Markup Language. It isn't a
+programming language; it's a markup language used to tell your browser how to
+structure the content you see on a screen.", "how_browsers_work": "Browsers
+(like Chrome) read HTML files from top to bottom. They parse the tags and
+convert them into a 'Document Object Model' (DOM), which is essentially a tree
+structure that tells the browser where to draw text, images, and links.",
+"the_doctype": "Every modern HTML5 document begins with . This isn't an HTML
+tag; it's an instruction to the browser that the document is written in HTML5,
+ensuring the page renders correctly in 'Standards Mode'.", "the_structure": "The
+ tag wraps everything. The  contains metadata (info about the page like the
+title), and the  contains everything the user actually sees." }, "syntax": {
+"general_tag_format": "Content goes here...", "self_closing_tag_format": "",
+"attribute_format": "<tagname attribute="value">Content" },
+"breakdown_of_syntax": { "opening_tag": "The  starts the element.", "content":
+"The text or other elements placed between the tags.", "closing_tag": "The  with
+a forward slash ends the element. Some tags (like ) are self-closing and don't
+need this.", "attributes": "Extra information provided inside the opening tag
+(e.g., class="main-text")." }, "rules_and_key_points": { "rule_1": "Always close
+your tags (unless they are void/self-closing tags).", "rule_2": "Use lowercase
+for all tag names (it's a best practice).", "rule_3": "Nest tags properly: Text,
+not Text.", "rule_4": "The  tag should ideally be used once per page for the
+main title.", "rule_5": "Do not use headings for styling (e.g., making text
+big); use them for structure.", "rule_6": "HTML ignores multiple spaces and new
+lines; use  or  for spacing.", "rule_7": "Attributes must always be inside the
+opening tag.", "rule_8": "Comments are for developers and are not visible to
+users on the page.", "rule_9": "Special characters like < or > must be written
+as entities (< or >) to avoid confusing the browser.", "rule_10": "Indentation
+(nesting) makes code readable but doesn't affect browser output." },
+"code_example_1": { "title": "Basic HTML Boilerplate", "description": "The
+essential structure every HTML file must have.", "code": "\n<html lang="en">\n\n
+<meta charset="UTF-8">\n My First Webpage\n\n\n Hello World!\n This is my very
+first paragraph in HTML.\n\n" }, "code_example_2": { "title": "Text Formatting
+and Entities", "description": "Using semantic tags to emphasize text and display
+special symbols.", "code": "\nImportant Notice\n\n Warning: This content is
+strictly confidential.\n Copyright © 2024 by MyCodeSchool.\n Old Price: $50 New
+Price: Free!\n" }, "output": "The browser will display a large heading 'Hello
+World!', followed by a smaller paragraph. In the second example, 'Warning' will
+be bold, 'strictly' will be italicized, and you will see a copyright symbol
+followed by strikethrough and underlined text.", "step_by_step_dry_run": [
+"Browser reads  and realizes it needs to use HTML5 standards.", "It enters the 
+element, identifying 'en' (English) as the language.", "It processes the , sets
+the character encoding to UTF-8, and stores the page title for the browser
+tab.", "It moves to the , sees , and renders it as the largest default
+heading.", "It sees , starts a new block of text, and stops when it hits .", "It
+encounters  and ignores them, skipping to the next tag." ],
+"memory_visualization": "Visualize a tree structure (DOM Tree): \nDocument ->
+[DOCTYPE] \n -> html \n -> head (title, meta)\n -> body \n -> h1 (Text: Hello)\n
+-> p (Text: Welcome)", "real_world_use_cases": [ "Creating the structure for a
+blog post using h1 for titles and p for content.", "Adding legal symbols like
+Copyright or Registered Trademark to footers.", "Creating accessible content for
+screen readers using strong and em instead of just bold/italic styles.",
+"Commenting out temporary code sections during website maintenance." ],
+"common_mistakes": [ "Forgetting to include , leading to weird layout issues in
+older browsers.", "Mismatched tags: opening a  but closing it with .", "Using
+multiple  tags just to make text large (bad for SEO).", "Using  to create large
+spaces instead of using CSS margins.", "Writing tags like  instead of  (not an
+error, but poor practice)." ], "best_practices": [ "Always include a 'lang'
+attribute in the  tag.", "Use semantic tags: use  for importance, not just  for
+visual bolding.", "Keep your code clean with consistent 2-space or 4-space
+indentation.", "Use comments to explain complex sections of your HTML.", "Always
+provide a meaningful  for SEO and usability." ], "faqs": [ { "question": "What
+is the difference between  and ?", "answer": "While both look bold,  is just for
+style, whereas  tells browsers and screen readers that the text is of high
+importance." }, { "question": "Why do we need ?", "answer": "It ensures your
+browser correctly displays almost all characters and symbols from all languages
+in the world." } ], "summary": "Phase 1 covered the 'bones' of a webpage. You
+learned that HTML uses tags to structure content, the importance of a proper
+document structure (DOCTYPE, html, head, body), and how to format text using
+headings, paragraphs, and emphasis tags.", "key_takeaways": [ "HTML defines
+structure, not style.", "The  contains visible content.", "Headings range from
+h1 (most important) to h6 (least important).", "Empty/Void tags like  do not
+need a closing tag.", "Comments are written as .", "Strong and Em are semantic;
+they add meaning, not just style.", "Special characters require entities like
+&.", "Valid nesting is crucial for the DOM tree.", "The  section is for metadata
+and titles.", "Browsers ignore extra white space in the source code." ],
+"preview_next_topic": "In Phase 2, we will bring our pages to life by adding
+Links (to connect pages) and Media (Images, Video, and Audio) to make the
+content engaging.", "questions_and_answers": [ { "question": "What does HTML
+stand for and what is its primary purpose?", "answer": "HTML stands for
+HyperText Markup Language. Its purpose is to define the structure and layout of
+a web document by using various tags to identify headings, paragraphs, links,
+and other content types.", "difficulty": "Easy Concept" }, { "question":
+"Explain the difference between the  and  sections.", "answer": "The  section
+contains 'metadata' (data about data) which is not visible to the user, such as
+the page title, character set, and links to CSS files. The  section contains all
+the visible content like text, images, and buttons that the user interacts
+with.", "difficulty": "Moderate Concept" }, { "question": "Write the code for an
+h2 heading that contains a word in italics and another word that is bold.",
+"answer": "This is italic and this is bold", "difficulty": "Moderate Practical"
+}, { "question": "How would you display the sentence 'The price is < $10 & the
+shipping is free' in HTML without triggering tag errors?", "answer": "The price
+is < 10 &amp; the shipping is free</p>",
+"difficulty": "Hard Practical"
+},
 {
-  "phase_metadata": { "phase_number": 1, "title": "HTML Basics: The Foundation of the Web", "estimated_time": "2 Hours" },
-  "learning_objectives": ["Understand the role of HTML", "Master the boilerplate structure"],
-  "prerequisites": ["Basic computer literacy"],
-  "introduction": "HTML is the skeleton of every webpage.",
-  "syntax": "<html>\n<head></head>\n<body></body>\n</html>",
-  "rules_and_key_points": ["Always close your tags", "Use lowercase tag names"],
-  "code_example_1": { "title": "Basic Boilerplate", "code": "<!DOCTYPE html>\n<html>\n<body>\n<h1>Hello World</h1>\n</body>\n</html>", "output": "Hello World heading rendered" },
-  "common_mistakes": ["Forgetting DOCTYPE"],
-  "best_practices": ["Always include a lang attribute"],
-  "key_takeaways": ["HTML defines structure, not style"],
-  "questions_and_answers": [
-    { "question": "What does HTML stand for?", "answer": "HyperText Markup Language.", "difficulty": "Easy" }
-  ],
-  "multiple_choice_questions": [
-    {
-      "question": "Which tag is used for the largest heading?",
-      "options": { "A": "<heading>", "B": "<h6>", "C": "<h1>", "D": "<head>" },
-      "answer": "C"
-    }
-  ]
+"question": "Identify the mistake: <p>Welcome to <strong>my website!</p></strong>",
+"answer": "The tags are incorrectly nested. The <strong> tag was opened inside the <p> tag but closed after the </p> tag. It should be: <p>Welcome to <strong>my website!</strong></p>",
+"difficulty": "Moderate Mistake"
+},
+{
+"question": "A student wrote an entire page without a <!DOCTYPE html> declaration. What might happen?",
+"answer": "The browser will enter 'Quirks Mode'. In this mode, the browser assumes the page is written for very old technology and might ignore modern CSS rules or render the layout inconsistently compared to other browsers.",
+"difficulty": "Hard Mistake"
+},
+{
+"question": "Create a basic HTML structure for a news article with a title, a sub-title, and two paragraphs separated by a horizontal line (use <hr>).",
+"answer": "<h1>Main News Title</h1>\n<h2>Sub-heading description</h2>\n<p>First paragraph content.</p>\n<hr>\n<p>Second paragraph content.</p>",
+"difficulty": "Moderate Coding"
+},
+{
+"question": "Construct a complete HTML5 document skeleton that includes a title 'Portfolio', an h1 heading, and a comment explaining that the content starts there.",
+"answer": "<!DOCTYPE html>\n<html lang='en'>\n<head>\n    <meta charset='UTF-8'>\n    <title>Portfolio</title>\n</head>\n<body>\n    <!-- Content starts here -->\n    <h1>My Portfolio</h1>\n</body>\n</html>",
+"difficulty": "Hard Coding"
 }
+],
+"multiple_choice_questions": [
+{
+"question": "Which tag is used to define the largest heading in HTML?",
+"options": {
+"A": "<heading>",
+"B": "<h6>",
+"C": "<h1>",
+"D": "<head>"
+},
+"answer": "C",
+"type": "Theory"
+},
+{
+"question": "What is the correct way to write a comment in HTML?",
+"options": {
+"A": "// This is a comment",
+"B": "/* This is a comment */",
+"C": "<-- This is a comment -->",
+"D": "<!-- This is a comment -->"
+},
+"answer": "D",
+"type": "Theory"
+},
+{
+"question": "What will be the output of: <p>Line 1<br>Line 2</p>?",
+"options": {
+"A": "Line 1 and Line 2 on the same line with a space",
+"B": "Line 1 and Line 2 on separate lines",
+"C": "Line 1 followed by a break tag text",
+"D": "A single line saying 'Line 1Line 2'"
+},
+"answer": "B",
+"type": "Output Prediction"
+},
+{
+"question": "Predict the visual result of: <s>50 20",
+"options": {
+"A": "50 in bold and 20 in normal",
+"B": "50 will have a line through it (strikethrough)", "C":
+"50 will be underlined",
+"D": "50 will be smaller than $20" }, "answer": "B", "type": "Output Prediction"
+}, { "question": "How will the browser render: Hello World?", "options": { "A":
+"Exactly as written with 5 spaces", "B": "With 0 spaces (HelloWorld)", "C":
+"With only 1 space (Hello World)", "D": "It will throw an error" }, "answer":
+"C", "type": "Output Prediction" }, { "question": "Find the bug: Title",
+"options": { "A": "The  tag is not closed", "B": "The  tag is nested inside the 
+tag", "C": "The  tag should be at the end", "D": "There are no bugs" },
+"answer": "B", "type": "Find the Bug" }, { "question": "Which entity is used to
+display the 'greater than' (>) symbol?", "options": { "A": ">", "B": "<", "C":
+"&", "D": "&greater;" }, "answer": "A", "type": "Find the Bug" }, { "question":
+"Complete the code for a correct HTML5 DOCTYPE: ____ html>", "options": { "A":
+"<DOCTYPE", "B": "<!DOCTYPE", "C": "<?DOCTYPE", "D": "<!ELEMENT" }, "answer":
+"B", "type": "Complete the Code" }, { "question": "Complete the code to make
+text emphasize: <>I am stressed</>", "options": { "A": "emphasis", "B": "i",
+"C": "em", "D": "italic" }, "answer": "C", "type": "Complete the Code" }, {
+"question": "What is the best approach for choosing heading tags?", "options": {
+"A": "Choose based on the font size you want", "B": "Use only  for everything to
+rank better on Google", "C": "Use them in a nested order (h1, then h2, then h3)
+to show content hierarchy", "D": "Headings are optional and shouldn't be used"
+}, "answer": "C", "type": "Best Approach" } ] }

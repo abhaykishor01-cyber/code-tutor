@@ -1,0 +1,329 @@
+{
+  "metadata": {
+    "phaseNumber": 14,
+    "title": "Bit Manipulation",
+    "duration": "6 hours",
+    "difficulty": "Advanced"
+  },
+  "learningObjectives": [
+    "Master binary representations, binary-to-decimal transitions, and bitwise states.",
+    "Utilize bitwise logical operators (&, |, ^, ~) for complex data optimization.",
+    "Implement left shift (<<) and right shift (>>) operators with complete precision.",
+    "Perform essential bitwise routines: checking, setting, clearing, and toggling specific bits.",
+    "Construct bitmasks for selective data extraction and memory compression.",
+    "Analyze undefined and implementation-defined behaviors of signed bit shifts.",
+    "Apply bit manipulation strategies to build space-efficient protocols (e.g., RGB565 packing)."
+  ],
+  "prerequisites": [
+    "Phase 3: Basic Operators and Expressions",
+    "Phase 4: Control Flow and Conditional Statements",
+    "Phase 5: Data Types and Integer Sizes (Signed vs. Unsigned representation)"
+  ],
+  "introduction": "In C, computing power is maximized when we interact directly with memory at its finest granularity: the bit. Bit manipulation is the process of modifying individual binary digits within a memory address instead of operating on whole integers or floating-point numbers. It is a fundamental technique used in embedded systems, drivers, graphics programming, cryptography, network protocols, and game engines. By controlling bits directly, you can perform high-speed calculations, compress structured flags into a single byte of memory, and bypass high-overhead arithmetic operators. This module covers the core bitwise mechanisms of C and demonstrates how to apply them to produce production-grade, highly-optimized systems code.",
+  "conceptExplanation": "Bitwise operations execute operations on the discrete binary bits that comprise a variable. C exposes six operators to control this level of memory:\n\n1. Bitwise AND (&): Compares corresponding bits of two operands. If both bits are 1, the resulting bit is 1; otherwise, it is 0. This is primarily used for clearing bits and masking fields.\n\n2. Bitwise OR (|): Compares bits. If at least one of the bits is 1, the result is 1. This is the primary tool used for setting bits.\n\n3. Bitwise XOR (^): Returns 1 if and only if the two compared bits differ (one is 1, the other is 0). If they are identical, it yields 0. This is used for toggling states and calculating checksums.\n\n4. Bitwise NOT (~): A unary operator that flips all bits (1 becomes 0, 0 becomes 1). This is used to create inverse masks.\n\n5. Left Shift (<<): Shifts the bit patterns to the left by a specified number of places. Vacated positions on the right are filled with zeros. Mathematically, shifting an unsigned value left by N is equivalent to multiplying it by 2 raised to the power of N, assuming no overflow occurs.\n\n6. Right Shift (>>): Shifts bits to the right. For unsigned integers, empty spaces on the left are filled with zeros (logical shift). For signed integers, the behavior is implementation-defined; most compilers fill vacated positions with the sign bit to preserve the sign (arithmetic shift). Avoid using signed integers when performing right-shift operations.\n\nBy combining these operators with 'masks' (carefully crafted constant values containing 1s and 0s in target locations), you can access, edit, or isolate any bit inside a memory word.",
+  "syntax": "/* Bitwise Operations Syntax */\nunsigned int result_and = value1 & value2;\nunsigned int result_or  = value1 | value2;\nunsigned int result_xor = value1 ^ value2;\nunsigned int result_not = ~value1;\nunsigned int result_lsh = value1 << num_positions;\nunsigned int result_rsh = value1 >> num_positions;\n\n/* Bit Modification Idioms (bit index 'n') */\nunsigned int set_bit    = value | (1U << n);\nunsigned int clear_bit  = value & ~(1U << n);\nunsigned int toggle_bit = value ^ (1U << n);\nunsigned int check_bit  = (value >> n) & 1U;",
+  "syntaxBreakdown": [
+    "value1, value2: Integer variables or constants. It is highly recommended to use unsigned types (e.g., uint32_t, uint8_t) to prevent sign-extension issues.",
+    "&: Bitwise AND. Combines flags or masks a value.",
+    "|: Bitwise OR. Combines properties or sets specific bits.",
+    "^: Bitwise XOR. Flips mismatched values; valuable for parity checks and fast toggling.",
+    "~: Bitwise NOT (one's complement). Inverts all bits in its single operand.",
+    "<<: Shift Left. Shifts bits left. The rightmost bits receive 0s.",
+    ">>: Shift Right. Shifts bits right. Performs a logical shift on unsigned values and an arithmetic shift on signed values.",
+    "1U << n: Generates a binary mask where only the bit at position 'n' is set to 1. The suffix 'U' ensures the constant 1 is treated as an unsigned integer, avoiding signed overflow."
+  ],
+  "rulesAndKeyPoints": [
+    "Always perform bit manipulation on unsigned types (uint8_t, uint16_t, uint32_t, uint64_t) to prevent undefined behaviors during shifts.",
+    "Shifts by negative values or shifts by a count greater than or equal to the width of the type trigger undefined behavior in C.",
+    "Left-shifting a signed 1 with value 1U << 31 inside a signed 32-bit integer is undefined behavior if the sign bit changes. Use 1U << 31 instead.",
+    "Understand Operator Precedence: Bitwise operators have lower priority than arithmetic operators and comparison operators. Always wrap bitwise expressions in parentheses: use 'if ((value & mask) == expected)' rather than 'if (value & mask == expected)'.",
+    "Arithmetic shifts on negative signed numbers are implementation-defined. Never assume the sign bit will propagate across all C compilers."
+  ],
+  "codeExample1": {
+    "title": "Core Bitwise Operations: Set, Clear, Toggle, and Check",
+    "code": "#include <stdio.h>\n#include <stdint.h>\n\n/* Function to print an 8-bit integer in binary format for educational inspection */\nvoid print_binary8(uint8_t value) {\n    for (int i = 7; i >= 0; i--) {\n        printf(\"%d\", (value >> i) & 1);\n    }\n    printf(\"\\n\");\n}\n\nint main(void) {\n    uint8_t reg = 0x00; /* Register starting at 00000000 */\n    printf(\"Initial register state:      \");\n    print_binary8(reg);\n\n    /* 1. Set Bit 3 (0-indexed, 4th bit from the right) */\n    reg |= (1U << 3);\n    printf(\"After setting bit 3:         \");\n    print_binary8(reg);\n\n    /* 2. Set Bit 5 */\n    reg |= (1U << 5);\n    printf(\"After setting bit 5:         \");\n    print_binary8(reg);\n\n    /* 3. Check if Bit 3 is set */\n    if ((reg & (1U << 3)) != 0) {\n        printf(\"Bit 3 is confirmed SET\\n\");\n    } else {\n        printf(\"Bit 3 is CLEAR\\n\");\n    }\n\n    /* 4. Toggle Bit 5 (turn it off) */\n    reg ^= (1U << 5);\n    printf(\"After toggling bit 5:        \");\n    print_binary8(reg);\n\n    /* 5. Clear Bit 3 */\n    reg &= ~(1U << 3);\n    printf(\"After clearing bit 3:        \");\n    print_binary8(reg);\n\n    /* 6. Verify if Bit 3 is clear */\n    if ((reg & (1U << 3)) == 0) {\n        printf(\"Bit 3 is confirmed CLEAR\\n\");\n    }\n\n    return 0;\n}",
+    "explanation": "This code demonstrates the primary bitwise idioms used in C. Using uint8_t ensures precise 8-bit registers. First, 'reg' is set to 0. Running 'reg |= (1U << 3)' builds a mask (00001000) and executes an OR operation with 'reg', flipping the fourth bit to 1. To clear that bit, 'reg &= ~(1U << 3)' takes the one's complement of the mask (11110111) and performs an AND operation with 'reg', clearing bit 3 while preserving all other bits."
+  },
+  "codeExample2": {
+    "title": "Real-World Application: Packing RGB Colors (RGB888 to RGB565)",
+    "code": "#include <stdio.h>\n#include <stdint.h>\n\n/* \n * Packs 24-bit RGB888 (8 bits Red, 8 bits Green, 8 bits Blue) \n * into a space-efficient 16-bit RGB565 representation (5 Red, 6 Green, 5 Blue).\n */\nuint16_t pack_rgb565(uint8_t r, uint8_t g, uint8_t b) {\n    /* Extract top bits by shifting down */\n    uint16_t red_5   = (r >> 3) & 0x1F; /* Keep only 5 bits */\n    uint16_t green_6 = (g >> 2) & 0x3F; /* Keep only 6 bits */\n    uint16_t blue_5  = (b >> 3) & 0x1F; /* Keep only 5 bits */\n\n    /* Shift components into their target slots and merge them using OR */\n    return (red_5 << 11) | (green_6 << 5) | blue_5;\n}\n\n/* Unpacks RGB565 back into standard RGB888 format with scale estimation */\nvoid unpack_rgb565(uint16_t rgb565, uint8_t *r, uint8_t *g, uint8_t *b) {\n    /* Extract components using masks, then shift back to full 8-bit ranges */\n    *r = ((rgb565 >> 11) & 0x1F) << 3;\n    *g = ((rgb565 >> 5) & 0x3F) << 2;\n    *b = (rgb565 & 0x1F) << 3;\n}\n\nint main(void) {\n    /* Example input: Forest Green (Red: 34, Green: 139, Blue: 34) */\n    uint8_t orig_r = 34;\n    uint8_t orig_g = 139;\n    uint8_t orig_b = 34;\n\n    printf(\"Original RGB888: R=%d, G=%d, B=%d\\n\", orig_r, orig_g, orig_b);\n\n    uint16_t packed = pack_rgb565(orig_r, orig_g, orig_b);\n    printf(\"Packed RGB565 (Hexadecimal): 0x%04X (16-bit storage)\\n\", packed);\n\n    uint8_t unpacked_r, unpacked_g, unpacked_b;\n    unpack_rgb565(packed, &unpacked_r, &unpacked_g, &unpacked_b);\n    printf(\"Unpacked RGB888: R=%d, G=%d, B=%d (Slight precision loss is normal)\\n\", \n            unpacked_r, unpacked_g, unpacked_b);\n\n    return 0;\n}",
+    "explanation": "This real-world example reduces memory usage for color rendering systems by packing 24 bits of color data into a 16-bit memory word. In RGB565, Red needs 5 bits, Green needs 6, and Blue needs 5. We drop the lowest bits of our original 8-bit values by shifting right, mask them to guarantee bounds, shift them left into their exact slots within the 16-bit word, and then combine them with bitwise OR. Unpacking reverses this workflow by isolating the target bits with masks and shifting them up.",
+    "expectedOutput": "Original RGB888: R=%d, G=%d, B=%d\nPacked RGB565 (Hexadecimal): 0x2444 (16-bit storage)\nUnpacked RGB888: R=32, G=136, B=32 (Slight precision loss is normal)"
+  },
+  "stepByStepDryRun": [
+    "The function pack_rgb565 starts with R = 34 (00100010 in binary), G = 139 (10001011 in binary), B = 34 (00100010 in binary).",
+    "Evaluate Red: r >> 3 shifts 00100010 right by 3, yielding 00000100 (4). Mask with 0x1F (00011111) gives 4 (00000100).",
+    "Evaluate Green: g >> 2 shifts 10001011 right by 2, yielding 00100010 (34). Mask with 0x3F (00111111) gives 34 (00100010).",
+    "Evaluate Blue: b >> 3 shifts 00100010 right by 3, yielding 00000100 (4). Mask with 0x1F (00011111) gives 4 (00000100).",
+    "Shift Red component left: red_5 << 11 translates 4 (0000000000000100) to 0010000000000000 (8192).",
+    "Shift Green component left: green_6 << 5 translates 34 (0000000000100010) to 0000010001000000 (1088).",
+    "Blue component remains in place: blue_5 is 4 (0000000000000100).",
+    "OR the values: (0010000000000000) | (0000010001000000) | (0000000000000100) = 0010010001000100, which evaluates to 0x2444 (9284 in decimal). The packing is complete."
+  ],
+  "memoryVisualization": {
+    "type": "Bitfield Layout and Stack",
+    "description": "Visual breakdown of the 16-bit stack variable 'packed' with value 0x2444 (0010010001000100)",
+    "nodes": [
+      {
+        "label": "packed (Bits 15-11): Red Channel",
+        "value": "00100 (Decimal 4)",
+        "address": "0x7FFEE3A20B11",
+        "color": "rose"
+      },
+      {
+        "label": "packed (Bits 10-5): Green Channel",
+        "value": "100010 (Decimal 34)",
+        "address": "0x7FFEE3A20B10",
+        "color": "emerald"
+      },
+      {
+        "label": "packed (Bits 4-0): Blue Channel",
+        "value": "00100 (Decimal 4)",
+        "address": "0x7FFEE3A20B0F",
+        "color": "sky"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Embedded Hardware Drivers: Writing directly to microcontroller peripheral registers to configure pins or configure baud rates.",
+    "Network Packet Headers: Encoding compact binary protocol payloads, such as IP header flags, TCP control flags, and DNS headers.",
+    "Image Processing Formats: Compressing pixels into custom bit depths (e.g., packing colors to fit into RGB565/RGB555 buffers).",
+    "Cryptography: Custom logical hash generation (e.g., MD5, SHA-256) where speed and bit-mixing are key requirements.",
+    "Fast Array of Booleans: Implementing Bitsets to track true/false flags for millions of items using minimum RAM."
+  ],
+  "commonMistakes": [
+    "Omitting mandatory parentheses. Writing 'x & 1 == 0' instead of '(x & 1) == 0'. In C, the '==' operator has higher precedence than the '&' operator, causing the system to evaluate '1 == 0' first.",
+    "Left-shifting a signed value by 31 bits, which overflows into the sign bit and produces undefined behavior on many platforms.",
+    "Applying bitwise operators to floating-point numbers. Bit manipulation is only valid on integer data types.",
+    "Using logical double-operators (&&, ||) when bitwise single-operators (&, |) are required, resulting in a boolean output (0 or 1) instead of bitwise operation.",
+    "Shifting out-of-bounds, such as shifting a 32-bit variable by 32 or more positions. This causes undefined behavior in standard compilers."
+  ],
+  "bestPractices": [
+    "Always use the 'U' or 'ULL' suffix (e.g., 1U << n) when creating masks to prevent signed integer overflow.",
+    "Declare hardware registers and variables meant for bit manipulation as 'unsigned' or explicitly use standard types like 'uint32_t'.",
+    "Use static inline helper functions or well-defined macros to clarify what you are doing (e.g., '#define SET_BIT(reg, bit) ((reg) |= (1U << (bit)))').",
+    "Always wrap macro arguments in parentheses to prevent priority parsing issues during macro expansion.",
+    "Keep standard architecture shifts in mind. For unsigned variables, '>>' is a logical shift (zeros filled). Avoid shifting signed variables to ensure portability."
+  ],
+  "faqs": [
+    {
+      "question": "What is the difference between a logical shift and an arithmetic shift?",
+      "answer": "A logical shift moves bits without preserving sign flags. It fills empty slots with zeros. A logical shift is always performed on unsigned types in C. An arithmetic shift preserves the sign of a signed number during right shifts: if the sign bit was 1 (representing a negative number), vacated positions are filled with 1s. For positive numbers, they are filled with 0s. In C, right-shifting signed variables is implementation-defined and should be avoided."
+    },
+    {
+      "question": "Why is bit manipulation faster than standard arithmetic?",
+      "answer": "Standard arithmetic operators like division (/) and multiplication (*) are complex operations at the CPU level, often requiring multiple clock cycles. Bitwise shifts are core hardware operations that execute in a single CPU clock cycle. This makes bit manipulation ideal for hot code paths and performance-critical loops."
+    },
+    {
+      "question": "Is it safe to shift a value by a number of bits equal to its data type's width?",
+      "answer": "No. In C, shifting by a value equal to or greater than the bit width of the operand results in undefined behavior. For example, shifting a 32-bit integer by 32 positions (x << 32) is undefined. Most CPUs use a modulo masking system on the shift amount, which means 'x << 32' might actually end up shifting by 0 on some systems."
+    }
+  ],
+  "summary": "Bit manipulation in C is a powerful technique that operates directly on individual bits. By utilizing bitwise operators—AND (&) to clear, OR (|) to set, XOR (^) to toggle, NOT (~) to invert, and bitwise shifts (<<, >>)—programmers can optimize memory usage and speed. Working with bits requires a clear understanding of operator precedence, the importance of using unsigned integer types, and avoiding undefined operations like signed overflows or shifting beyond the variable's bit width.",
+  "keyTakeaways": [
+    "Use & to clear, | to set, ^ to toggle, and ~ to invert specific bits.",
+    "Avoid using signed integers during bit manipulation to prevent undefined behaviors with right shifts.",
+    "Always put parentheses around bitwise operations because their operator precedence is lower than arithmetic and comparison operators.",
+    "To build safe and reliable bit masks, use explicit suffixes like '1U << shift_count'.",
+    "Shifts by more than or equal to the bit width of the target data type are undefined behavior in C."
+  ],
+  "nextTopicPreview": "With your understanding of memory layouts and binary operations, you are ready to study Phase 15: File Input/Output (I/O) Streams. You will learn to persist data directly to non-volatile storage, handling text streams, binary records, and file systems.",
+  "questionsAndAnswers": [
+    {
+      "id": "q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What is bit masking, and why is it preferred over boolean arrays in resource-constrained systems?",
+      "answer": "Bit masking is the practice of isolating, changing, or checking specific bits within an integer by applying another helper integer value (the mask) along with a bitwise logical operator. On resource-constrained systems, storing flags in individual boolean variables is highly inefficient because a single standard C 'bool' or 'char' variable occupies 8 bits of memory to store a simple 1 or 0. Using bit masking, you can pack up to 8 independent boolean flags into a single 8-bit byte, reducing memory usage by 87.5% while allowing the processor to perform updates or checks across all flags simultaneously with a single clock cycle.",
+      "explanation": "A mask is built by shifting 1 to the desired bit position. Combining this mask with OR (|) sets a flag, with AND (&) checks a flag, and with XOR (^) toggles a flag."
+    },
+    {
+      "id": "q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "How does an arithmetic right shift differ from a logical right shift, and how does the C language determine which one to run?",
+      "answer": "A logical right shift shifts all bits to the right and fills the leftmost vacated positions with zeros. An arithmetic right shift shifts bits to the right but fills the leftmost positions with a copy of the original leftmost bit (the sign bit). This preserves the mathematical sign of negative numbers in two's complement notation. In C, the shift type used is determined by the data type of the operand being shifted: shifting an unsigned type executes a logical right shift, whereas shifting a signed type executes an implementation-defined right shift, which is almost always an arithmetic shift on modern compilers.",
+      "explanation": "To ensure uniform, portable, and predictable results across all processors and compilers, always use unsigned data types (like 'uint32_t') when performing shift operations."
+    },
+    {
+      "id": "q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a highly optimized C function to count the number of set bits (1s) in an unsigned 32-bit integer.",
+      "answer": "An optimized approach is Brian Kernighan's Algorithm. Instead of shifting and checking every bit one by one (which always runs 32 loops), this algorithm clears the lowest set bit in each iteration using the expression 'v & (v - 1)'. This means the loop only runs as many times as there are actual set bits in the integer.\n\n```c\n#include <stdint.h>\n\nint count_set_bits(uint32_t v) {\n    int count = 0;\n    while (v) {\n        v &= (v - 1); // clears the lowest set bit\n        count++;\n    }\n    return count;\n}\n```",
+      "explanation": "Evaluating 'v - 1' flips all bits up to and including the lowest set bit. Performing an AND operation of this value with the original number clears that lowest set bit, allowing the algorithm to count the bits efficiently."
+    },
+    {
+      "id": "q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "How do you reverse the bits of a 32-bit unsigned integer without using dynamic memory or helper arrays?",
+      "answer": "You can reverse the bits of a 32-bit integer efficiently by swapping adjacent blocks of bits in memory using a series of masks and shifts, similar to a binary merge sort. We swap adjacent single bits, then adjacent 2-bit groups, then 4-bit, 8-bit, and finally 16-bit halves.\n\n```c\n#include <stdint.h>\n\nuint32_t reverse_bits(uint32_t n) {\n    n = ((n >> 1) & 0x55555555) | ((n & 0x55555555) << 1);\n    n = ((n >> 2) & 0x33333333) | ((n & 0x33333333) << 2);\n    n = ((n >> 4) & 0x0F0F0F0F) | ((n & 0x0F0F0F0F) << 4);\n    n = ((n >> 8) & 0x00FF00FF) | ((n & 0x00FF00FF) << 8);\n    n = ( n >> 16)             | ( n             << 16);\n    return n;\n}\n```",
+      "explanation": "Mask 0x55555555 isolates odd bits, while 0x33333333 isolates pairs. This approach swaps all 32 bits in just 5 sequential steps, running in O(1) constant time without loops."
+    },
+    {
+      "id": "q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Explain the operator precedence bug in 'if (x & 1 == 0)' and how to correct it.",
+      "answer": "In C, the equality comparison operator '==' has a higher precedence than the bitwise AND operator '&'. Because of this, the compiler processes the expression 'if (x & 1 == 0)' as 'if (x & (1 == 0))', which simplifies to 'if (x & 0)', evaluating to false (0) regardless of the value of x. To correct this, you must wrap the bitwise operation in parentheses to force it to evaluate first:\n\n```c\nif ((x & 1) == 0) {\n    /* Executes correctly if the lowest bit of x is zero */\n}\n```",
+      "explanation": "Always use explicit grouping parentheses when mixing bitwise operations with comparisons, logical relations, or arithmetic."
+    },
+    {
+      "id": "q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "What happens if you left-shift a signed integer by 31 bits in C, and how does using '1U' fix this issue?",
+      "answer": "If you left-shift a standard signed 32-bit integer, shifting a '1' into or past the sign bit (position 31) results in undefined behavior under the C standard. The statement '1 << 31' uses a signed integer literal '1'. When shifted left by 31, it attempts to set the sign bit, which is undefined behavior. To resolve this, append 'U' to make the literal unsigned: '1U << 31'. Since unsigned shift operations do not have sign bits, shifting is fully defined and safe up to 31 positions.",
+      "explanation": "Using '1U' creates a 'unsigned int' literal. Shifting an unsigned int is safe and predictable because it is defined to work modulo 2 raised to the power of the bit width."
+    },
+    {
+      "id": "q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Implement a function to swap two integers without using a temporary variable via bitwise XOR. Explain its risk.",
+      "answer": "You can swap two integers using three XOR operations in a row. This works because XOR is its own inverse.\n\n```c\nvoid xor_swap(int *x, int *y) {\n    if (x == y) return; /* Critical safety check */\n    *x ^= *y;\n    *y ^= *x;\n    *x ^= *y;\n}\n```\n\nThe primary risk is when 'x' and 'y' point to the exact same memory address (aliasing). If 'x == y', the first line '*x ^= *y' evaluates to '*x ^= *x', which clears the variable to 0. Without the safety check, the function will zero out the value instead of swapping it.",
+      "explanation": "XORing a value with itself yields 0. Always verify that pointer addresses are unique before using an XOR swap."
+    },
+    {
+      "id": "q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Write a C function to determine if an unsigned 32-bit integer is a power of two using bitwise operators, without loops.",
+      "answer": "A non-zero number is a power of two if it has exactly one bit set to 1 in its binary representation. You can check this in O(1) constant time by evaluating the expression 'x & (x - 1)'. If 'x' is a power of two, subtracting 1 flips all bits below the single set bit, and performing an AND operation of this with 'x' yields 0. We must also verify that 'x' is not 0.\n\n```c\n#include <stdbool.h>\n#include <stdint.h>\n\nbool is_power_of_two(uint32_t x) {\n    return (x != 0) && ((x & (x - 1)) == 0);\n}\n```",
+      "explanation": "For example, if x is 8 (1000 in binary), then x-1 is 7 (0111). Evaluating '1000 & 0111' yields 0000, confirming that 8 is a power of two."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "category": "Theory",
+      "question": "Which of the following operations is commonly used to clear specific bits in a register while keeping the other bits unchanged?",
+      "options": {
+        "A": "Bitwise OR (|) with a mask containing 1s at the target positions.",
+        "B": "Bitwise XOR (^) with a mask containing 0s at the target positions.",
+        "C": "Bitwise AND (&) with a mask containing 0s only at the target positions.",
+        "D": "Bitwise NOT (~) applied directly to the original register."
+      },
+      "correctOption": "C",
+      "explanation": "Performing an AND (&) operation with 0 always yields 0, clearing the targeted bits. Performing an AND with 1 preserves the original bit's value."
+    },
+    {
+      "id": "m2",
+      "category": "Theory",
+      "question": "What does the C standard specify about right-shifting (>>) a signed negative integer?",
+      "options": {
+        "A": "It is guaranteed to execute a logical shift, filling vacated positions with zeros.",
+        "B": "It is guaranteed to execute an arithmetic shift, filling vacated positions with ones.",
+        "C": "It triggers an immediate compiler error because bit operations on signed integers are banned.",
+        "D": "Its behavior is implementation-defined, meaning different compilers or architectures can handle it differently."
+      },
+      "correctOption": "D",
+      "explanation": "Under the ISO C Standard, right-shifting a signed negative integer is implementation-defined. While most desktop compilers perform an arithmetic shift, code that relies on this behavior is not portable."
+    },
+    {
+      "id": "m3",
+      "category": "Output Prediction",
+      "question": "What is the output of the following C code?\n```c\n#include <stdio.h>\nint main() {\n    unsigned char a = 5;\n    unsigned char b = 9;\n    printf(\"%d\", a ^ b);\n    return 0;\n}\n```",
+      "options": {
+        "A": "14",
+        "B": "12",
+        "C": "1",
+        "D": "0"
+      },
+      "correctOption": "B",
+      "explanation": "5 in binary is 0101. 9 in binary is 1001. Performing a bitwise XOR (^) compares the bits: 0101 ^ 1001 = 1100. 1100 in binary represents 12 in decimal."
+    },
+    {
+      "id": "m4",
+      "category": "Output Prediction",
+      "question": "What is the output of the following C code snippet?\n```c\n#include <stdio.h>\nint main() {\n    unsigned int x = 3;\n    printf(\"%u\", x << 3);\n    return 0;\n}\n```",
+      "options": {
+        "A": "24",
+        "B": "9",
+        "C": "6",
+        "D": "12"
+      },
+      "correctOption": "A",
+      "explanation": "Shifting left by 3 is mathematically equivalent to multiplying the value by 2 raised to the power of 3 (which is 8). Thus, 3 * 8 = 24. In binary, 00000011 shifted left by 3 becomes 00011000, which is 24."
+    },
+    {
+      "id": "m5",
+      "category": "Output Prediction",
+      "question": "What does this code output?\n```c\n#include <stdio.h>\nint main() {\n    unsigned int status = 0x0F;\n    if (status & 0x10 == 0) {\n        printf(\"Disabled\");\n    } else {\n        printf(\"Enabled\");\n    }\n    return 0;\n}\n```",
+      "options": {
+        "A": "Disabled",
+        "B": "Enabled",
+        "C": "The program crashes at runtime.",
+        "D": "The compiler rejects this due to an invalid syntax error."
+      },
+      "correctOption": "B",
+      "explanation": "Due to operator precedence, '0x10 == 0' is evaluated first because '==' has higher precedence than '&'. Since '0x10 == 0' is false, it returns 0. The expression becomes 'status & 0', which is 0. Since 0 is treated as false, the 'else' block executes, printing 'Enabled'. To fix this, you would write 'if ((status & 0x10) == 0)'."
+    },
+    {
+      "id": "m6",
+      "category": "Find the Bug",
+      "question": "Identify the bug in the following C code designed to check if bit 7 of a register is set:\n```c\n#include <stdint.h>\n#include <stdbool.h>\nbool is_bit7_set(uint8_t reg) {\n    return reg & 1U << 7 != 0;\n}\n```",
+      "options": {
+        "A": "You must use the bitwise XOR (^) operator instead of the bitwise AND (&) operator to check a bit.",
+        "B": "The bit shift '1U << 7' is invalid for 8-bit integers.",
+        "C": "The comparison operator '!=' has higher precedence than '&', so '7 != 0' is evaluated first.",
+        "D": "The variable 'reg' must be declared as volatile to perform bit shifts."
+      },
+      "correctOption": "C",
+      "explanation": "Because '!=' has higher precedence than '&', the compiler evaluates '1U << (7 != 0)' which becomes '1U << 1', which is 2. The expression then evaluates 'reg & 2', yielding an incorrect result. To fix this, add parentheses: 'return (reg & (1U << 7)) != 0;'."
+    },
+    {
+      "id": "m7",
+      "category": "Find the Bug",
+      "question": "What is the logic error in this function intended to clear bit 'n' of an unsigned 32-bit register?\n```c\n#include <stdint.h>\nuint32_t clear_bit(uint32_t reg, int n) {\n    return reg | ~(1U << n);\n}\n```",
+      "options": {
+        "A": "Using the bitwise OR (|) operator instead of AND (&) sets all other bits to 1 instead of clearing bit n.",
+        "B": "The shift operation '1U << n' is invalid on 32-bit values.",
+        "C": "The one's complement operator (~) cannot be applied to unsigned values.",
+        "D": "The function returns an incorrect type and will overflow."
+      },
+      "correctOption": "A",
+      "explanation": "To clear a bit, you must use the bitwise AND (&) operator with an inverted mask. Using '|' with a mask like '11110111' sets all other bits in the register to 1 while leaving bit n unchanged."
+    },
+    {
+      "id": "m8",
+      "category": "Complete the Code",
+      "question": "Fill in the blank to complete the function that checks if the N-th bit of a variable is set:\n```c\n#include <stdbool.h>\n#include <stdint.h>\nbool check_nth_bit(uint32_t val, int n) {\n    return (______ ) != 0;\n}\n```",
+      "options": {
+        "A": "(val >> n) & 1U",
+        "B": "val & ~(1U << n)",
+        "C": "val | (1U << n)",
+        "D": "val ^ (1U << n)"
+      },
+      "correctOption": "A",
+      "explanation": "Shifting the target bit 'n' positions to the right places it at the lowest bit position (bit 0). Masking it with '& 1U' then isolates its value, returning 1 if set and 0 if clear."
+    },
+    {
+      "id": "m9",
+      "category": "Complete the Code",
+      "question": "Which code segment correctly toggles only bits 0 and 1 of an unsigned 8-bit variable 'reg'? (For example, 00000101 becomes 00000110)",
+      "options": {
+        "A": "reg &= ~0x03;",
+        "B": "reg ^= 0x03;",
+        "C": "reg |= 0x03;",
+        "D": "reg = ~reg;"
+      },
+      "correctOption": "B",
+      "explanation": "The XOR (^) operator toggles the target bits when combined with a mask containing 1s. The value '0x03' is '00000011' in binary, which targets and toggles bits 0 and 1 while preserving the remaining bits."
+    },
+    {
+      "id": "m10",
+      "category": "Best Approach",
+      "question": "In a performance-critical loop, what is the best and most portable way to divide an unsigned integer 'x' by 4?",
+      "options": {
+        "A": "x = x >> 2;",
+        "B": "x = x / 4; and trust the compiler's optimizer.",
+        "C": "x = x >> 4;",
+        "D": "x = x & 0x04;"
+      },
+      "correctOption": "B",
+      "explanation": "Modern optimizing compilers automatically convert division by constant powers of two into high-speed bitwise right shifts. Writing 'x / 4' is the best approach because it is easy to read, portable, and allows the compiler to optimize the operation safely without introducing manual errors."
+    }
+  ]
+}

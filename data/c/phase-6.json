@@ -1,0 +1,328 @@
+{
+  "metadata": {
+    "phaseNumber": 6,
+    "title": "Arrays in C",
+    "duration": "2 Weeks",
+    "difficulty": "Intermediate"
+  },
+  "learningObjectives": [
+    "Understand continuous contiguous memory allocation for primitive data types.",
+    "Declare, initialize, and manipulate one-dimensional, two-dimensional, and multi-dimensional arrays.",
+    "Implement core array operations: Traversal, Searching (Linear & Binary), Updating, Insertion, and Deletion.",
+    "Analyze the decay of arrays into pointers and safely pass arrays to functions with explicit size parameters.",
+    "Formulate multi-dimensional arrays as matrix models and implement operations like transposition and matrix multiplication."
+  ],
+  "prerequisites": [
+    "Phase 3: Control flow and conditional structures.",
+    "Phase 4: Loops and iteration mechanics.",
+    "Phase 5: Functions, scope, and basic local memory storage."
+  ],
+  "introduction": "An array is a homogeneous, statically sized sequential collection of elements stored in contiguous memory locations. When writing software, declaring individual variables for hundreds of related records is unmanageable. Arrays solve this problem by providing a collective variable name associated with a zero-indexed key. This structures memory systematically, allowing the CPU to access any element in constant time (O(1)) via offset calculations. This phase explores the storage paradigms, address calculation mechanisms, multi-dimensional layouts, and proper techniques for transferring array data across program scopes.",
+  "conceptExplanation": "Arrays are structures that allocate block-level contiguous memory. In a one-dimensional (1D) array, elements are arranged sequentially. The name of the array acts as a constant pointer to its first element (base address). Address Calculation: The address of element index 'i' is determined by: Address(Arr[i]) = Base_Address + (i * sizeof(DataType)). For example, if a 32-bit integer array starts at address 1000, Arr[2] resides at address 1008. In Two-Dimensional (2D) Arrays, C utilizes Row-Major Order, meaning elements of the first row are stored continuously, followed immediately by the second row. Address calculation shifts to: Address(Arr[i][j]) = Base_Address + (i * Columns + j) * sizeof(DataType). Multi-dimensional arrays follow this flat mapping recursively. Passing arrays to functions in C involves 'Array Decay'. When passed as an argument, an array converts to a pointer to its first element. This design prevents stack overflow by avoiding large copying actions, but means the receiving function loses size metadata. Hence, passing the physical size of the array is mandatory for security and bounds verification.",
+  "syntax": "1D Array: dataType arrayName[arraySize]; 2D Array: dataType arrayName[rows][cols]; Initialized Array: dataType arrayName[] = {val1, val2, val3}; Passing to Function: void functionName(dataType arrayParam[], int size);",
+  "syntaxBreakdown": [
+    "dataType: Specifies the element type (e.g., int, float, char) which dictates byte step size.",
+    "arrayName: The identifier representing the collection, functioning as a constant pointer to index 0.",
+    "arraySize: An integer constant expression defining the capacity of the array allocated at compile-time.",
+    "rows / cols: Dimensions for multi-dimensional layouts, with cols required in function signatures to compute row-major offsets.",
+    "arrayParam[]: Declares a formal parameter representing a decayed pointer to the base address."
+  ],
+  "rulesAndKeyPoints": [
+    "Array sizes must be constant expressions known at compile-time unless using Variable Length Arrays (VLAs) in C99, which should be used with caution due to stack overflow risks.",
+    "Array indices are zero-based, running from 0 to N-1, where N is the declared size.",
+    "C does not perform run-time bounds checking. Writing to an index outside [0, N-1] causes undefined behavior, corrupting adjacent stack data.",
+    "The name of the array evaluates to its base address but is non-modifiable; you cannot perform reassignments like arr1 = arr2.",
+    "When passing a multi-dimensional array to a function, all dimensions except the first must be explicitly specified in the parameter declaration."
+  ],
+  "codeExample1": {
+    "title": "Fundamental 1D Array Operations: Search, Insert, and Delete",
+    "code": "#include <stdio.h>\\n\\n#define MAX_SIZE 10\\n\\nvoid printArray(const int arr[], int size) {\\n    for (int i = 0; i < size; i++) {\\n        printf(\"%d \", arr[i]);\\n\\n    }\\n    printf(\"\\\\n\");\\n}\\n\\nint linearSearch(const int arr[], int size, int target) {\\n    for (int i = 0; i < size; i++) {\\n        if (arr[i] == target) return i;\\n    }\\n    return -1;\\n}\\n\\nint insertElement(int arr[], int *size, int element, int capacity, int position) {\\n    if (*size >= capacity || position < 0 || position > *size) return 0;\\n    for (int i = *size; i > position; i--) {\\n        arr[i] = arr[i - 1];\\n    }\\n    arr[position] = element;\\n    (*size)++;\\n    return 1;\\n}\\n\\nint deleteElement(int arr[], int *size, int position) {\\n    if (position < 0 || position >= *size) return 0;\\n    for (int i = position; i < *size - 1; i++) {\\n        arr[i] = arr[i + 1];\\n    }\\n    (*size)--;\\n    return 1;\\n}\\n\\nint main(void) {\\n    int scores[MAX_SIZE] = {85, 92, 78, 90};\\n    int currentSize = 4;\\n\\n    printf(\"Initial array: \");\\n    printArray(scores, currentSize);\\n\\n    int target = 92;\\n    int foundIndex = linearSearch(scores, currentSize, target);\\n    printf(\"Search for %d: Found at index %d\\\\n\", target, foundIndex);\\n\\n    if (insertElement(scores, &currentSize, 99, MAX_SIZE, 2)) {\\n        printf(\"After insertion at index 2: \");\\n        printArray(scores, currentSize);\\n    }\\n\\n    if (deleteElement(scores, &currentSize, 1)) {\\n        printf(\"After deletion at index 1: \");\\n        printArray(scores, currentSize);\\n    }\\n\\n    return 0;\\n}",
+    "explanation": "This application demonstrates operations on a 1D array. Traversal is used in printArray. The linearSearch function iterates to find a target value. The insertElement function shifts elements rightward from the target index to prevent data overwrite and increments the logical size. The deleteElement function shifts remaining elements leftward to fill the gap at the deletion index and decrements the logical size. These operations run in O(N) time in the worst-case."
+  },
+  "codeExample2": {
+    "title": "Matrix Processing: Transposing a 2D Array",
+    "code": "#include <stdio.h>\\n\\n#define ROWS 2\\n#define COLS 3\\n\\nvoid printMatrix(int matrix[ROWS][COLS]) {\\n    for (int i = 0; i < ROWS; i++) {\\n        for (int j = 0; j < COLS; j++) {\\n            printf(\"%d \", matrix[i][j]);\\n        }\\n        printf(\"\\\\n\");\\n    }\\n}\\n\\nvoid transposeMatrix(int src[ROWS][COLS], int dest[COLS][ROWS]) {\\n    for (int i = 0; i < ROWS; i++) {\\n        for (int j = 0; j < COLS; j++) {\\n            dest[j][i] = src[i][j];\\n        }\\n    }\\n}\\n\\nint main(void) {\\n    int original[ROWS][COLS] = {\\n        {1, 2, 3},\\n        {4, 5, 6}\\n    };\\n    int transposed[COLS][ROWS];\\n\\n    printf(\"Original Matrix (%dx%d):\\\\n\", ROWS, COLS);\\n    printMatrix(original);\\n\\n    transposeMatrix(original, transposed);\\n\\n    printf(\"\\\\nTransposed Matrix (%dx%d):\\\\n\", COLS, ROWS);\\n    for (int i = 0; i < COLS; i++) {\\n        for (int j = 0; j < ROWS; j++) {\\n            printf(\"%d \", transposed[i][j]);\\n        }\\n        printf(\"\\\\n\");\\n    }\\n\\n    return 0;\\n}",
+    "explanation": "This example performs matrix transposition. The original 2D array is stored as 2 rows and 3 columns. The transposeMatrix function iterates through the dimensions, swapping the row indices with column indices: destination[j][i] = source[i][j]. This highlights how 2D contiguous blocks are restructured.",
+    "expectedOutput": "Original Matrix (2x3):\\n1 2 3 \\n4 5 6 \\n\\nTransposed Matrix (3x2):\\n1 4 \\n2 5 \\n3 6"
+  },
+  "stepByStepDryRun": [
+    "Step 1: Main initiates variable currentSize = 4 and static score array with elements [85, 92, 78, 90] at stack base 0x7ffd00.",
+    "Step 2: linearSearch is called, passing the decay pointer 'scores' (0x7ffd00) and target 92.",
+    "Step 3: Inside search, loop variable i is initialized to 0. Accessing arr[0] translates to reading memory address 0x7ffd00 + (0*4) = 85. No match.",
+    "Step 4: Loop variable increments to i = 1. Accessing arr[1] reads address 0x7ffd00 + (1*4) = 92. Match found. Function exits, returning index 1.",
+    "Step 5: insertElement is called, passing address of currentSize (0x7ffd10), position 2, and value 99.",
+    "Step 6: Shift phase begins from end index 4 down to index 3: index 4 becomes 90 (old index 3), index 3 becomes 78 (old index 2).",
+    "Step 7: Position index 2 is updated to value 99. The size value referenced by size pointer is updated to 5. Return code 1."
+  ],
+  "memoryVisualization": {
+    "type": "Contiguous Stack Frame Allocation",
+    "description": "A layout map showing address steps of a 4-element 32-bit integer array 'scores' on the stack, detailing base address decay.",
+    "nodes": [
+      {
+        "label": "scores[0] (Base Address)",
+        "value": "85",
+        "address": "0x7ffd0000",
+        "color": "emerald"
+      },
+      {
+        "label": "scores[1] (Offset 4 Bytes)",
+        "value": "92",
+        "address": "0x7ffd0004",
+        "color": "sky"
+      },
+      {
+        "label": "scores[2] (Offset 8 Bytes)",
+        "value": "78",
+        "address": "0x7ffd0008",
+        "color": "rose"
+      },
+      {
+        "label": "scores[3] (Offset 12 Bytes)",
+        "value": "90",
+        "address": "0x7ffd000C",
+        "color": "amber"
+      },
+      {
+        "label": "Function Pointer Parameter 'arr'",
+        "value": "0x7ffd0000",
+        "address": "0x7ffd0024",
+        "color": "violet"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Image Buffering: Storing structural pixel frames as multidimensional intensity matrices.",
+    "Look-up Tables (LUTs): Providing constant time O(1) mathematical lookups for hardware optimization.",
+    "Embedded Audio Sampling: Storing sequential digitizations in a continuous linear audio channel buffer."
+  ],
+  "commonMistakes": [
+    "Writing to arr[size] instead of terminating the loop or bounds logic at arr[size-1]. This causes off-by-one memory corruption.",
+    "Attempting to copy arrays via 'arr2 = arr1'. C does not support direct assignment; this will result in a compilation error.",
+    "Using sizeof(arr) inside a function to get the array size. Inside functions, the array has decayed to a pointer, returning the pointer size (4 or 8 bytes) instead of the total allocation size."
+  ],
+  "bestPractices": [
+    "Always pass the logical array size alongside the decayed array pointer when writing generic routines.",
+    "Define array capacities using preprocessor directives (#define) to prevent magic-number sizes across your program.",
+    "Explicitly initialize array declarations to avoid garbage stack values, utilizing '{0}' for full block zeroing."
+  ],
+  "faqs": [
+    {
+      "question": "What is the difference between an array's logical size and its physical capacity?",
+      "answer": "Physical capacity is the maximum storage limit allocated at compilation (e.g., reserving space for 100 elements). Logical size is the count of valid items currently in use. Your loops should respect the logical size, and insert operations must verify that this logical size does not exceed physical capacity."
+    },
+    {
+      "question": "Can array sizes be dynamically set during runtime using standard array declarations?",
+      "answer": "Standard arrays require their sizes to be constant expressions at compile time. Variable Length Arrays (VLAs) in C99 allow runtime dimensions, but they are allocated on the stack. If the runtime size is too large, it can cause immediate stack overflows. For dynamic runtime allocation, use standard heap allocation via malloc instead."
+    },
+    {
+      "question": "Why must the second dimension be declared when passing a 2D array to a function?",
+      "answer": "C uses Row-Major Order to map a 2D array to linear memory. To calculate the address of matrix[i][j], the compiler uses the formula: Base + (i * Column_Count + j) * Element_Size. Without knowing Column_Count, the compiler cannot calculate the memory offset for any row index greater than zero."
+    }
+  ],
+  "summary": "This phase covered arrays in C. We examined 1D, 2D, and multi-dimensional constructs, noting their contiguous storage layouts in memory. We explored common manipulation operations including searching, insertion, and deletion, and analyzed how arrays decay into pointers when passed to function boundaries.",
+  "keyTakeaways": [
+    "Arrays offer fast O(1) element access through offset arithmetic.",
+    "Array elements must be of the same data type.",
+    "Array bounds must be monitored manually in C to avoid undefined behavior.",
+    "Passing an array to a function passes a copy of its base address, meaning updates inside functions modify the original array."
+  ],
+  "nextTopicPreview": "Next, we will cover Pointers, exploring deep memory manipulation, pointer arithmetic, and allocation mechanics.",
+  "questionsAndAnswers": [
+    {
+      "id": "Q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "Explain what 'array decay' is when passing an array to a function in C.",
+      "answer": "Array decay is the automatic conversion of an array name to a pointer pointing directly to its first element (index 0) when it is evaluated inside an expression or passed to a function scope. Inside the function, the parameter type is resolved as a regular pointer of that data type. This design avoids copying the entire array payload into the stack frame, saving memory and processor cycles.",
+      "explanation": "Because of array decay, evaluating sizeof(arr) inside the receiving function returns the system pointer size (typically 8 bytes on modern 64-bit systems) rather than the original array allocation size."
+    },
+    {
+      "id": "Q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "How does C represent a 2D array in hardware memory?",
+      "answer": "Hardware memory is linearly addressed. C manages two-dimensional arrays via a technique called Row-Major Order. The 2D grid is flattened so that the entire first row is placed in contiguous storage, followed immediately by the second row, and so on. The program translates multidimensional coordinates [i][j] into a single offset using: Offset = (i * TotalColumns) + j.",
+      "explanation": "Because memory is flat, index calculations require the column boundary size to structure and jump to the correct row index."
+    },
+    {
+      "id": "Q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a C function to reverse a 1D array of integers in-place.",
+      "answer": "To reverse an array in-place, we use a two-pointer approach, working from both ends toward the middle and swapping elements until the pointers meet: void reverseArray(int arr[], int size) { int left = 0, right = size - 1; while (left < right) { int temp = arr[left]; arr[left] = arr[right]; arr[right] = temp; left++; right--; } }",
+      "explanation": "This method has an O(N) time complexity and an O(1) auxiliary space complexity since no additional storage is allocated."
+    },
+    {
+      "id": "Q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "Write a C function to verify if a square matrix is symmetric.",
+      "answer": "A square matrix is symmetric if it is equal to its transpose (matrix[i][j] == matrix[j][i]). We can write a verification function that returns 1 if symmetric and 0 otherwise: int isSymmetric(int size, int matrix[size][size]) { for (int i = 0; i < size; i++) { for (int j = 0; j < i; j++) { if (matrix[i][j] != matrix[j][i]) return 0; } } return 1; }",
+      "explanation": "This function checks the lower triangle against the upper triangle, avoiding redundant checks along the main diagonal."
+    },
+    {
+      "id": "Q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Why does writing beyond array bounds sometimes run without crashing, and what risks does this pose?",
+      "answer": "C does not enforce bounds checking at compilation or runtime. If an array boundary is crossed, the write operation still occurs at the calculated memory address. If this address falls within the program's allocated memory, it can overwrite adjacent stack variables without crashing. This can corrupt loop variables or return addresses, leading to unstable behavior.",
+      "explanation": "This vulnerability is known as a stack buffer overflow and can be exploited to alter program control flow."
+    },
+    {
+      "id": "Q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Identify and explain the bug in: void process(int arr[]) { int size = sizeof(arr)/sizeof(arr[0]); for(int i=0; i<size; i++) { arr[i] *= 2; } }",
+      "answer": "The bug is that the parameter 'arr' is a decayed pointer. Inside the function, 'sizeof(arr)' returns the size of the pointer (typically 8 bytes), and 'sizeof(arr[0])' returns the size of an integer (4 bytes). Thus, 'size' will always evaluate to 2 on 64-bit systems, regardless of the actual length of the original array passed.",
+      "explanation": "To fix this, you must pass the array size as an explicit parameter: void process(int arr[], int size)."
+    },
+    {
+      "id": "Q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write a C program to merge two sorted arrays of size M and N into a third sorted array of size M+N.",
+      "answer": "To merge two sorted arrays, use two index pointers to traverse each array, comparing elements and writing the smaller value to the destination array: void mergeArrays(int a[], int b[], int res[], int M, int N) { int i = 0, j = 0, k = 0; while (i < M && j < N) { if (a[i] <= b[j]) { res[k++] = a[i++]; } else { res[k++] = b[j++]; } } while (i < M) { res[k++] = a[i++]; } while (j < N) { res[k++] = b[j++]; } }",
+      "explanation": "This performs a linear merge in O(M+N) time and is the core merge step used in Merge Sort."
+    },
+    {
+      "id": "Q8",
+      "category": "Coding/Application",
+      "difficulty": "Hard",
+      "question": "Write a C function to rotate an N x N square matrix by 90 degrees clockwise in-place.",
+      "answer": "To rotate an NxN matrix by 90 degrees clockwise in-place, first transpose the matrix (swap matrix[i][j] with matrix[j][i]), and then reverse each row: void rotate90Clockwise(int N, int mat[N][N]) { for (int i = 0; i < N; i++) { for (int j = i + 1; j < N; j++) { int temp = mat[i][j]; mat[i][j] = mat[j][i]; mat[j][i] = temp; } } for (int i = 0; i < N; i++) { int start = 0, end = N - 1; while (start < end) { int temp = mat[i][start]; mat[i][start] = mat[i][end]; mat[i][end] = temp; start++; end--; } } }",
+      "explanation": "First transposing the matrix swaps the axes, and then reversing each row yields the 90-degree clockwise rotation in-place with O(1) extra space."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "M1",
+      "category": "Theory",
+      "question": "Which of the following is true regarding how arrays are stored in memory in C?",
+      "options": {
+        "A": "Elements are stored linked together using dynamic non-contiguous pointers.",
+        "B": "Elements are stored sequentially in contiguous memory blocks.",
+        "C": "Each row of a 2D array is stored in a separate stack frame.",
+        "D": "Arrays are stored in heap memory by default."
+      },
+      "correctOption": "B",
+      "explanation": "C allocates arrays in contiguous memory, meaning that elements are placed next to each other in a continuous block of memory."
+    },
+    {
+      "id": "M2",
+      "category": "Theory",
+      "question": "When a 2D array defined as 'int mat[4][5]' is passed to a function, which declaration is correct?",
+      "options": {
+        "A": "void func(int mat[][])",
+        "B": "void func(int mat[4][])",
+        "C": "void func(int mat[][5])",
+        "D": "void func(int mat[4])"
+      },
+      "correctOption": "C",
+      "explanation": "When passing a 2D array to a function, you can omit the first dimension, but the second dimension (the column size) must be specified so the compiler can perform address calculation offsets."
+    },
+    {
+      "id": "M3",
+      "category": "Output Prediction",
+      "question": "What is the output of the following C code snippet?\\nint arr[5] = {1, 2, 3};\\nprintf(\"%d\", arr[4]);",
+      "options": {
+        "A": "Garbage value",
+        "B": "Compilation error",
+        "C": "1",
+        "D": "0"
+      },
+      "correctOption": "D",
+      "explanation": "When an array is partially initialized, C automatically initializes all remaining, unspecified elements to 0."
+    },
+    {
+      "id": "M4",
+      "category": "Output Prediction",
+      "question": "Given the code below, what is the output on a 64-bit architecture?\\nint arr[5] = {10, 20, 30, 40, 50};\\nint *ptr = arr;\\nprintf(\"%d\", *(ptr + 2));",
+      "options": {
+        "A": "10",
+        "B": "30",
+        "C": "20",
+        "D": "0"
+      },
+      "correctOption": "B",
+      "explanation": "The array name decays to a pointer to the first element (index 0). Adding 2 to this pointer increments the address by 2 * sizeof(int), shifting it to point to index 2, which has a value of 30."
+    },
+    {
+      "id": "M5",
+      "category": "Output Prediction",
+      "question": "What is the output of the following program?\\nvoid modify(int arr[]) {\\n    arr[0] = 99;\\n}\\nint main() {\\n    int data[2] = {1, 2};\\n    modify(data);\\n    printf(\"%d\", data[0]);\\n    return 0;\\n}",
+      "options": {
+        "A": "1",
+        "B": "99",
+        "C": "2",
+        "D": "Compilation error"
+      },
+      "correctOption": "B",
+      "explanation": "Because arrays decay to pointers, passing an array to a function passes its address. Modifications inside the function directly alter the original array elements."
+    },
+    {
+      "id": "M6",
+      "category": "Find the Bug",
+      "question": "Identify the bug in the following array manipulation routine:\\nint arr[10];\\nfor (int i = 1; i <= 10; i++) {\\n    arr[i] = i * 2;\\n}",
+      "options": {
+        "A": "The loop starts at 1, causing a syntax warning.",
+        "B": "The loop condition i <= 10 accesses index 10, which is out of bounds.",
+        "C": "The assignment expression is a type mismatch.",
+        "D": "The loop variable is not initialized."
+      },
+      "correctOption": "B",
+      "explanation": "An array of size 10 has valid indices from 0 to 9. Accessing index 10 is an out-of-bounds access, which causes undefined behavior."
+    },
+    {
+      "id": "M7",
+      "category": "Find the Bug",
+      "question": "What is the problem with the initialization: int size = 10; float scores[size];?",
+      "options": {
+        "A": "Floats cannot be declared as arrays.",
+        "B": "Using a non-const variable for array initialization is illegal in standard pre-C99 code.",
+        "C": "The array initialization must include float values in curly braces.",
+        "D": "Variable 'size' must be initialized with a floating-point number."
+      },
+      "correctOption": "B",
+      "explanation": "In standard ANSI C (pre-C99), the size of an array must be a constant expression known at compile time. Variable-Length Arrays (VLAs) were introduced in C99, but they are still discouraged in system programming because of stack overflow vulnerabilities."
+    },
+    {
+      "id": "M8",
+      "category": "Complete the Code",
+      "question": "Fill in the blank to complete the logic to find the maximum element in an array:\\nint max = arr[0];\\nfor (int i = 1; i < size; i++) {\\n    if (_______) max = arr[i];\\n}",
+      "options": {
+        "A": "arr[i] < max",
+        "B": "arr[i] > max",
+        "C": "arr[i] != max",
+        "D": "arr[i] == max"
+      },
+      "correctOption": "B",
+      "explanation": "To find the maximum element, you compare each element to the current maximum, updating the maximum if a larger element is found."
+    },
+    {
+      "id": "M9",
+      "category": "Complete the Code",
+      "question": "Choose the correct expression to complete the binary search index calculation, avoiding integer overflow:\\nint mid = _______;",
+      "options": {
+        "A": "(low + high) / 2",
+        "B": "low + (high - low) / 2",
+        "C": "high - (low / 2)",
+        "D": "low + (high / 2)"
+      },
+      "correctOption": "B",
+      "explanation": "While '(low + high) / 2' is mathematically equivalent, it can cause integer overflow if the sum of low and high exceeds the maximum value of a signed integer. Using 'low + (high - low) / 2' avoids this risk."
+    },
+    {
+      "id": "M10",
+      "category": "Best Approach",
+      "question": "You need to frequently search for items in a static dataset of 1,000,000 sorted elements. Which search method is best?",
+      "options": {
+        "A": "Linear search to find elements in O(N) time.",
+        "B": "Binary search to find elements in O(log N) time.",
+        "C": "Sequential traversal to find elements in O(N log N) time.",
+        "D": "Bubble search to find elements in O(N^2) time."
+      },
+      "correctOption": "B",
+      "explanation": "Since the dataset is already sorted, binary search is the most efficient choice, reducing the search time complexity to O(log N)."
+    }
+  ]
+}

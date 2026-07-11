@@ -1,0 +1,182 @@
+{ "phase_metadata": { "phase_number": 12, "phase_name": "File Handling in C++",
+"learning_objectives": [ "Understand the stream-based approach to file I/O",
+"Master reading and writing text files using ifstream and ofstream", "Manage
+file modes such as append, binary, and truncate", "Perform binary file
+operations for efficient data storage", "Implement basic object serialization
+techniques" ], "prerequisites": [ "Basic understanding of classes and objects",
+"Familiarity with std::string and basic I/O (cin/cout)", "Knowledge of error
+handling (basic if-statements)" ] }, "content": { "introduction": "Until now,
+every program we wrote lost its data as soon as the execution ended. This is
+because data was stored in RAM (volatile memory). File Handling allows us to
+store data permanently on a Hard Drive or SSD. In C++, we treat files as
+'streams'—a flow of data between your program and the physical storage.",
+"concept_explanation": { "what_is_it": "File handling is the process of
+creating, writing to, reading from, and manipulating files on a storage device
+using C++ code.", "why_do_we_need_it": "We need it for data persistence. It
+allows applications like word processors, databases, and games to save user
+progress, settings, and records even after the program is closed or the computer
+is restarted.", "how_does_it_work": "C++ uses the  library. It provides three
+main classes: 1. ofstream (Output File Stream) to write files, 2. ifstream
+(Input File Stream) to read files, and 3. fstream (File Stream) to do both. You
+open a file, perform operations, and then close it.", "when_to_use": "Use file
+handling whenever you need to store logs, save user configurations, export
+reports, or process large datasets that don't fit in memory.",
+"memory_behavior": "When you read a file, data moves from the disk into a buffer
+in the Stack or Heap. When writing, data moves from the program's memory to a
+buffer, which is eventually 'flushed' to the disk. Using binary mode writes the
+exact memory representation of data without conversion to text." }, "syntax": {
+"basic_declaration": "#include \n\nstd::ofstream
+outFile("filename.txt");\nstd::ifstream inFile("filename.txt");", "file_modes":
+"file.open("data.bin", std::ios::out | std::ios::binary | std::ios::app);",
+"breakdown": { "ofstream": "The class used to create and write to files.",
+"ifstream": "The class used to read data from existing files.", "ios::out":
+"Mode that opens a file for writing (default for ofstream).", "ios::in": "Mode
+that opens a file for reading (default for ifstream).", "ios::app": "Append
+mode; new data is added to the end of the file.", "ios::binary": "Opens the file
+in binary mode instead of text mode.", "is_open()": "A member function that
+returns true if the file was successfully opened." } }, "rules_and_key_points":
+[ "Always include the  header.", "Always check if a file opened successfully
+using .is_open() or the operator!.", "Closing a file using .close() is good
+practice, though RAII handles it automatically when the object goes out of
+scope.", "Text mode converts special characters (like newlines) based on the OS;
+Binary mode does not.", "Use std::getline() to read text files line-by-line.",
+"Use .write() and .read() for binary operations.", "The file pointer position
+can be managed using seekg/tellg (input) and seekp/tellp (output).", "If you
+open a file for writing without ios::app, the existing content is overwritten by
+default.", "Error flags like .eof(), .fail(), and .bad() help monitor the stream
+state.", "Serialization is the process of converting an object into a format
+that can be stored or transmitted." ], "code_example_1": { "title": "Basic Text
+Writing and Reading", "description": "A simple demonstration of creating a file,
+writing a line of text, and reading it back.", "code": "#include \n#include
+\n#include \n\nint main() {\n // Writing to a file\n std::ofstream
+writer("hello.txt");\n if (writer.is_open()) {\n writer << "Welcome to C++ File
+Handling!" << std::endl;\n writer << "This is a text file." << std::endl;\n
+writer.close();\n std::cout << "File written successfully.\n";\n }\n\n //
+Reading from a file\n std::ifstream reader("hello.txt");\n std::string line;\n
+if (reader.is_open()) {\n std::cout << "Reading content from file:\n";\n while
+(std::getline(reader, line)) {\n std::cout << line << std::endl;\n }\n
+reader.close();\n } else {\n std::cerr << "Error: Could not open file for
+reading.\n";\n }\n\n return 0;\n}", "output": "File written
+successfully.\nReading content from file:\nWelcome to C++ File Handling!\nThis
+is a text file.", "dry_run": "1. The program creates an ofstream object 'writer'
+for 'hello.txt'.\n2. It checks if the file is open and writes two lines.\n3. The
+writer is closed.\n4. An ifstream object 'reader' opens the same file.\n5. A
+while loop uses getline to fetch each line until the end-of-file (EOF).\n6. Each
+line is printed to the console." }, "code_example_2": { "title": "Binary
+Serialization of a Struct", "description": "Saving a structured record to a
+binary file and retrieving it.", "code": "#include \n#include \n\nstruct Player
+{\n int id;\n int level;\n float score;\n};\n\nint main() {\n Player p1 =
+{101, 5, 1500.50f};\n\n // Save Object to Binary File\n std::ofstream
+outBin("save.dat", std::ios::binary);\n if (outBin) {\n
+outBin.write(reinterpret_cast<char*>(&p1), sizeof(Player));\n outBin.close();\n
+}\n\n // Read Object from Binary File\n Player pLoad;\n std::ifstream
+inBin("save.dat", std::ios::binary);\n if (inBin) {\n
+inBin.read(reinterpret_cast<char*>(&pLoad), sizeof(Player));\n inBin.close();\n
+\n std::cout << "Player Loaded: ID=" << pLoad.id \n << ", Level=" << pLoad.level
+\n << ", Score=" << pLoad.score << std::endl;\n }\n\n return 0;\n}", "output":
+"Player Loaded: ID=101, Level=5, Score=1500.5", "dry_run": "1. A struct 'Player'
+is defined.\n2. An instance p1 is initialized.\n3. outBin.write() takes a char
+pointer to the memory of p1 and the size of the struct.\n4. This dumps the raw
+bytes into 'save.dat'.\n5. inBin.read() performs the inverse, filling the memory
+of pLoad with the bytes from the file." }, "memory_visualization": "In Text
+Mode: The integer 123 is stored as characters '1', '2', '3' (3 bytes). In Binary
+Mode: The integer 123 is stored as its 4-byte memory representation
+(0x0000007B). Reading binary is faster because no parsing from text to integer
+is needed.", "real_world_use_cases": [ "Configuration Files: Storing .ini or
+.cfg settings for applications.", "Logging: Writing system events or errors to a
+.log file for later debugging.", "Game Saves: Storing player stats, inventory,
+and world state in binary format.", "Database Engines: Managing how records are
+stored and indexed on the disk." ], "common_mistakes": [ "Forgetting to check
+.is_open(): Leads to silent failures if the file is missing or locked.",
+"Incorrect paths: Providing a relative path that doesn't exist in the execution
+directory.", "Reading past EOF: Not checking the stream state inside a loop,
+causing the last item to be processed twice.", "Mixing binary and text: Writing
+binary data to a file opened in text mode can cause data corruption (due to
+newline translation).", "Serializing pointers: Writing a struct that contains a
+pointer to a file; when you read it back, the pointer address is invalid
+(dangling)." ], "best_practices": [ "Use RAII: Declare stream objects locally so
+they close automatically.", "Use .is_open() or if(file) immediately after
+opening.", "Use std::ios::binary for non-text data to avoid character
+translation issues.", "Always use sizeof() when working with binary read/write
+to ensure portability.", "Prefer std::getline for reading strings to handle
+spaces correctly." ], "faq": [ { "question": "What is the difference between
+tellg and tellp?", "answer": "tellg (get) is used for the input stream position
+(reading), while tellp (put) is used for the output stream position (writing)."
+}, { "question": "Does .close() happen automatically?", "answer": "Yes, when the
+fstream object's destructor is called at the end of its scope, it closes the
+file. However, manual closing is better if you need to reopen the file in a
+different mode immediately." } ], "summary": "Phase 12 covered the essentials of
+file persistence in C++. We explored text streams for human-readable data and
+binary streams for efficient machine-readable data. We also learned how to
+serialize simple objects and manage file pointers.", "key_takeaways": [ "fstream
+library is the gateway to persistent storage.", "Use ofstream for writing,
+ifstream for reading.", "Check file status before performing operations.",
+"Binary mode is essential for structs and raw data.", "Serialization allows
+saving the state of an application." ], "preview_next_topic": "In Phase 13, we
+will dive into Modern C++ (C++11 to C++20) features like Move Semantics, Lambda
+Expressions, and Rvalue References to make our code faster and more expressive."
+}, "assessment": { "mixed_questions": [ { "id": "Q1", "type": "Easy Concept",
+"question": "What is the difference between ifstream and ofstream?", "answer":
+"ifstream (input file stream) is specifically for reading data from files into
+the program, whereas ofstream (output file stream) is for writing data from the
+program into files." }, { "id": "Q2", "type": "Moderate Concept", "question":
+"When should you use std::ios::app instead of std::ios::out?", "answer": "You
+use std::ios::app (append) when you want to add new data to the end of an
+existing file without deleting its current contents. std::ios::out by itself
+will truncate (clear) the file upon opening." }, { "id": "Q3", "type": "Moderate
+Practical", "question": "Write a code snippet to check if a file named
+'config.txt' exists and is readable.", "answer": "std::ifstream
+file("config.txt"); if(file.is_open()) { /* exists and is readable / } else { /
+handle error */ }" }, { "id": "Q4", "type": "Hard Practical", "question": "Write
+a complete function 'countLines' that takes a filename as a string and returns
+the number of lines in that file.", "answer": "int countLines(std::string
+filename) { std::ifstream file(filename); std::string line; int count = 0;
+while(std::getline(file, line)) count++; return count; }" }, { "id": "Q5",
+"type": "Moderate Mistake", "question": "Identify the bug: \nstd::ofstream
+out("data.txt");\nout << "Hello";\n// Missing something here\nstd::ifstream
+in("data.txt");", "answer": "The bug is that the file 'out' is not closed or
+flushed before trying to read from 'in'. The data might still be in the memory
+buffer and not on the disk yet. Call out.close() first." }, { "id": "Q6",
+"type": "Hard Mistake", "question": "Why is it dangerous to write a class
+containing a 'std::string' member using .write() in binary mode?", "answer":
+"std::string contains a pointer to a dynamically allocated memory block. Writing
+it using .write() saves the pointer's memory address, not the actual text. When
+you read it back, that address will be invalid, causing a crash." }, { "id":
+"Q7", "type": "Moderate Application", "question": "Predict the output:
+\nstd::ofstream f("test.txt"); f << "12345"; f.close();\nstd::ifstream
+in("test.txt"); in.seekg(2);\nchar c; in >> c; std::cout << c;", "answer": "The
+output is '3'. seekg(2) moves the read pointer to the 3rd character (index 2),
+which is '3'." }, { "id": "Q8", "type": "Hard Application", "question":
+"Implement a 'Log' function that appends a timestamp string to a file
+'log.txt'.", "answer": "void Log(std::string msg) { std::ofstream
+logFile("log.txt", std::ios::app); if(logFile) logFile << msg << std::endl; }" }
+], "mcqs": [ { "question": "Which header is required for file handling in C++?",
+"options": { "A": "", "B": "", "C": "", "D": "" }, "answer": "C" }, {
+"question": "Which mode is used to open a file for both reading and writing?",
+"options": { "A": "std::ios::in | std::ios::out", "B": "std::ios::dual", "C":
+"std::ios::rw", "D": "std::ios::all" }, "answer": "A" }, { "question": "What is
+the result of 'while(file >> word)' when reading a file?", "options": { "A":
+"Reads the file line by line", "B": "Reads the file word by word, skipping
+whitespace", "C": "Reads the whole file into one string", "1D": "Causes an
+infinite loop" }, "answer": "B" }, { "question": "Predict output: If a file
+contains 'C++ Programming' and you use 'in >> str', what is in 'str'?",
+"options": { "A": "C++ Programming", "B": "C++", "C": "Programming", "D": "C" },
+"answer": "B" }, { "question": "What does seekg(0, std::ios::end) do?",
+"options": { "A": "Moves the write pointer to the start", "B": "Moves the read
+pointer to the end of the file", "C": "Deletes the file content", "D": "Checks
+if the file is empty" }, "answer": "B" }, { "question": "Find the bug: ofstream
+file; file.open('data.txt'); file << 'Hi';", "options": { "A": "Should use
+double quotes for strings", "B": "ofstream cannot open files", "C": "Missing
+#include ", "D": "Missing semicolon" }, "answer": "A" }, { "question": "Which
+flag ensures we don't overwrite existing content?", "options": { "A":
+"std::ios::trunc", "B": "std::ios::noreplace", "C": "std::ios::app", "D":
+"std::ios::ate" }, "answer": "C" }, { "question": "Complete the code: if
+(file.______) { // file is ready }", "options": { "A": "is_ready()", "B":
+"opened()", "C": "is_open()", "D": "good_to_go()" }, "answer": "C" }, {
+"question": "To read a whole line including spaces, use:", "options": { "A":
+"file >> line", "B": "file.get(line)", "C": "std::getline(file, line)", "D":
+"file.read_all()" }, "answer": "C" }, { "question": "What is the best way to
+handle file closing?", "options": { "A": "Always call .close() manually at every
+return point", "B": "Let the destructor handle it (RAII)", "C": "Files don't
+need to be closed in modern C++", "D": "Delete the file object" }, "answer": "B"
+} ] } }

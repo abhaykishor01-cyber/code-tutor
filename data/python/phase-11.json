@@ -1,0 +1,159 @@
+{ "phase_metadata": { "phase_number": 11, "phase_name": "Advanced Python
+Concepts", "description": "Master professional Python patterns including
+Decorators, Generators, Context Managers, and Functional Programming tools.",
+"estimated_time": "6 Hours" }, "learning_objectives": [ "Understand and
+implement Closures and Decorators to extend function behavior.", "Use Generators
+and Iterators for memory-efficient data processing.", "Implement Context
+Managers for robust resource management using the 'with' statement.", "Master
+advanced comprehensions and functional tools like map, filter, and reduce.",
+"Write more Pythonic, elegant, and efficient code." ], "prerequisites": [
+"Proficiency in Phase 5 (Functions) including *args and **kwargs.",
+"Understanding of Phase 6 (Data Structures).", "Basic knowledge of Phase 10
+(Exception Handling)." ], "introduction": "Welcome to Advanced Python! In this
+phase, we move beyond 'how to code' to 'how to code efficiently.' We will
+explore patterns used by professional developers to manage memory, clean up
+resources automatically, and modify function behavior without changing their
+source code. These tools are the secret sauce of Python's power and elegance.",
+"concept_explanation": { "closures": "A closure is a nested function that
+remembers the values from its enclosing scope even after the outer function has
+finished executing. It 'closes over' the variables.", "decorators": "Decorators
+are functions that take another function as an argument, add some functionality,
+and return a new function. They are used to 'wrap' existing logic.",
+"generators": "Generators are special functions that return an iterator using
+the 'yield' keyword. Unlike lists, they don't store all values in memory; they
+generate them on the fly (Lazy Evaluation).", "iterators": "An object that can
+be iterated upon. It implements iter() and next() methods.", "context_managers":
+"Objects that manage resources (like files or database connections) using the
+'with' statement, ensuring resources are cleaned up even if errors occur.",
+"functional_tools": "Tools like map(), filter(), and reduce() allow us to
+process sequences elegantly using functions as first-class citizens." },
+"syntax": { "decorator": "@decorator_name\ndef my_function():\n pass",
+"generator": "def my_gen():\n yield value", "context_manager": "with
+open('file.txt') as f:\n data = f.read()", "map_filter": "map(function,
+iterable)\nfilter(function, iterable)" }, "syntax_breakdown": { "yield_keyword":
+"The 'yield' keyword pauses function execution and saves its state, returning a
+value to the caller. When called again, it resumes from where it left off.",
+"decorator_symbol": "The '@' symbol is syntactic sugar used above a function
+definition to apply a decorator.", "with_statement": "The 'with' statement
+ensures that cleanup methods (exit) are called automatically at the end of the
+block." }, "rules_and_key_points": [ "A closure must have a nested function.",
+"The nested function must refer to a value defined in the enclosing function.",
+"Decorators help follow the DRY (Don't Repeat Yourself) principle.", "Generators
+are more memory-efficient than list comprehensions for large datasets.", "An
+iterator raises StopIteration when no more elements are available.", "Context
+Managers handle resource setup and teardown automatically.", "The 'nonlocal'
+keyword is often used in closures to modify variables in the outer scope.", "The
+'functools.wraps' decorator should be used to preserve metadata of the original
+function.", "Map and Filter return iterators in Python 3, not lists.", "Reduce
+must be imported from the 'functools' module." ], "code_examples": [ { "title":
+"A Simple Decorator for Logging", "description": "Creating a decorator that
+prints a message whenever a function is called.", "code": "import
+functools\n\ndef logger(func):\n @functools.wraps(func)\n def wrapper(*args,
+**kwargs):\n print(f'Calling function: {func.name}')\n result = func(*args,
+**kwargs)\n print(f'{func.name} finished execution.')\n return result\n return
+wrapper\n\n@logger\ndef greet(name):\n """Greets the user."""\n print(f'Hello,
+{name}!')\n\ngreet('Alice')", "output": "Calling function: greet\nHello,
+Alice!\ngreet finished execution." }, { "title": "Generator for Fibonacci
+Sequence", "description": "Generating an infinite sequence without crashing the
+memory.", "code": "def fibonacci_gen(limit):\n a, b = 0, 1\n count = 0\n while
+count < limit:\n yield a\n a, b = b, a + b\n count += 1\n\n# Using the
+generator\nfib = fibonacci_gen(5)\nfor num in fib:\n print(num)", "output":
+"0\n1\n1\n2\n3" } ], "dry_run": { "step_1": "The generator function
+fibonacci_gen(5) is called. It returns a generator object but doesn't run the
+code yet.", "step_2": "The 'for' loop calls next() on the generator object.",
+"step_3": "Execution enters the function, sets a=0, b=1, yields 0, and pauses.",
+"step_4": "The loop prints 0, then calls next() again.", "step_5": "The function
+resumes, updates a=1, b=1, yields 1, and pauses again.", "step_6": "This
+continues until count reaches the limit, then the generator terminates." },
+"memory_visualization": "A list [0, 1, 1, 2, 3] occupies space for all integers
+at once. A Generator only stores current values of 'a', 'b', and 'count'. It
+calculates the next number only when asked. Think of a List as a DVD (full movie
+stored) and a Generator as a Live Stream (data arrives as you watch).",
+"real_world_use_cases": [ "Decorators: Authorization, Logging, Timing function
+performance (Benchmarking).", "Generators: Reading gigabyte-sized log files line
+by line.", "Context Managers: Database transactions, temporary file creation,
+network sockets.", "Closures: Creating simple 'factory' functions without the
+overhead of a full class." ], "common_mistakes": [ "Trying to reuse a generator
+(it is exhausted after one full iteration).", "Forgetting to return the
+'wrapper' function inside a decorator.", "Using list comprehensions [x for x in
+range(1000000)] when a generator (x for x in ...) would save memory.", "Not
+using @functools.wraps, which causes the decorated function to lose its name and
+docstring." ], "best_practices": [ "Always use 'with' when handling files.",
+"Use generators for large datasets or infinite streams.", "Keep decorators
+simple and focused on one task.", "Use map/filter/reduce sparingly; sometimes a
+list comprehension is more readable.", "Use 'nonlocal' in closures only when
+necessary to modify outer variables." ], "faq": [ { "question": "What is the
+difference between an Iterable and an Iterator?", "answer": "An Iterable is
+something you can loop over (like a list). An Iterator is the object that
+actually tracks the progress during the loop." }, { "question": "When should I
+use a Closure instead of a Class?", "answer": "Use a closure if you only need
+one or two methods and want to keep your code lightweight and concise." } ],
+"summary": "Phase 11 covered the 'Pythonic' way of handling advanced logic. You
+learned how to use closures to maintain state, decorators to modify behavior,
+generators to save memory, and context managers to handle resources safely.",
+"preview_next": "In Phase 12, we transition into the world of Data Science,
+exploring NumPy, Pandas, and how Python handles large-scale data analysis.",
+"questions_and_answers": [ { "type": "Concept", "difficulty": "Easy",
+"question": "Explain the role of the 'yield' keyword in a function.", "answer":
+"The 'yield' keyword converts a function into a generator. It allows the
+function to return a value and pause its state, so it can resume exactly where
+it left off when next() is called." }, { "type": "Concept", "difficulty":
+"Moderate", "question": "Why is @functools.wraps(func) considered a best
+practice when writing decorators?", "answer": "It copies the original function's
+metadata (like name and doc) to the wrapper function. Without it, if you inspect
+the decorated function, it would appear as 'wrapper' instead of its actual
+name." }, { "type": "Practical", "difficulty": "Moderate", "question": "Write a
+generator function that yields only even numbers from 0 up to n.", "answer":
+"def even_numbers(n):\n for i in range(n + 1):\n if i % 2 == 0:\n yield i" }, {
+"type": "Practical", "difficulty": "Hard", "question": "Create a decorator named
+'timer' that calculates and prints how long a function takes to execute.",
+"answer": "import time, functools\ndef timer(func):\n @functools.wraps(func)\n
+def wrapper(args, **kwargs):\n start = time.perf_counter()\n result = func(args,
+**kwargs)\n end = time.perf_counter()\n print(f'{func.name} took {end -
+start:.4f} seconds')\n return result\n return wrapper" }, { "type": "Mistake",
+"difficulty": "Moderate", "question": "Identify the bug: \ndef my_dec(f):\n def
+wrap():\n print('Hi')\n f()\n # Missing return\n@my_dec\ndef say_hi():\n
+print('Hello')", "answer": "The decorator 'my_dec' must return the 'wrap'
+function. Without the return statement, 'say_hi' becomes None." }, { "type":
+"Mistake", "difficulty": "Hard", "question": "Why does this code fail on the
+second print?\ngen = (x for x in range(3))\nprint(list(gen))\nprint(list(gen))",
+"answer": "Generators are iterators; they are 'exhausted' after one use. Once
+you convert it to a list, it has reached its end and will yield nothing on
+subsequent calls." }, { "type": "Application", "difficulty": "Moderate",
+"question": "Use filter() and a lambda function to extract all words starting
+with 'P' from ['Python', 'Java', 'PHP', 'C++'].", "answer": "words = ['Python',
+'Java', 'PHP', 'C++']\nresult = list(filter(lambda x: x.startswith('P'),
+words))" }, { "type": "Application", "difficulty": "Hard", "question":
+"Implement a closure that maintains a 'running total' of numbers passed to it.",
+"answer": "def make_averager():\n total = 0\n def averager(value):\n nonlocal
+total\n total += value\n return total\n return averager\n\ncalc =
+make_averager()\nprint(calc(10)) # 10\nprint(calc(5)) # 15" } ],
+"multiple_choice_questions": [ { "question": "What is the primary benefit of
+using a Generator?", "options": { "A": "Faster execution speed than lists", "B":
+"Memory efficiency", "C": "Ability to index elements", "D": "Automatic error
+handling" }, "answer": "B" }, { "question": "Which method is called at the start
+of a 'with' block in a Context Manager?", "options": { "A": "start", "B":
+"init", "C": "enter", "D": "open" }, "answer": "C" }, { "question": "What will
+this output? \ngen = (xx for x in
+range(3))\nprint(next(gen))\nprint(next(gen))", "options": { "A": "0 1", "B":
+"1 4", "C": "0 1 4", "D": "Error" }, "answer": "A" }, { "question": "In a
+closure, what keyword is used to modify a variable in the outer function's
+scope?", "options": { "A": "global", "B": "external", "C": "inner", "D":
+"nonlocal" }, "answer": "D" }, { "question": "Predict the output: \nnums =
+[1, 2, 3]\nsq = map(lambda x: xx, nums)\nprint(type(sq))", "options": { "A":
+"<class 'list'>", "B": "<class 'map'>", "C": "<class 'generator'>", "D": "<class
+'tuple'>" }, "answer": "B" }, { "question": "Find the bug: \n@my_decorator\ndef
+func(): pass", "options": { "A": "Missing parenthesis on func()", "B":
+"Decorator must be defined after func", "C": "Decorator must be defined before
+func", "D": "The @ symbol is invalid" }, "answer": "C" }, { "question": "Which
+function is used to combine elements of an iterable into a single cumulative
+value?", "options": { "A": "map", "B": "filter", "C": "reduce", "D":
+"accumulate" }, "answer": "C" }, { "question": "What happens when an iterator
+runs out of items?", "options": { "A": "It returns None", "B": "It returns
+False", "C": "It raises StopIteration", "D": "It loops back to the start" },
+"answer": "C" }, { "question": "Complete the code for a generator: \ndef
+my_range(n):\n i = 0\n while i < n:\n ____ i\n i += 1", "options": { "A":
+"return", "B": "yield", "C": "break", "D": "give" }, "answer": "B" }, {
+"question": "What is the most 'Pythonic' way to manage a file resource?",
+"options": { "A": "try/finally", "B": "open and close manually", "C": "the
+'with' statement", "D": "using a global file pointer" }, "answer": "C" } ] }

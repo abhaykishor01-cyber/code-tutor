@@ -1,0 +1,257 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 9,
+    "phaseTitle": "Object-Oriented Programming (OOP) in JavaScript",
+    "description": "Master the principles of OOP by exploring ES6 Classes, Prototypes, and Inheritance. Learn how to design scalable and reusable code architectures using modern JavaScript patterns.",
+    "estimatedTime": "200 minutes"
+  },
+  "learningObjectives": [
+    "Understand the Prototype-based nature of JavaScript vs. Class-based languages.",
+    "Create and instantiate ES6 Classes with constructors and methods.",
+    "Implement Inheritance using the 'extends' and 'super' keywords.",
+    "Apply Encapsulation using private fields and Getters/Setters.",
+    "Master Static methods and properties for utility logic.",
+    "Learn to extend functionality using Mixins and the Prototype Chain."
+  ],
+  "prerequisites": [
+    "Phase 4 - Functions and 'this' context",
+    "Phase 6 - Object literals and property access"
+  ],
+  "introduction": "Object-Oriented Programming (OOP) is a paradigm based on the concept of 'objects', which contain data and code. While Phase 6 introduced basic objects, Phase 9 focuses on how to create 'blueprints' for these objects. JavaScript is unique because it uses 'Prototypal Inheritance' under the hood, but provides the 'Class' syntax to make code more readable and familiar to developers coming from languages like Java or C++.",
+  "conceptExplanation": "### The Four Pillars of OOP\n1. **Encapsulation:** Grouping data (properties) and methods together and hiding internal details (using private fields).\n2. **Inheritance:** Creating new classes based on existing ones to reuse code.\n3. **Polymorphism:** The ability of different classes to respond to the same method call in their own way.\n4. **Abstraction:** Hiding complex implementation details and showing only the necessary features.\n\n### Prototype vs. Class\nIn JS, every object has a hidden property called `[[Prototype]]` that links to another object. When you call a method, JS looks at the object; if it's not there, it looks at the prototype. ES6 Classes are 'syntactic sugar'—they look like classes from other languages but still use this prototype chain behind the scenes.",
+  "syntax": "// 1. Class Definition\nclass Person {\n  #secret; // Private field (ES2022)\n\n  constructor(name) {\n    this.name = name;\n    this.#secret = 'Internal Key';\n  }\n\n  greet() {\n    return `Hi, I am ${this.name}`;\n  }\n}\n\n// 2. Inheritance\nclass Employee extends Person {\n  constructor(name, role) {\n    super(name); // Calls the parent constructor\n    this.role = role;\n  }\n}",
+  "breakdownOfSyntax": {
+    "class": "Keyword used to declare a blueprint for objects.",
+    "constructor": "A special method that runs automatically when a new instance is created using 'new'.",
+    "extends": "Enables a class to inherit properties and methods from a parent class.",
+    "super()": "A function call required in a child constructor to initialize the parent class.",
+    "static": "Defines a method or property that belongs to the class itself, not the instances.",
+    "#privateField": "Prefixing a property with # makes it inaccessible from outside the class."
+  },
+  "rulesAndKeyPoints": [
+    "Classes are NOT hoisted; you must declare them before creating instances.",
+    "The 'new' keyword is mandatory to instantiate a class.",
+    "Methods defined inside a class are automatically added to the Prototype, saving memory.",
+    "Use 'get' and 'set' to create 'computed properties' that look like data but run logic.",
+    "Private fields (#) cannot be accessed or deleted outside the class body.",
+    "Static methods are called on the Class name (e.g., Math.random()), not on instances.",
+    "The 'super' keyword must be called before using 'this' in a derived class constructor.",
+    "JavaScript does not support multiple inheritance (one class cannot extend two classes).",
+    "Prototypes allow for 'monkey-patching', but it is considered a bad practice.",
+    "Every class method is executed in 'strict mode' by default."
+  ],
+  "codeExample1": {
+    "title": "Basic Class with Getters and Setters",
+    "description": "Creating a blueprint for a BankAccount with balance protection.",
+    "code": "class BankAccount {\n  #balance = 0; // Private field\n\n  constructor(owner) {\n    this.owner = owner;\n  }\n\n  deposit(amount) {\n    if (amount > 0) this.#balance += amount;\n  }\n\n  get balance() {\n    return `$${this.#balance}`;\n  }\n\n  set balance(val) {\n    console.error('Cannot set balance directly!');\n  }\n}\n\nconst myAcc = new BankAccount('John');\nmyAcc.deposit(100);\nconsole.log(myAcc.balance); // $100\nmyAcc.balance = 500; // Error log"
+  },
+  "codeExample2": {
+    "title": "Inheritance and Polymorphism",
+    "description": "Extending a generic 'Animal' class into specific types.",
+    "code": "class Animal {\n  constructor(name) {\n    this.name = name;\n  }\n\n  makeSound() {\n    console.log('Generic sound');\n  }\n}\n\nclass Dog extends Animal {\n  makeSound() {\n    console.log('Woof! Woof!');\n  }\n}\n\nclass Cat extends Animal {\n  makeSound() {\n    console.log('Meow!');\n  }\n}\n\nconst pets = [new Dog('Rex'), new Cat('Whiskers')];\npets.forEach(pet => pet.makeSound()); // Polymorphism in action"
+  },
+  "output": "Example 1 Output:\n$100\nCannot set balance directly!\n\nExample 2 Output:\nWoof! Woof!\nMeow!",
+  "stepByStepDryRun": {
+    "method": "Class Instantiation with 'new'",
+    "code": "const p = new Person('Alice');",
+    "steps": [
+      "Step 1: A new empty object {} is created in the Heap.",
+      "Step 2: The object's internal [[Prototype]] is linked to Person.prototype.",
+      "Step 3: The 'constructor' function is called with the argument 'Alice'.",
+      "Step 4: Inside the constructor, 'this' is bound to the new empty object.",
+      "Step 5: 'this.name = name' adds the property to the object.",
+      "Step 6: The constructor automatically returns the object, and it's assigned to 'p'."
+    ]
+  },
+  "memoryVisualization": "PROTOTYPE CHAIN VISUALIZATION:\n[ Instance: dog ] --(__proto__)--> [ Dog.prototype ] --(__proto__)--> [ Animal.prototype ] --(__proto__)--> [ Object.prototype ] --(__proto__)--> null\n\nMethods like 'bark()' live in Dog.prototype. Methods like 'eat()' live in Animal.prototype. When you call dog.eat(), JS climbs this chain until it finds the method. This ensures that 1000 dog instances share only ONE copy of the 'bark' function in memory.",
+  "realWorldUseCases": [
+    "UI Frameworks: Creating 'Component' base classes for buttons, modals, and inputs.",
+    "Game Development: Defining a 'Player' class and extending it for 'Warrior', 'Mage', etc.",
+    "Backend Development: Creating 'Service' or 'Controller' classes in Node.js (Express/NestJS).",
+    "Database Modeling: Representing rows in a table as 'Model' objects.",
+    "Error Handling: Creating custom Error classes by extending the built-in Error class."
+  ],
+  "commonMistakes": [
+    "Forgetting to call super() in a child constructor (ReferenceError).",
+    "Defining methods inside the constructor instead of the class body (Wastes memory as every instance gets a unique function copy).",
+    "Assuming private fields (#) are just a naming convention (They are truly enforced by the engine).",
+    "Calling a static method on an instance instead of the Class name.",
+    "Using arrow functions as class methods when they don't need 'this' (Arrow functions in classes can lead to unexpected behavior during inheritance)."
+  ],
+  "bestPractices": [
+    "Keep classes focused on a single responsibility (Solid principles).",
+    "Use private fields (#) for any data that shouldn't be touched from outside.",
+    "Always use the 'PascalCase' naming convention for Class names (e.g., UserProfile).",
+    "Prefer composition over deep inheritance trees (avoid extending more than 2-3 levels).",
+    "Use static methods for 'Factory' functions that create instances of the class.",
+    "Always extend the built-in 'Error' class for custom error types."
+  ],
+  "frequentlyAskedQuestions": [
+    {
+      "difficulty": "Easy Concept",
+      "question": "What is a constructor?",
+      "answer": "A constructor is a special method in a class used for initializing objects. It runs once per object when 'new' is called."
+    },
+    {
+      "difficulty": "Moderate Concept",
+      "question": "What is the difference between a static method and a regular method?",
+      "answer": "A regular method belongs to the object 'instance' and can access data using 'this'. A static method belongs to the Class itself and cannot access instance data."
+    },
+    {
+      "difficulty": "Moderate Practical",
+      "question": "Why do we need super()?",
+      "answer": "In inheritance, super() executes the parent's constructor. This ensures the child object gets all the properties defined in the parent class before adding its own."
+    },
+    {
+      "difficulty": "Hard Practical",
+      "question": "What happens if you don't define a constructor in a class?",
+      "answer": "JavaScript automatically provides a default empty constructor. For derived classes, the default constructor automatically calls super(...args)."
+    },
+    {
+      "difficulty": "Moderate Mistake",
+      "question": "Can I use private fields in old browsers?",
+      "answer": "No. Private fields (#) require modern browsers or a transpiler like Babel. Historically, developers used an underscore (_variable) as a 'soft' private convention."
+    },
+    {
+      "difficulty": "Hard Mistake",
+      "question": "Does JavaScript support 'Abstract Classes'?",
+      "answer": "Not natively with a keyword, but you can simulate one by throwing an error in the constructor if 'new.target === BaseClass', or by throwing errors in methods that must be overridden."
+    },
+    {
+      "difficulty": "Moderate Coding",
+      "question": "Write a class 'Rectangle' with width and height, and a getter for 'area'.",
+      "answer": "class Rectangle { constructor(w, h) { this.w = w; this.h = h; } get area() { return this.w * this.h; } }"
+    },
+    {
+      "difficulty": "Hard Coding",
+      "question": "How do you implement a Mixin to add 'canFly' behavior to a class?",
+      "answer": "const FlyMixin = Base => class extends Base { fly() { console.log('Flying!'); } }; class Bird {}; class FlyingBird extends FlyMixin(Bird) {};"
+    }
+  ],
+  "summary": "Phase 9 covered the essential aspects of Object-Oriented Programming in JavaScript. We learned how Classes provide a cleaner syntax for Prototypal inheritance, how to use Encapsulation with private fields, and how to manage relationships between data structures through Inheritance and Polymorphism.",
+  "keyTakeaways": [
+    "Classes are blueprints for objects.",
+    "Prototypal Inheritance is the underlying engine of JS objects.",
+    "Constructor initializes instance properties.",
+    "Static methods belong to the class, not the instance.",
+    "Private fields (#) ensure true data encapsulation.",
+    "Extends and Super enable code reuse through inheritance.",
+    "Getters and Setters provide controlled access to properties.",
+    "Polymorphism allows child classes to customize parent methods.",
+    "Composition can often be better than deep inheritance.",
+    "The Prototype chain is used for method lookup across the hierarchy."
+  ],
+  "previewOfNextTopic": "In Phase 10, we will learn how to handle the inevitable: Errors. We'll explore try/catch, custom errors, and defensive programming techniques.",
+  "mcqs": [
+    {
+      "type": "Theory",
+      "question": "What is the main mechanism JavaScript uses for inheritance?",
+      "options": {
+        "A": "Classical Inheritance",
+        "B": "Prototypal Inheritance",
+        "C": "Functional Inheritance",
+        "D": "Binary Inheritance"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Theory",
+      "question": "Which keyword is used to access methods of the parent class?",
+      "options": {
+        "A": "this",
+        "B": "parent",
+        "C": "super",
+        "D": "proto"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "class T { static say() { return 'Hi'; } } const t = new T(); console.log(t.say());",
+      "options": {
+        "A": "'Hi'",
+        "B": "undefined",
+        "C": "TypeError (t.say is not a function)",
+        "D": "null"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "class A {}; class B extends A {}; console.log(new B() instanceof A);",
+      "options": {
+        "A": "true",
+        "B": "false",
+        "C": "undefined",
+        "D": "Error"
+      },
+      "answer": "A"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "class X { #p = 5; } const x = new X(); console.log(x.#p);",
+      "options": {
+        "A": "5",
+        "B": "undefined",
+        "C": "SyntaxError (Private field access)",
+        "D": "null"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "class Child extends Parent { constructor() { this.name = 'C'; super(); } }",
+      "options": {
+        "A": "Missing quotes",
+        "B": "super() must be called before accessing 'this'",
+        "C": "Child cannot extend Parent",
+        "D": "Constructor cannot have 'this'"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "class User { constructor(n) { name = n; } }",
+      "options": {
+        "A": "Missing 'this.' before name",
+        "B": "Constructor must be capitalized",
+        "C": "Cannot pass arguments to constructor",
+        "D": "User must be a function"
+      },
+      "answer": "A"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "To make a property read-only, you should only define a ____.",
+      "options": {
+        "A": "Setter",
+        "B": "Getter",
+        "C": "Static method",
+        "D": "Private field"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "A method that doesn't require an instance is marked as ____.",
+      "options": {
+        "A": "private",
+        "B": "protected",
+        "C": "static",
+        "D": "abstract"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Best Approach",
+      "question": "What is the best way to share a single method across 10,000 instances to save memory?",
+      "options": {
+        "A": "Define the method inside the constructor",
+        "B": "Define the method as a property on each instance",
+        "C": "Define the method as a standard class method (Prototype)",
+        "D": "Copy the function manually to each object"
+      },
+      "answer": "C"
+    }
+  ]
+}

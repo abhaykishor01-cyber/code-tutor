@@ -1,0 +1,408 @@
+{
+  "phase_metadata": {
+    "phase_number": 7,
+    "title": "Pointers in C++",
+    "description": "Master memory addresses, pointers, references, dynamic memory allocation with new and delete, and modern smart pointers (unique_ptr, shared_ptr, weak_ptr)."
+  },
+  "learning_objectives": [
+    "Explain how variables are stored in physical memory addresses and how to query them.",
+    "Declare, initialize, and dereference pointers to manipulate memory directly and safely.",
+    "Compare and contrast pointers with references, understanding memory overhead and nullability differences.",
+    "Allocate and deallocate dynamic heap memory using new and delete without introducing leaks.",
+    "Implement modern C++ automated memory management using unique_ptr, shared_ptr, and weak_ptr."
+  ],
+  "prerequisites": [
+    "Variables, fundamental data types, and their size in bytes.",
+    "Control flow statements (loops, branches, and scope rules).",
+    "Function syntax, parameter passing by value, and scope lifetime."
+  ],
+  "introduction": "In C++, memory management is the key capability that separates advanced developers from beginners. Unlike managed languages (like Java, C#, or Python) that employ garbage collectors to run in the background and clean up memory, C++ grants you direct, unmediated control over the system's memory. This control is achieved through pointers and references. By understanding pointers, you learn how computers execute code at the machine level, enabling you to build high-performance gaming engines, operating systems, and custom database management systems with maximum efficiency.",
+  "concept_explanation": "A pointer is a variable whose content is not a direct value, but rather a hexadecimal address representing a specific location in the computer's Random Access Memory (RAM). When you declare a variable (e.g., int age = 25), the compiler assigns a physical storage address on the Stack. A pointer variable holds that address, allowing you to read or rewrite 'age' indirectly. A reference, conversely, is an alias—an alternative name for an existing variable. It does not possess its own storage address in the same way a pointer does, making it a safer and syntactically simpler alternative.",
+  "syntax": "// 1. Declaring a pointer and storing an address\ndata_type* pointer_name = &existing_variable;\n\n// 2. Dereferencing a pointer to modify the value\n*pointer_name = new_value;\n\n// 3. Creating a reference (alias)\ndata_type& reference_name = existing_variable;\n\n// 4. Dynamic allocation on the heap\ndata_type* heap_ptr = new data_type;\ndelete heap_ptr;\n\n// 5. Smart pointer initialization\nstd::unique_ptr<data_type> smart_ptr = std::make_unique<data_type>(args);",
+  "syntax_breakdown": [
+    {
+      "element": "data_type*",
+      "explanation": "The asterisk (*) appended to the data type signifies that this variable is a pointer. It instructs the compiler to allocate space sufficient for holding a memory address rather than a raw value."
+    },
+    {
+      "element": "&existing_variable",
+      "explanation": "The address-of operator (&) is an unary operator that queries the physical, hexadecimal memory address of a variable stored on the stack."
+    },
+    {
+      "element": "*pointer_name",
+      "explanation": "When placed before an already declared pointer variable, the asterisk (*) acts as the dereference operator. It resolves the address stored inside the pointer and accesses the actual value resides at that address."
+    },
+    {
+      "element": "data_type&",
+      "explanation": "The ampersand (&) used within a variable declaration creates a reference. It binds the reference name permanently to the target variable, making them share the identical memory cell."
+    },
+    {
+      "element": "new / delete",
+      "explanation": "The 'new' operator reserves space on the dynamic Heap segment of RAM during runtime. The 'delete' operator frees this space, returning it to the operating system's pool."
+    },
+    {
+      "element": "std::unique_ptr",
+      "explanation": "A modern C++ smart pointer template class that wraps a raw pointer. It maintains sole ownership of its dynamic object and automatically deallocates the heap memory when the unique_ptr goes out of scope."
+    }
+  ],
+  "rules_and_key_points": [
+    "Always initialize pointers upon declaration. An uninitialized pointer points to a random address (a wild pointer) and can corrupt memory if dereferenced.",
+    "A pointer can be reassigned to point to different memory addresses throughout its lifetime, whereas a reference is locked to its initial variable and cannot be rebound.",
+    "Pointers can be assigned to 'nullptr' to indicate they point to no valid memory. References can never be null; they must refer to a valid, existing variable.",
+    "Every 'new' allocation must have a matching 'delete' statement. Failing to deallocate dynamic heap memory causes a memory leak, exhausting RAM over time.",
+    "Do not mix 'new[]' with 'delete'. Array allocations (new int[10]) require the array delete syntax (delete[] ptr) to trigger destructors correctly.",
+    "Prefer References over Pointers for function arguments when nullability and reassignment are not required. This establishes 'const' correctness and safety.",
+    "Avoid raw pointers for owning resources. Modern C++ (C++11 and newer) dictates using std::unique_ptr for single-ownership and std::shared_ptr for shared-ownership.",
+    "A pointer to a constant (const int* ptr) prevents modifying the target value through the pointer, while a constant pointer (int* const ptr) prevents pointing to a different address.",
+    "The arrow operator (ptr->member) is shorthand for dereferencing a pointer to an object and accessing its member: (*ptr).member.",
+    "Pointer arithmetic operates in units of the pointed-to type's byte size. Incrementing an int* by 1 advances the address by 4 bytes on standard systems."
+  ],
+  "code_example_1_basic": {
+    "title": "Basic Pointer Operations and Address Queries",
+    "code": "#include <iostream>\n\nint main() {\n    int health = 80;\n    // Declare an integer pointer and initialize it with the address of 'health'\n    int* healthPtr = &health;\n\n    std::cout << \"[Variable info] health = \" << health << \"\\n\";\n    std::cout << \"[Memory Address] &health = \" << &health << \"\\n\";\n    std::cout << \"[Pointer content] healthPtr = \" << healthPtr << \"\\n\";\n    std::cout << \"[Dereferenced pointer] *healthPtr = \" << *healthPtr << \"\\n\\n\";\n\n    // Modify value indirectly through the pointer\n    *healthPtr = 100;\n    std::cout << \"[After Modification] health = \" << health << \"\\n\";\n    std::cout << \"[After Modification] *healthPtr = \" << *healthPtr << \"\\n\";\n\n    // Create a pointer to nullptr\n    int* emptyPtr = nullptr;\n    if (emptyPtr == nullptr) {\n        std::cout << \"[Safety Check] emptyPtr is safe and points to nothing.\\n\";\n    }\n\n    return 0;\n}",
+    "explanation": "This fundamental example demonstrates compiling pointer declarations, fetching addresses using the & operator, reading and writing memory indirectly using the * dereference operator, and validating pointers against nullptr.",
+    "expected_output": "[Variable info] health = 80\n[Memory Address] &health = 0x7ffee3b4a2bc\n[Pointer content] healthPtr = 0x7ffee3b4a2bc\n[Dereferenced pointer] *healthPtr = 80\n\n[After Modification] health = 100\n[After Modification] *healthPtr = 100\n[Safety Check] emptyPtr is safe and points to nothing.",
+    "dry_run": [
+      {
+        "line": "int health = 80;",
+        "description": "Allocates 4 bytes on the stack for the integer variable 'health' and assigns the value 80. Let's assume its location is 0x7ffee3b4a2bc."
+      },
+      {
+        "line": "int* healthPtr = &health;",
+        "description": "Allocates 8 bytes on the stack for the pointer 'healthPtr'. The address-of operator queries 'health''s location (0x7ffee3b4a2bc) and stores it inside 'healthPtr'."
+      },
+      {
+        "line": "*healthPtr = 100;",
+        "description": "The dereference operator resolves the address in 'healthPtr' (0x7ffee3b4a2bc) and updates the memory location with 100. Consequently, the variable 'health' is modified."
+      }
+    ]
+  },
+  "code_example_2_practical": {
+    "title": "Dynamic Heap Allocation vs. Modern Smart Pointers",
+    "code": "#include <iostream>\n#include <string>\n\nclass Character {\npublic:\n    std::string name;\n    Character(std::string n) : name(n) {\n        std::cout << \"[Constructor] Character \" << name << \" created on Heap.\\n\";\n    }\n    ~Character() {\n        std::cout << \"[Destructor] Character \" << name << \" destroyed and memory freed.\\n\";\n    }\n};\n\nint main() {\n    std::cout << \"=== 1. Manual Memory Allocation (Old C++ Style) ===\\n\";\n    // Allocating dynamic memory manually on the Heap\n    Character* rawPtr = new Character(\"Geralt\");\n    std::cout << \"Character Name: \" << rawPtr->name << \"\\n\";\n    // Explicit deallocation is mandatory, or a memory leak occurs\n    delete rawPtr;\n    rawPtr = nullptr; // Set to nullptr to avoid dangling pointer issues\n\n    std::cout << \"\\n=== 2. Smart Memory Allocation (Modern C++ Style) ===\\n\";\n    {\n        // Allocating dynamic memory with an automatic unique_ptr wrapper\n        std::unique_ptr<Character> smartPtr = std::make_unique<Character>(\"Yennefer\");\n        std::cout << \"Character Name: \" << smartPtr->name << \"\\n\";\n        // No delete required. Memory will automatically free when the block ends.\n    } \n    std::cout << \"Scope ended for smartPtr.\\n\";\n\n    return 0;\n}",
+    "explanation": "This example compares legacy C++ memory allocation using 'new' and 'delete' with modern C++ RAII (Resource Acquisition Is Initialization) using 'std::unique_ptr'. It proves that smart pointers eliminate memory leaks by automating cleanup at scope boundary exits.",
+    "expected_output": "=== 1. Manual Memory Allocation (Old C++ Style) ===\n[Constructor] Character Geralt created on Heap.\nCharacter Name: Geralt\n[Destructor] Character Geralt destroyed and memory freed.\n\n=== 2. Smart Memory Allocation (Modern C++ Style) ===\n[Constructor] Character Yennefer created on Heap.\nCharacter Name: Yennefer\n[Destructor] Character Yennefer destroyed and memory freed.\nScope ended for smartPtr.",
+    "dry_run": [
+      {
+        "line": "Character* rawPtr = new Character(\"Geralt\");",
+        "description": "Instantiates a 'Character' object on the Heap segment of memory. Runs the constructor with 'Geralt'. The address of this Heap memory (e.g. 0x0000a2f1b0c0) is stored in rawPtr on the Stack."
+      },
+      {
+        "line": "delete rawPtr;",
+        "description": "Invokes the Character destructor immediately and returns the Heap memory space to the OS. rawPtr becomes a dangling pointer until assigned to nullptr."
+      },
+      {
+        "line": "std::unique_ptr<Character> smartPtr = ...",
+        "description": "Wraps a heap-allocated 'Yennefer' object inside 'smartPtr' on the stack. unique_ptr manages the resource."
+      },
+      {
+        "line": "}",
+        "description": "The local block scope ends. The stack pops 'smartPtr'. The unique_ptr destructor is automatically triggered, which safely invokes delete on the managed dynamic memory."
+      }
+    ]
+  },
+  "memory_visualization": {
+    "type": "Stack and Heap RAM Segments",
+    "description": "This diagram visualizes how physical addresses, pointers, and variables occupy space across the Stack and Heap segments of computer memory.",
+    "entities": [
+      {
+        "name": "health (int)",
+        "address": "0x7ffee3b4a2bc",
+        "value": "100",
+        "segment": "Stack"
+      },
+      {
+        "name": "healthPtr (int*)",
+        "address": "0x7ffee3b4a2c0",
+        "value": "0x7ffee3b4a2bc",
+        "segment": "Stack",
+        "points_to": "0x7ffee3b4a2bc"
+      },
+      {
+        "name": "rawPtr (Character*)",
+        "address": "0x7ffee3b4a2c8",
+        "value": "0x0000a2f1b0c0",
+        "segment": "Stack",
+        "points_to": "0x0000a2f1b0c0"
+      },
+      {
+        "name": "Character Geralt (Object)",
+        "address": "0x0000a2f1b0c0",
+        "value": "{ name: \"Geralt\" }",
+        "segment": "Heap"
+      }
+    ]
+  },
+  "real_world_use_cases": [
+    {
+      "scenario": "Game Engine Memory Management",
+      "description": "Engines like Unreal Engine 5 manage hundreds of thousands of dynamic meshes, textures, and actors on the Heap. They use smart pointers and custom allocators to clean up objects instantly as soon as they leave a game level, avoiding lagging or memory exhaustion."
+    },
+    {
+      "scenario": "High-Speed Networking Drivers",
+      "description": "Drivers avoid copying incoming packet data between different system layers. They pass the physical memory address (pointer) of the packet buffer through functions, enabling extreme network throughput."
+    },
+    {
+      "scenario": "Polymorphism & OOP Class Hierarchies",
+      "description": "To invoke virtual functions dynamically and support subclass structures at runtime, base class pointers or references must be used to refer to derived objects in memory."
+    }
+  ],
+  "common_mistakes": [
+    {
+      "mistake": "Uninitialized Pointers (Wild Pointers)",
+      "explanation": "Declaring a pointer without initializing it: 'int* ptr; *ptr = 10;'. The pointer points to a random memory block, and modifying it leads to crashes or catastrophic data corruption.",
+      "fix": "Always initialize pointers to nullptr or a valid variable address: 'int* ptr = nullptr;'."
+    },
+    {
+      "mistake": "Memory Leaks",
+      "explanation": "Reserving dynamic heap storage via new but failing to invoke delete: 'void foo() { int* p = new int(5); }'. When the function returns, the stack variable 'p' is lost, but the allocated heap integer remains blocked forever.",
+      "fix": "Ensure every execution path has a corresponding 'delete' statement, or migrate to 'std::unique_ptr'."
+    },
+    {
+      "mistake": "Dangling Pointers",
+      "explanation": "Deleting heap memory but continuing to use the pointer pointing to it: 'delete ptr; std::cout << *ptr;'. The memory is now reclaimed, and accessing it triggers Undefined Behavior.",
+      "fix": "Set pointers to 'nullptr' immediately after deallocating: 'delete ptr; ptr = nullptr;'."
+    },
+    {
+      "mistake": "Double Free",
+      "explanation": "Calling 'delete' twice on the identical heap address. This corrupts the heap allocator metadata, leading to immediate system crashes.",
+      "fix": "Check for nullptr or set pointers to nullptr after deletion. Deleting a nullptr is guaranteed to be safe and does nothing."
+    }
+  ],
+  "best_practices": [
+    "Prefer references over pointers when you do not require re-binding or null pointer values.",
+    "Use 'const' references (e.g. const std::string& text) to pass large structures to functions without copying overhead.",
+    "Never declare raw owning pointers. Use std::unique_ptr for single owner scenarios and std::shared_ptr for multiple owners.",
+    "Always compile with flags like '-fsanitize=address' to detect memory leaks and invalid pointer operations instantly.",
+    "Never return pointers or references to local variables defined inside a function. Once the function exits, local variables are destroyed, leaving dangling outcomes."
+  ],
+  "frequently_asked_questions": [
+    {
+      "question": "What is the physical size of a pointer variable in bytes?",
+      "answer": "The size of a pointer depends entirely on your CPU architecture, not the data type it points to. On a 64-bit computer, any pointer (char*, double*, Object*) is 8 bytes in size to hold a 64-bit memory address. On 32-bit systems, pointers are 4 bytes."
+    },
+    {
+      "question": "Why does deleting a nullptr not crash the application?",
+      "answer": "The C++ standard explicitly defines that calling 'delete' or 'delete[]' on 'nullptr' is a safe, no-op (no operation). It is designed this way so developers do not have to write manual checking safeguards before deleting variables."
+    },
+    {
+      "question": "What is the difference between a pointer and a reference?",
+      "answer": "Pointers can be reassigned to other targets, can be null (nullptr), and require dereference syntax (*) to access content. References are aliases, cannot be null, must be initialized on creation, are bound permanently to their target, and use normal variable syntax."
+    }
+  ],
+  "summary": "Pointers and references provide the foundational access mechanics for computer memory in C++. By learning how to store addresses, dereference pointers, pass reference variables safely, and allocate memory on the dynamic Heap segment of RAM, you master low-level efficiency and performance. Using modern RAII wrappers such as std::unique_ptr ensures you achieve these benefits with zero memory leak risks.",
+  "key_takeaways": [
+    "A pointer variable stores the hexadecimal address of another memory cell.",
+    "The address-of operator (&) queries variable addresses; the dereference operator (*) accesses their values.",
+    "References are permanent aliases for variables and cannot be null.",
+    "The Heap segment handles dynamic allocations that survive function scopes, managed with 'new' and 'delete'.",
+    "Modern smart pointers automate Heap cleanup, fully eliminating the danger of memory leaks."
+  ],
+  "preview_next_topic": "In Phase 8, we will study Templates. Templates let you write generic, highly reusable algorithms and classes. By using templates, you can create data structures (like custom lists or vectors) that operate with any type while maintaining complete, compile-time type safety and maximum speed.",
+  "questions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Querying Variable Memory Addresses",
+      "question": "Explain the role of the ampersand (&) operator when placed before an existing variable. Write a simple statement to extract and print the memory address of an integer named 'level'.",
+      "hint": "The & operator is known as the address-of operator. Pair it directly with 'std::cout'.",
+      "answer": "The ampersand (&) acts as the 'address-of' operator when placed before an already declared variable. Instead of retrieving the value stored in the variable, it queries the variable's physical hexadecimal memory address. To print the address of an integer named 'level', you can use:\n\nint level = 15;\nstd::cout << &level << std::endl;"
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Reference vs. Pointer Binding",
+      "question": "Explain whether a reference can be reassigned to represent a different variable after its initial declaration. Compare this behavior to a pointer's assignment capabilities.",
+      "hint": "Think about how reference binding behaves during assignment statements.",
+      "answer": "No, a reference cannot be reassigned to refer to a different variable after its creation. A reference is permanently bound to its target variable upon initialization. Any subsequent assignment statement (e.g., ref = anotherVar) simply copies the value of anotherVar into the original variable referred to by the reference. Pointers, conversely, can be freely reassigned to point to different memory addresses at any point during their lifetime by updating the address they store (e.g., ptr = &anotherVar)."
+    },
+    {
+      "id": "q3",
+      "difficulty": "Easy-Medium",
+      "type": "Common mistake",
+      "title": "Spotting the Local Variable Reference Bug",
+      "question": "Explain the major bug in the following code snippet and describe why it causes unstable behavior at runtime:\n\nint* getLocalPointer() {\n    int value = 42;\n    return &value;\n}",
+      "hint": "Think about the life cycle of stack variables when their enclosing function exits.",
+      "answer": "The function returns the memory address of a local variable 'value' allocated on the Stack. Local variables are automatically destroyed and popped off the stack when the function exits. As a result, the returned pointer is immediately a dangling pointer. Attempting to read or write to this address in the calling scope leads to Undefined Behavior—the memory may be overwritten by other function call stacks, leading to corrupt values or program crashes."
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "Practical usage",
+      "title": "Swapping Values Using Pointers",
+      "question": "Write a complete C++ function named 'swapNumbers' that accepts two integer pointers (int* a, int* b) and swaps the actual values of the integers they point to without using references.",
+      "hint": "Use a temporary variable to hold the value of one integer while swapping.",
+      "answer": "void swapNumbers(int* a, int* b) {\n    if (a != nullptr && b != nullptr) {\n        int temp = *a;\n        *a = *b;\n        *b = temp;\n    }\n}"
+    },
+    {
+      "id": "q5",
+      "difficulty": "Medium",
+      "type": "Practical usage",
+      "title": "Safe Pointer Dereferencing Function",
+      "question": "Write a utility function in C++ named 'doubleValue' that accepts an integer pointer 'ptr'. The function should double the value of the pointed-to integer. It must do this safely, ensuring the application does not crash if a 'nullptr' is passed.",
+      "hint": "Always perform a null check before using the dereference operator.",
+      "answer": "void doubleValue(int* ptr) {\n    if (ptr != nullptr) {\n        *ptr = (*ptr) * 2;\n    }\n}"
+    },
+    {
+      "id": "q6",
+      "difficulty": "Medium-Hard",
+      "type": "Common mistake",
+      "title": "Debugging a Dynamic Memory Array Leak",
+      "question": "Identify the critical leak in this code block and supply the corrected statement to fix it:\n\nint* scores = new int[50];\n// ... work with array ...\ndelete scores;",
+      "hint": "Look at the operator used to allocate the array ('new[]') and verify if the delete syntax matches.",
+      "answer": "The bug is a memory leak and potential Undefined Behavior caused by mismatched deallocation operators. An array allocated with 'new[]' must be released using 'delete[]'. Using plain 'delete scores' only releases the first element of the array or corrupts heap metadata, failing to trigger correct cleanup for the remaining 49 elements. The correct statement is:\n\ndelete[] scores;"
+    },
+    {
+      "id": "q7",
+      "difficulty": "Hard",
+      "type": "Coding/application",
+      "title": "Creating a Simple Custom Smart Pointer Class",
+      "question": "Implement a minimal, basic custom smart pointer class 'SimpleIntOwner' that behaves like unique_ptr for an integer. It should accept an 'int*' in its constructor and deallocate it in its destructor to guarantee memory cleanup.",
+      "hint": "Define a constructor that saves the pointer and a destructor that deletes it.",
+      "answer": "class SimpleIntOwner {\nprivate:\n    int* rawPtr;\npublic:\n    explicit SimpleIntOwner(int* p) : rawPtr(p) {}\n    ~SimpleIntOwner() {\n        delete rawPtr;\n    }\n    int getValue() const {\n        return rawPtr ? *rawPtr : 0;\n    }\n    void setValue(int val) {\n        if (rawPtr) *rawPtr = val;\n    }\n    // Prevent copy operations to behave like unique_ptr\n    SimpleIntOwner(const SimpleIntOwner&) = delete;\n    SimpleIntOwner& operator=(const SimpleIntOwner&) = delete;\n};"
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "Coding/application",
+      "title": "Implementing a Pointer-Based Linked List Node Append",
+      "question": "Given a Node structure containing an integer value and a next pointer, write a function 'appendNode' that appends a new node with value 'val' at the end of a pointer-linked list. It should work even if the list is empty (represented by a head pointer that is nullptr).\n\nstruct Node {\n    int data;\n    Node* next;\n};\nvoid appendNode(Node*& head, int val);",
+      "hint": "Iterate through the list until node->next is nullptr. Remember to handle head being nullptr.",
+      "answer": "void appendNode(Node*& head, int val) {\n    Node* newNode = new Node{val, nullptr};\n    if (head == nullptr) {\n        head = newNode;\n        return;\n    }\n    Node* current = head;\n    while (current->next != nullptr) {\n        current = current->next;\n    }\n    current->next = newNode;\n}"
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "mcq1",
+      "type": "Theory",
+      "question": "What is the physical size of an integer pointer (int*) on a standard 64-bit CPU architecture?",
+      "options": {
+        "A": "4 bytes, because it points to an integer which occupies 4 bytes.",
+        "B": "8 bytes, because 64-bit pointers hold 64-bit memory addresses.",
+        "C": "16 bytes, due to extra alignment padding required for pointers on modern OS channels.",
+        "D": "It varies dynamically depending on the size of the integer stored in RAM."
+      },
+      "answer": "B",
+      "explanation": "On any CPU, pointer size is dictated by the address bus width, not the size of the targeted data type. A 64-bit computer handles 8-byte (64-bit) addresses, meaning any pointer (int*, char*, double*) requires 8 bytes."
+    },
+    {
+      "id": "mcq2",
+      "type": "Theory",
+      "question": "Which statement accurately describes the primary difference between a reference and a pointer?",
+      "options": {
+        "A": "Pointers are safer because they are checked at compile-time, while references are resolved at run-time.",
+        "B": "References can be assigned to nullptr, whereas pointers are guaranteed to be non-null.",
+        "C": "Pointers can point to nullptr and be reassigned, while references must be initialized at creation and cannot be rebound.",
+        "D": "References occupy heap memory, whereas pointers always reside on the call stack."
+      },
+      "answer": "C",
+      "explanation": "Pointers can store nullptr and be updated to point to different variables. References are strict variable aliases; they must refer to an active variable on declaration and cannot be pointed to anything else during their lifespan."
+    },
+    {
+      "id": "mcq3",
+      "type": "Output Prediction",
+      "question": "Predict the terminal output of the following C++ program:\n\n#include <iostream>\nint main() {\n    int value = 25;\n    int* ptr = &value;\n    *ptr += 15;\n    std::cout << value;\n    return 0;\n}",
+      "options": {
+        "A": "25",
+        "B": "15",
+        "C": "40",
+        "D": "The memory address of the variable 'value' (hexadecimal)"
+      },
+      "answer": "C",
+      "explanation": "*ptr dereferences the pointer to access 'value'. Doing '*ptr += 15' is functionally identical to doing 'value += 15'. Therefore, value increases from 25 to 40."
+    },
+    {
+      "id": "mcq4",
+      "type": "Output Prediction",
+      "question": "What will be printed to the screen by this code snippet?\n\n#include <iostream>\nint main() {\n    int a = 10, b = 20;\n    int* ptr = &a;\n    ptr = &b;\n    *ptr = 30;\n    std::cout << a << \" \" << b;\n    return 0;\n}",
+      "options": {
+        "A": "10 20",
+        "B": "30 20",
+        "C": "10 30",
+        "D": "30 30"
+      },
+      "answer": "C",
+      "explanation": "First, 'ptr' points to 'a'. Then, 'ptr' is reassigned to point to 'b'. Dereferencing '*ptr = 30' modifies 'b' to 30. Variable 'a' remains completely untouched (10), printing '10 30'."
+    },
+    {
+      "id": "mcq5",
+      "type": "Output Prediction",
+      "question": "Identify the output of this reference alias experiment:\n\n#include <iostream>\nint main() {\n    int x = 5;\n    int& ref = x;\n    ref = 15;\n    x = 10;\n    std::cout << ref;\n    return 0;\n}",
+      "options": {
+        "A": "5",
+        "B": "15",
+        "C": "10",
+        "D": "Compile error because ref cannot be modified"
+      },
+      "answer": "C",
+      "explanation": "'ref' is an alias for 'x'. Any operation on 'x' modifies what 'ref' returns since they point to the same memory cell. When x is set to 10, ref returns 10."
+    },
+    {
+      "id": "mcq6",
+      "type": "Find the Bug",
+      "question": "What is the main memory issue in this C++ code block?\n\nvoid generateReport() {\n    double* data = new double[100];\n    if (data[0] < 0.0) {\n        return;\n    }\n    delete[] data;\n}",
+      "options": {
+        "A": "The array is deleted using delete[] which is incorrect for double elements.",
+        "B": "If the first data cell is less than 0.0, the function exits early, leaking the allocated double array.",
+        "C": "There is a double free error on the 'data' array.",
+        "D": "The array must be checked for nullptr before deletion occurs."
+      },
+      "answer": "B",
+      "explanation": "If 'data[0] < 0.0' evaluates to true, the function returns immediately. The 'delete[] data;' line is skipped, leaving 800 bytes of dynamic memory leaked on the heap."
+    },
+    {
+      "id": "mcq7",
+      "type": "Find the Bug",
+      "question": "Find the compilation error in the following pointer code:\n\nint main() {\n    const int age = 18;\n    int* ptr = &age;\n    return 0;\n}",
+      "options": {
+        "A": "The variable 'age' cannot be assigned 18 directly.",
+        "B": "Cannot convert 'const int*' to 'int*' because it drops the const qualifier.",
+        "C": "The main function is missing the const attribute.",
+        "D": "The pointer must be declared with '&*' instead of just '*'."
+      },
+      "answer": "B",
+      "explanation": "'age' is a const int. Storing its address requires a pointer to a constant (const int*). Declaring it as a standard 'int*' would allow modifying a const value through dereferencing, which the compiler blocks to maintain const safety."
+    },
+    {
+      "id": "mcq8",
+      "type": "Complete the Code",
+      "question": "Which statement correctly completes the blank to allocate a single dynamic integer on the heap, setting its initial value to 99?\n\nint* ptr = ___________;",
+      "options": {
+        "A": "malloc(int, 99)",
+        "B": "new int{99}",
+        "C": "&99",
+        "D": "std::make_shared(99)"
+      },
+      "answer": "B",
+      "explanation": "In C++, the 'new' operator combined with brackets or braces (new int{99} or new int(99)) initializes the dynamically allocated heap variable to the provided argument."
+    },
+    {
+      "id": "mcq9",
+      "type": "Complete the Code",
+      "question": "Which standard library function completes the statement to instantiate a modern unique_ptr holding a Character object safely?\n\nstd::unique_ptr<Character> hero = ____________<Character>(\"Arthur\");",
+      "options": {
+        "A": "std::new_unique",
+        "B": "std::unique",
+        "C": "std::make_unique",
+        "D": "std::alloc_unique"
+      },
+      "answer": "C",
+      "explanation": "The 'std::make_unique' factory function is the safe, modern standard library method to instantiate dynamic objects. It handles exception safety and constructs the underlying type smoothly."
+    },
+    {
+      "id": "mcq10",
+      "type": "Best Approach",
+      "question": "You need to write a function that calculates the statistical mean of a massive vector of double floats (containing millions of records). Which parameter signature is the most optimal and safe approach?",
+      "options": {
+        "A": "double getMean(std::vector<double> dataset);",
+        "B": "double getMean(std::vector<double>* dataset);",
+        "C": "double getMean(const std::vector<double>& dataset);",
+        "D": "double getMean(std::vector<double>&& dataset);"
+      },
+      "answer": "C",
+      "explanation": "Passing by constant reference ('const std::vector<double>&') is the industry standard. It avoids duplicating millions of values on the call stack (saving time and space) while using the 'const' qualifier to protect the input data from accidental modifications."
+    }
+  ]
+}

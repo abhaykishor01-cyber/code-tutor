@@ -1,0 +1,217 @@
+{ "phase_metadata": { "phase_number": 7, "phase_name": "Polymorphism and
+Abstraction", "description": "Mastering the ability of objects to take many
+forms through Method Overloading, Overriding, Abstract Classes, and
+Interfaces.", "java_version": "21 LTS" }, "learning_objectives": [ "Understand
+the difference between compile-time and runtime polymorphism", "Implement method
+overloading and overriding correctly", "Apply dynamic method dispatch for
+flexible code design", "Create and implement abstract classes to provide
+templates", "Design systems using interfaces with default and static methods",
+"Differentiate between abstraction via classes and interfaces" ],
+"prerequisites": [ "Phase 5: OOP Basics (Classes and Objects)", "Phase 6:
+Inheritance (extends, super keyword)" ], "introduction": "Polymorphism is a
+Greek word meaning 'many forms'. In Java, it allows one interface or method to
+be used for a general class of actions. The specific action is determined by the
+exact nature of the situation. It is the third pillar of Object-Oriented
+Programming, working hand-in-hand with inheritance to make code flexible and
+reusable.", "concept_explanation": { "what_is_it": "Polymorphism allows an
+object to be treated as an instance of its parent class or an interface it
+implements. This enables one variable to hold different types of objects at
+different times.", "types_of_polymorphism": "1. Compile-time Polymorphism
+(Static Binding): Achieved through Method Overloading. The compiler determines
+which method to call based on the method signature.\n2. Runtime Polymorphism
+(Dynamic Binding): Achieved through Method Overriding and Dynamic Method
+Dispatch. The JVM determines which method to call at runtime based on the actual
+object type.", "abstraction": "Abstraction is the process of hiding
+implementation details and showing only functionality. In Java, we achieve this
+using Abstract Classes (0 to 100% abstraction) and Interfaces (100% abstraction,
+though Java 8+ allows default methods).", "why_use_it": "It allows us to write
+'generic' code that works with a broad category of objects (like 'Shape') while
+allowing specific behaviors (like 'Circle' or 'Square') to be executed
+automatically.", "memory_behavior": "During Dynamic Method Dispatch, the JVM
+uses a virtual method table (vtable) to look up the actual method implementation
+of the object on the Heap, even if the reference variable is of the parent type
+on the Stack." }, "syntax": { "method_overloading": "void display(int a) { ...
+}\nvoid display(String b) { ... }", "method_overriding": "@Override\nvoid
+sound() { ... }", "abstract_class": "abstract class Animal {\n abstract void
+move();\n void breathe() { System.out.println("Breathing..."); }\n}",
+"interface": "interface Camera {\n void takePhoto();\n default void flash() {
+System.out.println("Flash on"); }\n}" }, "syntax_breakdown": {
+"abstract_keyword": "Used to declare a class that cannot be instantiated or a
+method that has no body.", "interface_keyword": "Used to declare a reference
+type that is a collection of abstract methods and constant declarations.",
+"override_annotation": "Tells the compiler that the method is intended to
+override a method in a superclass. Helps catch spelling errors.",
+"implements_keyword": "Used by a class to adopt an interface.",
+"default_keyword": "Used within an interface to provide a method body, allowing
+backward compatibility.", "static_interface_methods": "Methods in an interface
+that belong to the interface itself and cannot be overridden." },
+"rules_and_key_points": [ "Constructor and private methods cannot be
+overridden.", "The return type of an overriding method must be the same or a
+subtype (covariant return type).", "An abstract class can have constructors,
+while an interface cannot.", "A class can implement multiple interfaces but
+extend only one class.", "Static methods are hidden, not overridden, in
+inheritance.", "Interface variables are implicitly public, static, and final.",
+"Abstract methods must be implemented by the first concrete subclass.", "The
+@Override annotation is optional but highly recommended for safety.",
+"Polymorphism requires an 'is-a' relationship (inheritance or implementation).",
+"Final methods cannot be overridden, and final classes cannot be extended." ],
+"code_example_1": { "title": "Method Overloading and Overriding", "description":
+"Demonstrating how a single method name behaves differently based on parameters
+(Static) and object type (Dynamic).", "code": "class Calculator {\n //
+Overloading: Same name, different parameters\n int add(int a, int b) {\n return
+a + b;\n }\n \n int add(int a, int b, int c) {\n return a + b + c;\n
+}\n}\n\nclass Animal {\n void speak() {\n System.out.println("Animal makes a
+sound");\n }\n}\n\nclass Dog extends Animal {\n @Override\n void speak() {\n
+System.out.println("Dog barks");\n }\n}\n\npublic class PolyDemo {\n public
+static void main(String[] args) {\n Calculator calc = new Calculator();\n
+System.out.println("Sum 1: " + calc.add(5, 10));\n System.out.println("Sum 2: "
++ calc.add(5, 10, 15));\n\n // Dynamic Method Dispatch\n Animal myPet = new
+Dog();\n myPet.speak(); // Calls Dog's version at runtime\n }\n}" },
+"code_example_2": { "title": "Abstract Classes and Interfaces (Java 21)",
+"description": "Using an interface for behavior and an abstract class for a
+template in a payment system.", "code": "interface Payable {\n void
+processPayment(double amount);\n\n // Java 8+ Default Method\n default void
+printReceipt(double amount) {\n System.out.println("Receipt generated for: $" +
+amount);\n }\n}\n\nabstract class PaymentMethod implements Payable {\n String
+providerName;\n\n PaymentMethod(String provider) {\n this.providerName =
+provider;\n }\n\n abstract boolean validateDetails();\n}\n\nclass CreditCard
+extends PaymentMethod {\n CreditCard(String provider) {\n super(provider);\n
+}\n\n @Override\n public boolean validateDetails() {\n
+System.out.println("Validating Credit Card for " + providerName);\n return
+true;\n }\n\n @Override\n public void processPayment(double amount) {\n if
+(validateDetails()) {\n System.out.println("Charging $" + amount + " via Credit
+Card");\n }\n }\n}\n\npublic class PaymentSystem {\n public static void
+main(String[] args) {\n Payable payment = new CreditCard("Visa");\n
+payment.processPayment(250.0);\n payment.printReceipt(250.0);\n }\n}" },
+"expected_output": "Sum 1: 15\nSum 2: 30\nDog barks\nValidating Credit Card for
+Visa\nCharging $250.0 via Credit Card\nReceipt generated for: $250.0",
+"step_by_step_dry_run": "1. Main method starts. \n2. 'calc' object is created.
+Compiler links 'add(int, int)' to the first call based on two arguments.\n3.
+'myPet' reference of type 'Animal' is created on the Stack.\n4. A 'Dog' object
+is created on the Heap.\n5. 'myPet' points to the 'Dog' object. \n6. When
+'myPet.speak()' is called, JVM looks at the actual object (Dog) and finds the
+overridden 'speak' method.\n7. 'Dog barks' is printed. This is Runtime
+Polymorphism.", "memory_visualization": "Stack: contains reference variables
+like 'myPet' (type Animal). \nHeap: contains the actual object 'new Dog()'.
+\nMethod Area: contains class templates for Animal and Dog. \nAt runtime,
+'myPet.speak()' follows the reference to the Heap, checks the object's class
+metadata, and executes the version of 'speak' found in the Dog class.",
+"real_world_use_cases": [ "JDBC Driver: The same 'Connection' interface is used
+for MySQL, PostgreSQL, and Oracle databases.", "UI Frameworks: A generic
+'Button' class where 'onClick' behavior is overridden for specific buttons.",
+"Payment Gateways: Treating PayPal, Stripe, and Credit Cards as a generic
+'Payment' type.", "File Handling: Treating local files and cloud files via a
+common 'Storage' interface." ], "common_mistakes": [ "Trying to instantiate an
+abstract class using 'new AbstractClass()'.", "Forgetting the @Override
+annotation, leading to accidental method overloading (mismatching parameters).",
+"Thinking that static methods can be overridden (they are actually hidden).",
+"Not making an overriding method public when the interface method is public by
+default.", "Confusing 'abstract' with 'interface'—abstract classes allow shared
+state (instance variables), interfaces (mostly) don't." ], "best_practices": [
+"Always use @Override to catch signature mismatches at compile time.", "Program
+to an interface, not an implementation (e.g., List list = new ArrayList()).",
+"Use abstract classes for 'is-a' relationships with shared code.", "Use
+interfaces for 'can-do' capabilities (e.g., Drawable, Runnable).", "Keep
+interfaces small and focused (Interface Segregation Principle)." ], "faq": [ {
+"question": "Can an interface have a constructor?", "answer": "No. Interfaces
+cannot be instantiated and do not have instance state that requires
+initialization via a constructor." }, { "question": "What is the difference
+between Overloading and Overriding?", "answer": "Overloading occurs in the same
+class with different parameters (compile-time). Overriding occurs in a subclass
+with the same signature (runtime)." }, { "question": "Can we override a static
+method?", "answer": "No. Static methods are bound to the class, not the
+instance. Defining a static method with the same signature in a subclass is
+called 'Method Hiding'." } ], "summary": "Phase 7 introduced Polymorphism and
+Abstraction. We learned that polymorphism allows objects to behave differently
+based on their actual type at runtime. We explored how abstract classes provide
+a partial blueprint while interfaces provide a strict contract for behavior,
+including the modern Java features of default and static methods.",
+"key_takeaways": [ "Polymorphism = One name, multiple forms.", "Overloading is
+checked by the compiler; Overriding is checked by the JVM.", "Dynamic Method
+Dispatch enables loose coupling.", "Abstract classes can have state; Interfaces
+define pure behavior.", "Default methods allow interfaces to evolve without
+breaking existing code." ], "next_topic_preview": "In Phase 8, we will explore
+Encapsulation and Packages, learning how to protect data and organize our Java
+projects into professional modules.", "questions": [ { "difficulty": "Easy",
+"topic": "Concept", "question": "What is the primary difference between
+compile-time and runtime polymorphism in Java?", "answer": "Compile-time
+polymorphism is achieved through method overloading where the compiler selects
+the method based on the signature. Runtime polymorphism is achieved through
+method overriding where the JVM selects the method based on the actual object
+type at execution time." }, { "difficulty": "Moderate", "topic": "Concept",
+"question": "When would you prefer an abstract class over an interface in
+Java 21?", "answer": "Use an abstract class when you want to share common code
+(methods with bodies) and state (instance variables) among closely related
+classes. Use an interface when you want to define a contract that can be
+implemented by unrelated classes, or when you need a class to implement multiple
+behaviors." }, { "difficulty": "Moderate", "topic": "Practical Usage",
+"question": "Write a small code snippet demonstrating 'Upcasting' and explaining
+why it is useful.", "answer": "Example: 'Shape s = new Circle();'. This is
+upcasting. It is useful because it allows us to create methods that accept a
+'Shape' parameter, and we can pass any subclass like Circle, Square, or Triangle
+to it, making the code more flexible." }, { "difficulty": "Hard", "topic":
+"Practical Usage", "question": "Implement an interface named 'SmartDevice' with
+an abstract method 'turnOn()' and a default method 'updateFirmware()' that
+prints a generic update message. Then, create a class 'SmartPhone' that
+implements it.", "answer": "interface SmartDevice { void turnOn(); default void
+updateFirmware() { System.out.println("Updating firmware..."); } }\nclass
+SmartPhone implements SmartDevice { public void turnOn() {
+System.out.println("Phone screen lighting up"); } }" }, { "difficulty":
+"Moderate", "topic": "Common Mistake", "question": "Identify the bug: 'abstract
+class Test { abstract static void display(); }'", "answer": "The bug is that a
+method cannot be both 'abstract' and 'static'. Abstract methods are meant to be
+overridden by subclasses to provide an implementation for an instance, whereas
+static methods belong to the class and cannot be overridden." }, { "difficulty":
+"Hard", "topic": "Common Mistake", "question": "What happens if a subclass
+overrides a method but changes the access modifier from 'public' in the parent
+to 'protected' in the child?", "answer": "This will cause a compilation error.
+In Java, an overriding method cannot assign a weaker access privilege. Since
+'public' is more accessible than 'protected', the child class must keep it
+'public'." }, { "difficulty": "Moderate", "topic": "Coding", "question": "Create
+a class hierarchy: Parent 'Employee' with a method 'getSalary()', and Child
+'Developer' that overrides 'getSalary()' to add a bonus.", "answer": "class
+Employee { double getSalary() { return 50000; } }\nclass Developer extends
+Employee { @Override double getSalary() { return super.getSalary() + 10000; } }"
+}, { "difficulty": "Hard", "topic": "Coding/Application", "question":
+"Demonstrate Dynamic Method Dispatch with three levels of inheritance:
+GrandParent, Parent, and Child, each overriding a method 'identify()'. Use a
+GrandParent reference to call the method on a Child object.", "answer": "class
+GP { void identify() { System.out.println("GP"); } }\nclass P extends GP { void
+identify() { System.out.println("P"); } }\nclass C extends P { void identify() {
+System.out.println("C"); } }\n// In main: GP obj = new C(); obj.identify(); //
+Prints 'C'" } ], "mcqs": [ { "question": "Which keyword is used to prevent a
+method from being overridden?", "options": { "A": "static", "B": "abstract",
+"C": "final", "D": "private" }, "answer": "C" }, { "question": "Can an abstract
+class have a main method?", "options": { "A": "Yes, and it can be executed",
+"B": "No, abstract classes cannot have any static methods", "C": "Yes, but it
+cannot be executed", "D": "No, because abstract classes cannot be instantiated"
+}, "answer": "A" }, { "question": "What is the output? class A { void m() {
+System.out.print("A"); } } class B extends A { void m() { System.out.print("B");
+} } ... A obj = new B(); obj.m();", "options": { "A": "A", "B": "B", "C":
+"Compilation Error", "D": "Runtime Error" }, "answer": "B" }, { "question":
+"Which of these is TRUE about interfaces in Java 8 and later?", "options": {
+"A": "They can have private constructors", "B": "They can have default methods
+with implementation", "C": "They can be instantiated directly", "D": "They
+cannot have static methods" }, "answer": "B" }, { "question": "Predict output:
+class X { int a = 10; } class Y extends X { int a = 20; } ... X obj = new Y();
+System.out.println(obj.a);", "options": { "A": "10", "B": "20", "C":
+"Compilation Error", "D": "0" }, "answer": "A" }, { "question": "Find the bug:
+interface MyInter { void run(); } class MyClass implements MyInter { void run()
+{ System.out.println("Running"); } }", "options": { "A": "Interface methods must
+be private", "B": "MyClass must be abstract", "C": "The run() method in MyClass
+must be public", "D": "The run() method cannot have a body" }, "answer": "C" },
+{ "question": "Which of the following is NOT required for Method Overriding?",
+"options": { "A": "Same method name", "B": "Same argument list", "C":
+"Inheritance relationship", "D": "Different return type" }, "answer": "D" }, {
+"question": "Complete the code: interface Flyable { _____ void fly(); }",
+"options": { "A": "abstract", "B": "final", "C": "static", "D": "No keyword
+needed (it is implicit)" }, "answer": "D" }, { "question": "What is 'Method
+Hiding' in Java?", "options": { "A": "Overriding a private method", "B":
+"Defining a static method in a subclass with the same signature as one in the
+superclass", "C": "Using the 'final' keyword on a class", "D": "Encapsulating
+methods in a private package" }, "answer": "B" }, { "question": "Best Approach:
+You want to define a behavior for 'Printing' that can be applied to both a
+'Document' class and a 'Photo' class. Which should you use?", "options": { "A":
+"An abstract parent class 'Printable'", "B": "A single class with method
+overloading", "C": "An interface 'Printable'", "D": "Static methods in a Utility
+class" }, "answer": "C" } ] }

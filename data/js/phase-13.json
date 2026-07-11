@@ -1,0 +1,255 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 13,
+    "phaseTitle": "Modern JavaScript: Beyond the Basics",
+    "description": "Master advanced ES6+ features that power modern frameworks. Explore metaprogramming with Proxies, efficient memory management with WeakCollections, and the magic of Generators and Symbols.",
+    "estimatedTime": "180 minutes"
+  },
+  "learningObjectives": [
+    "Master advanced destructuring techniques for complex data structures.",
+    "Implement Symbols to create unique, non-colliding object properties.",
+    "Understand the garbage collection benefits of WeakMap and WeakSet.",
+    "Use Proxies and Reflect for metaprogramming, validation, and observation.",
+    "Write custom Iterators and Generators to handle data streams efficiently.",
+    "Explore the upcoming Decorators proposal and tagged template literals."
+  ],
+  "prerequisites": [
+    "Phase 5 - Arrays",
+    "Phase 6 - Objects",
+    "Phase 9 - OOP in JavaScript"
+  ],
+  "introduction": "JavaScript evolves every year through the ECMAScript (ES) standards. Modern JavaScript (ES6 and beyond) isn't just about 'newer' syntax; it's about providing powerful tools to write cleaner, more efficient, and more expressive code. In this phase, we move beyond simple variables and functions to explore the 'magic' features like Proxies, Generators, and specialized collections that make advanced library development and high-performance applications possible.",
+  "conceptExplanation": "### 1. Metaprogramming (Proxy & Reflect)\nMetaprogramming is 'programming that programs'. A **Proxy** allows you to wrap an object and intercept operations like getting a property or setting a value. **Reflect** is a built-in object that provides methods for interceptable JavaScript operations, making it easier to forward actions from a Proxy.\n\n### 2. Specialized Collections (WeakMap & WeakSet)\nUnlike standard Maps, a **WeakMap** holds 'weak' references to its keys. If there are no other references to an object used as a key, the garbage collector can remove it from memory. This is crucial for preventing memory leaks in large applications.\n\n### 3. Iterators and Generators\n**Iterators** define how an object is traversed. **Generators** are special functions (marked with `*`) that can be paused using the `yield` keyword, allowing them to produce a sequence of values over time rather than all at once.",
+  "syntax": "// --- Advanced Destructuring ---\nconst { user: { id }, tags: [firstTag] } = data;\n\n// --- Proxy ---\nconst proxy = new Proxy(target, {\n  get(obj, prop) { return prop in obj ? obj[prop] : 'Not Found'; }\n});\n\n// --- Generators ---\nfunction* idGenerator() {\n  let id = 1;\n  while(true) yield id++;\n}\n\n// --- Symbols ---\nconst HIDDEN = Symbol('private');\nobj[HIDDEN] = 'secret';",
+  "breakdownOfSyntax": {
+    "Proxy(target, handler)": "The 'target' is the original object; the 'handler' is an object containing 'traps' (interceptors).",
+    "yield": "Used inside generators to pause execution and return a value to the caller.",
+    "Symbol()": "Creates a unique, immutable primitive value often used as private-ish object keys.",
+    "WeakMap": "A collection of key/value pairs where keys must be objects and are held weakly.",
+    "Tagged Templates": "A function that parses a template literal, allowing for custom string processing."
+  },
+  "rulesAndKeyPoints": [
+    "Symbols are always unique; Symbol('a') === Symbol('a') is false.",
+    "WeakMaps are not iterable; you cannot check their size or clear them.",
+    "The Proxy 'get' trap triggers when a property is accessed; 'set' triggers on assignment.",
+    "Generators return an Iterator object with a .next() method.",
+    "A Generator stays in a 'suspended' state until .next() is called.",
+    "Reflect methods have the same names as Proxy traps, ensuring easy delegation.",
+    "Advanced destructuring can rename variables: const { oldName: newName } = obj.",
+    "WeakSet can only store objects, not primitives.",
+    "Template literals can be 'tagged' by a function to prevent XSS or format SQL.",
+    "Decorators (currently a proposal) are functions used to modify classes or properties."
+  ],
+  "codeExample1": {
+    "title": "Proxy Validation System",
+    "description": "Using a Proxy to protect an object from invalid data types.",
+    "code": "const user = { age: 25 };\n\nconst validator = {\n  set(obj, prop, value) {\n    if (prop === 'age') {\n      if (typeof value !== 'number') throw new TypeError('Age must be a number');\n      if (value < 0) throw new RangeError('Age cannot be negative');\n    }\n    obj[prop] = value;\n    return true; // Success\n  }\n};\n\nconst safeUser = new Proxy(user, validator);\n\nsafeUser.age = 30; // Works\n// safeUser.age = '30'; // Throws TypeError"
+  },
+  "codeExample2": {
+    "title": "Generator for Infinite Streams",
+    "description": "Using a generator to create an infinite ID sequence without consuming memory.",
+    "code": "function* createIdGenerator() {\n  let id = 100;\n  while (true) {\n    yield `USER_${id++}`;\n  }\n}\n\nconst gen = createIdGenerator();\n\nconsole.log(gen.next().value); // USER_100\nconsole.log(gen.next().value); // USER_101\nconsole.log(gen.next().value); // USER_102\n\n// The loop never crashes because it only runs when gen.next() is called."
+  },
+  "output": "Example 1 Output:\n(Internal object updated to age 30)\n\nExample 2 Output:\nUSER_100\nUSER_101\nUSER_102",
+  "stepByStepDryRun": {
+    "method": "Generator Execution",
+    "code": "function* count() { yield 1; yield 2; } const g = count();",
+    "steps": [
+      "Step 1: The generator function 'count' is called. It returns a Generator Object but doesn't run the code inside yet.",
+      "Step 2: g.next() is called. The function runs until it hits 'yield 1'. It returns { value: 1, done: false } and pauses.",
+      "Step 3: g.next() is called again. Execution resumes from the pause point. It hits 'yield 2', returns { value: 2, done: false } and pauses.",
+      "Step 4: g.next() is called a third time. There are no more yields. It returns { value: undefined, done: true }."
+    ]
+  },
+  "memoryVisualization": "WEAKMAP VS MAP MEMORY:\n1. [Standard Map]: Stores an object key. Even if you set your external variable to null, the Map still holds a reference to that object. The object stays in the Heap.\n2. [WeakMap]: Stores an object key 'weakly'. If the external variable is set to null, the WeakMap does not prevent garbage collection. The object is deleted from the Heap, and the entry automatically disappears from the WeakMap. This is the ultimate fix for memory leaks when attaching metadata to DOM elements.",
+  "realWorldUseCases": [
+    "Data Validation: Proxies used in libraries like Vue.js to detect changes and update the UI (Reactivity).",
+    "Private Data: Using Symbols to store properties on objects that won't show up in normal for...in loops.",
+    "Pagination: Generators used to fetch the 'next page' of an API only when the user scrolls down.",
+    "Caching: WeakMaps used to cache results of expensive calculations based on object inputs.",
+    "Safe APIs: Using Reflect to perform operations that might throw errors in a more predictable way."
+  ],
+  "commonMistakes": [
+    "Thinking WeakMaps are iterable (they have no .forEach or .length).",
+    "Trying to use a string or number as a key in a WeakMap (keys MUST be objects).",
+    "Forgetting the * in generator function declarations.",
+    "Using Proxy on an object and then continuing to use the 'target' object directly (this bypasses the traps).",
+    "Confusing Symbols with private properties (#). Symbols are hidden from some tools but still discoverable via Object.getOwnPropertySymbols()."
+  ],
+  "bestPractices": [
+    "Use Proxies for logging, profiling, and validation layers.",
+    "Use WeakMap for attaching data to objects you don't own (like DOM nodes).",
+    "Prefer advanced destructuring for cleaner function parameters.",
+    "Use Symbols for 'internal' library keys to avoid naming collisions with user-defined keys.",
+    "Use Generators when dealing with large datasets that don't need to be in memory all at once.",
+    "Always return true from the 'set' trap in a Proxy to indicate success."
+  ],
+  "frequentlyAskedQuestions": [
+    {
+      "difficulty": "Easy Concept",
+      "question": "What is a Symbol?",
+      "answer": "A Symbol is a primitive data type that is guaranteed to be unique. Even if you create two symbols with the same description, they are not equal."
+    },
+    {
+      "difficulty": "Moderate Concept",
+      "question": "How does a Proxy 'trap' work?",
+      "answer": "A trap is an interceptor function. When you perform an action on a Proxy (like reading a property), the engine calls your trap function instead of the default behavior, allowing you to modify the result."
+    },
+    {
+      "difficulty": "Moderate Practical",
+      "question": "What is the primary use case for WeakMap?",
+      "answer": "WeakMaps are primarily used to store private data for an object or to keep track of object-related metadata without preventing the object from being garbage collected."
+    },
+    {
+      "difficulty": "Hard Practical",
+      "question": "How do Generators help with asynchronous code?",
+      "answer": "Generators can yield Promises. A 'runner' function can wait for the promise to resolve and then pass the result back into the generator via .next(result), making async code look synchronous."
+    },
+    {
+      "difficulty": "Moderate Mistake",
+      "question": "Why can't I use 'for...of' on a WeakMap?",
+      "answer": "Because WeakMaps are designed around garbage collection. If you could iterate over them, the contents would depend on the state of the garbage collector, which is non-deterministic and could lead to bugs."
+    },
+    {
+      "difficulty": "Hard Mistake",
+      "question": "What is the difference between Proxy and Object.defineProperty?",
+      "answer": "Object.defineProperty modifies the original object and only works for existing properties. Proxy is a wrapper that can intercept virtual properties, deletions, and function calls that defineProperty cannot."
+    },
+    {
+      "difficulty": "Moderate Coding",
+      "question": "Write a snippet to deeply destructure 'city' from { user: { address: { city: 'NY' } } }.",
+      "answer": "const { user: { address: { city } } } = obj;"
+    },
+    {
+      "difficulty": "Hard Coding",
+      "question": "Create a Proxy that converts all property accesses to uppercase strings, even if the property doesn't exist.",
+      "answer": "const p = new Proxy({}, { get: (t, prop) => String(prop).toUpperCase() });"
+    }
+  ],
+  "summary": "Phase 13 explored the advanced features of modern JavaScript. We learned how to use Proxies for metaprogramming, WeakCollections for memory efficiency, and Generators for handling complex data flows. These tools allow us to write higher-level abstractions used in professional library development.",
+  "keyTakeaways": [
+    "Proxies intercept and redefine fundamental object operations.",
+    "Reflect provides a clean API for default object actions.",
+    "WeakMap/Set enable memory-safe data associations.",
+    "Symbols provide unique, non-string property keys.",
+    "Generators allow function execution to be paused and resumed.",
+    "Advanced destructuring simplifies data extraction from deep objects.",
+    "Tagged template literals enable custom string parsing logic.",
+    "Generators are excellent for producing infinite or lazy-loaded sequences.",
+    "Metaprogramming helps build more flexible and robust code architectures.",
+    "Modern JS focuses on both developer experience and memory management."
+  ],
+  "previewOfNextTopic": "In Phase 14, we leave the browser and enter the world of Node.js, learning how to use JavaScript to build servers, handle files, and manage packages with npm.",
+  "mcqs": [
+    {
+      "type": "Theory",
+      "question": "Which collection type is best suited to prevent memory leaks when storing object metadata?",
+      "options": {
+        "A": "Map",
+        "B": "Set",
+        "C": "WeakMap",
+        "D": "Object"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Theory",
+      "question": "What does the 'yield' keyword do inside a generator function?",
+      "options": {
+        "A": "Stops the function forever",
+        "B": "Returns a value and pauses execution",
+        "C": "Throws an error",
+        "D": "Calls another function"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "const s1 = Symbol('id'); const s2 = Symbol('id'); console.log(s1 === s2);",
+      "options": {
+        "A": "true",
+        "B": "false",
+        "C": "undefined",
+        "D": "TypeError"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "function* g() { yield 10; return 20; } const it = g(); console.log(it.next().value, it.next().value);",
+      "options": {
+        "A": "10, 20",
+        "B": "10, undefined",
+        "C": "20, 10",
+        "D": "undefined, 20"
+      },
+      "answer": "A"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "const p = new Proxy({a:1}, { get: () => 42 }); console.log(p.a, p.b);",
+      "options": {
+        "A": "1, undefined",
+        "B": "42, 42",
+        "C": "1, 42",
+        "D": "Error"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "const wm = new WeakMap(); wm.set('key', {val: 1});",
+      "options": {
+        "A": "WeakMap requires .add() instead of .set()",
+        "B": "Keys in WeakMap must be objects, not strings",
+        "C": "Values in WeakMap must be strings",
+        "D": "WeakMap is a constant"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "function generator() { yield 1; }",
+      "options": {
+        "A": "Missing 'function*' star",
+        "B": "yield can only be used in loops",
+        "C": "Missing return statement",
+        "D": "yield is a reserved word for objects"
+      },
+      "answer": "A"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "To intercept property assignment in a Proxy, use the ____ trap.",
+      "options": {
+        "A": "get",
+        "B": "set",
+        "C": "apply",
+        "D": "construct"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "const { user: { name ____ userName } } = data; // Rename name to userName",
+      "options": {
+        "A": "as",
+        "B": ":",
+        "C": "->",
+        "D": "="
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Best Approach",
+      "question": "How should you iterate over a very large file line-by-line to minimize RAM usage?",
+      "options": {
+        "A": "Read the whole file into an array and use .forEach()",
+        "B": "Use a generator to yield one line at a time",
+        "C": "Use a standard Map to store all lines",
+        "D": "Use a Proxy to watch the file"
+      },
+      "answer": "B"
+    }
+  ]
+}

@@ -1,0 +1,198 @@
+{ "phase_metadata": { "phase_number": 14, "phase_name": "Design Patterns",
+"learning_objectives": [ "Understand the purpose of Design Patterns in software
+architecture", "Implement the Singleton pattern for resource management", "Apply
+the Factory Method pattern to decouple object creation", "Use the Observer
+pattern for event-driven systems", "Implement the Strategy pattern to switch
+algorithms at runtime" ], "prerequisites": [ "Phase 4 - Inheritance", "Phase 5 -
+Polymorphism", "Phase 7 - Pointers & Smart Pointers" ] }, "introduction":
+"Design patterns are proven solutions to common problems in software design.
+Rather than being a specific piece of code, a pattern is a template or a
+blueprint for how to solve a problem that occurs in many different situations.
+In C++, patterns help us write code that is easier to maintain, extend, and
+reuse. We focus on four foundational patterns: Singleton (Creational), Factory
+(Creational), Observer (Behavioral), and Strategy (Behavioral).",
+"concept_explanation": { "singleton": { "definition": "The Singleton pattern
+ensures that a class has only one instance and provides a global point of access
+to it.", "why_needed": "Useful for managing shared resources like a Database
+connection, a Log file, or Configuration settings where having multiple
+instances would cause data inconsistency.", "how_it_works": "The constructor is
+made private. A static method is used to control the creation of the single
+instance, which is stored in a static variable.", "memory_behavior": "The static
+instance typically lives in the Data Segment (static memory) or on the Heap if
+created via a pointer, persisting for the duration of the program." },
+"factory": { "definition": "The Factory Method provides an interface for
+creating objects but allows subclasses to decide which class to instantiate.",
+"why_needed": "It decouples the client code from the specific classes it needs
+to create, making the system easier to extend with new types without modifying
+existing code.", "how_it_works": "A 'Creator' class declares a method that
+returns an object of a 'Product' interface. Subclasses override this method to
+return specific 'Concrete Product' instances." }, "observer": { "definition":
+"Defines a one-to-many dependency between objects so that when one object
+changes state, all its dependents are notified.", "why_needed": "Essential for
+creating distributed event-handling systems, like UI buttons or stock market
+tickers.", "how_it_works": "The 'Subject' keeps a list of 'Observers'. When a
+change occurs, the Subject loops through the list and calls a notification
+method on each Observer." }, "strategy": { "definition": "The Strategy pattern
+defines a family of algorithms, encapsulates each one, and makes them
+interchangeable at runtime.", "why_needed": "Avoids massive switch-cases or
+if-else blocks when you have multiple ways to perform a task (e.g., different
+sorting algorithms or payment methods).", "how_it_works": "The 'Context' class
+contains a pointer to a 'Strategy' interface. The client can swap out the
+specific Strategy implementation at any time." } }, "syntax_and_breakdown": {
+"syntax": "class Singleton {\nprivate:\n Singleton() {}\n static Singleton*
+instance;\npublic:\n static Singleton* getInstance() {\n if (!instance) instance
+= new Singleton();\n return instance;\n }\n};", "breakdown": [ { "keyword":
+"private constructor", "explanation": "Prevents other classes from creating
+instances using the 'new' keyword." }, { "keyword": "static variable",
+"explanation": "Holds the single instance of the class across the entire
+program." }, { "keyword": "getInstance()", "explanation": "The 'Gatekeeper'
+method that ensures only one instance is ever created." } ] },
+"rules_and_key_points": [ "Design patterns are templates, not libraries.",
+"Singleton: Use private constructors and deleted copy/assignment operators.",
+"Factory: Promotes the 'Open/Closed' principle (open for extension, closed for
+modification).", "Observer: Relies on an interface so the Subject doesn't need
+to know the concrete types of Observers.", "Strategy: Use composition (having a
+strategy) instead of inheritance.", "Always use virtual destructors in base
+classes of Factory/Strategy patterns to avoid memory leaks.", "C++17 'static
+local' variables provide a thread-safe way to implement Singletons (Meyers
+Singleton).", "Prefer smart pointers (std::unique_ptr) in Factory methods to
+manage ownership automatically.", "Patterns should only be used when they solve
+a specific problem; don't over-engineer.", "Interfaces in C++ are implemented
+using classes with pure virtual functions." ], "code_example_1": { "title":
+"Meyers Singleton (Modern C++17)", "description": "The simplest and most robust
+way to implement a Singleton in modern C++.", "code": "#include \n#include
+\n\nclass Logger {\npublic:\n // Get the single instance\n static Logger&
+getInstance() {\n static Logger instance; // Created only once, thread-safe in
+C++11+\n return instance;\n }\n\n void log(const std::string& message) {\n
+std::cout << "[LOG]: " << message << std::endl;\n }\n\n // Delete copy
+constructor and assignment operator\n Logger(const Logger&) = delete;\n void
+operator=(const Logger&) = delete;\n\nprivate:\n Logger() {\n std::cout <<
+"Logger Initialized." << std::endl;\n }\n};\n\nint main() {\n
+Logger::getInstance().log("Application started.");\n
+Logger::getInstance().log("Doing some work...");\n return 0;\n}", "output":
+"Logger Initialized.\n[LOG]: Application started.\n[LOG]: Doing some work..." },
+"code_example_2": { "title": "Strategy Pattern for Payment Systems",
+"description": "Using the Strategy pattern to switch between Credit Card and
+PayPal payments.", "code": "#include \n#include \n\n// Strategy Interface\nclass
+PaymentStrategy {\npublic:\n virtual ~PaymentStrategy() = default;\n virtual
+void collectPayment(double amount) const = 0;\n};\n\n// Concrete Strategy
+A\nclass CreditCard : public PaymentStrategy {\npublic:\n void
+collectPayment(double amount) const override {\n std::cout << "Processing Credit
+Card payment of $" << amount << std::endl;\n }\n};\n\n// Concrete Strategy
+B\nclass PayPal : public PaymentStrategy {\npublic:\n void collectPayment(double
+amount) const override {\n std::cout << "Processing PayPal payment of $" <<
+amount << std::endl;\n }\n};\n\n// Context\nclass ShoppingCart {\nprivate:\n
+std::unique_ptr strategy;\npublic:\n void setPaymentMethod(std::unique_ptr
+newStrategy) {\n strategy = std::move(newStrategy);\n }\n void checkout(double
+total) {\n if (strategy) strategy->collectPayment(total);\n else std::cout <<
+"Please select a payment method!" << std::endl;\n }\n};\n\nint main() {\n
+ShoppingCart cart;\n \n std::cout << "--- Payment 1 ---" << std::endl;\n
+cart.setPaymentMethod(std::make_unique());\n cart.checkout(150.50);\n\n
+std::cout << "\n--- Payment 2 ---" << std::endl;\n
+cart.setPaymentMethod(std::make_unique());\n cart.checkout(45.00);\n\n
+return 0;\n}", "output": "--- Payment 1 ---\nProcessing Credit Card payment of
+$150.5\n\n--- Payment 2 ---\nProcessing PayPal payment of $45" },
+"memory_visualization": "In the Singleton pattern, the 'static Logger instance'
+is stored in the static/global memory area. In the Strategy pattern, the
+'std::unique_ptr' stores a pointer on the stack that points to an object
+(CreditCard or PayPal) residing on the Heap. When 'setPaymentMethod' is called,
+the old strategy on the heap is automatically deleted by the unique_ptr.",
+"real_world_use_cases": [ "Singleton: A Print Spooler managing a single printer
+queue.", "Factory: A Cross-Platform UI library creating 'WindowsButton' or
+'MacButton' based on the OS.", "Observer: A News Agency app pushing updates to
+thousands of mobile users.", "Strategy: A file compression app allowing users to
+choose between ZIP, RAR, or 7z algorithms." ], "common_mistakes": [ "Singleton:
+Forgetting to delete the copy constructor, allowing users to clone the
+instance.", "Factory: Forgetting 'virtual' destructors, leading to memory leaks
+when deleting derived objects.", "Observer: Creating circular dependencies where
+Subject and Observer depend too heavily on each other's details.", "Strategy:
+Using the pattern for simple logic that could be a simple function, leading to
+'class explosion'." ], "best_practices": [ "Prefer the 'Meyers Singleton'
+(static local variable) for simplicity and thread safety.", "Always use
+'std::unique_ptr' or 'std::shared_ptr' when returning objects from a Factory.",
+"Keep interfaces small and focused (Interface Segregation Principle).", "Use the
+'override' keyword in C++ to ensure you are correctly implementing design
+pattern interfaces." ], "faqs": [ { "question": "Is Singleton a bad pattern?",
+"answer": "It is often called an 'anti-pattern' if overused because it
+introduces global state, but it is perfectly valid for resource managers like
+Loggers or DB connections." }, { "question": "Why use Factory instead of just
+'new'?", "answer": "If you use 'new', your code is hard-coded to a specific
+class. Factory lets you change the class without changing the code that uses
+it." } ], "summary": { "key_takeaways": [ "Patterns solve recurring
+architectural problems.", "Creational patterns (Singleton, Factory) handle
+object creation.", "Behavioral patterns (Observer, Strategy) handle object
+communication.", "Patterns increase flexibility and decouple code components."
+], "preview_next_topic": "In Phase 15, we will apply these patterns and
+everything we've learned so far to build real-world Mini Projects!" },
+"questions": [ { "id": 1, "difficulty": "Easy", "type": "Theory", "question":
+"What is the primary difference between a Singleton and a global variable?",
+"answer": "A global variable does not prevent multiple instances from being
+created, whereas a Singleton explicitly controls and restricts instantiation to
+exactly one object." }, { "id": 2, "difficulty": "Easy-Medium", "type":
+"Theory", "question": "In the Factory Pattern, why is it crucial to have a
+virtual destructor in the Base class?", "answer": "If the base class destructor
+is not virtual, deleting a derived object through a base pointer results in
+undefined behavior, usually failing to call the derived destructor and causing
+memory leaks." }, { "id": 3, "difficulty": "Medium", "type": "Practical",
+"question": "Implement a 'Configuration' Singleton class that stores a single
+string 'appName'.", "answer": "class Configuration { private: Configuration() {}
+public: std::string appName = 'MyApp'; static Configuration& getInstance() {
+static Configuration instance; return instance; } Configuration(const
+Configuration&) = delete; void operator=(const Configuration&) = delete; };" },
+{ "id": 4, "difficulty": "Medium", "type": "Practical", "question": "Create a
+Factory Method called 'ShapeFactory' that returns a unique_ptr to either a
+'Circle' or 'Square' based on a string input.", "answer": "std::unique_ptr
+ShapeFactory::createShape(string type) { if(type == 'circle') return
+make_unique(); else return make_unique(); }" }, { "id": 5, "difficulty":
+"Medium", "type": "Debug", "question": "Find the bug: class Singleton { public:
+Singleton* getInstance() { if (!inst) inst = new Singleton(); return inst; }
+private: static Singleton* inst; };", "answer": "The getInstance() method must
+be 'static'. Otherwise, you need an instance to call getInstance(), which
+defeats the purpose of a Singleton." }, { "id": 6, "difficulty": "Medium-Hard",
+"type": "Modify", "question": "Refactor a code that uses 'if (mode == FAST)
+fastSort(); else slowSort();' into a Strategy pattern.", "answer": "Define a
+SortStrategy interface, implement FastSort and SlowSort as concrete strategies,
+and have a Context class hold a pointer to the current strategy." }, { "id": 7,
+"difficulty": "Hard", "type": "Predict", "question": "If an Observer pattern
+implementation has 3 observers attached to a Subject, and 'notify()' is called
+twice, how many total updates are executed?", "answer": "6 updates (3 observers
+* 2 notification cycles)." }, { "id": 8, "difficulty": "Challenge", "type":
+"Implementation", "question": "Implement a simple Observer pattern where a
+'WeatherStation' (Subject) notifies 'PhoneDisplay' (Observer) of temperature
+changes.", "answer": "Requires an Observer interface with an update(float temp)
+method, and a WeatherStation class with a vector of Observer pointers and a
+notify() method that iterates through them." } ], "mcqs": [ { "type": "Theory",
+"question": "Which design pattern is used to provide a single point of access to
+a resource?", "options": { "A": "Factory", "B": "Observer", "C": "Singleton",
+"D": "Strategy" }, "answer": "C" }, { "type": "Theory", "question": "The
+'Open/Closed Principle' is a primary motivation for which pattern?", "options":
+{ "A": "Singleton", "B": "Factory Method", "C": "Static Pattern", "D":
+"Namespace Pattern" }, "answer": "B" }, { "type": "Output Prediction",
+"question": "What is the output? static int count = 0; class S { S() { count++;
+} public: static S& get() { static S instance; return instance; } }; int main()
+{ S::get(); S::get(); cout << count; }", "options": { "A": "0", "B": "1", "C":
+"2", "D": "Error" }, "answer": "B" }, { "type": "Output Prediction", "question":
+"Given a Strategy pattern where StrategyA prints 'A' and StrategyB prints 'B'.
+If we set strategy to A, then switch to B, then call execute(), what is
+printed?", "options": { "A": "A", "B": "B", "C": "AB", "D": "BA" }, "answer":
+"B" }, { "type": "Output Prediction", "question": "In a Factory returning
+unique_ptr, what happens to the object when the pointer goes out of scope?",
+"options": { "A": "Memory leak", "B": "Nothing, remains in heap", "C":
+"Automatically deleted", "D": "Compile error" }, "answer": "C" }, { "type":
+"Find the Bug", "question": "Why would 'Singleton s = Singleton::getInstance();'
+fail if the pattern is correctly implemented?", "options": { "A": "getInstance()
+is private", "B": "Copy constructor is deleted", "C": "Cannot assign to a
+variable", "D": "Singleton must be a pointer" }, "answer": "B" }, { "type":
+"Find the Bug", "question": "What is missing in this Observer base class: 'class
+Observer { public: virtual void update() = 0; };'?", "options": { "A": "A
+private constructor", "B": "A virtual destructor", "C": "A static instance",
+"D": "A data member" }, "answer": "B" }, { "type": "Complete the Code",
+"question": "To prevent cloning a Singleton, we use: Singleton(const Singleton&)
+= ______;", "options": { "A": "void", "B": "null", "C": "delete", "D": "private"
+}, "answer": "C" }, { "type": "Complete the Code", "question": "In the Observer
+pattern, the Subject usually stores Observers in a ________.", "options": { "A":
+"std::vector", "B": "static variable", "C": "single pointer", "D": "enum" },
+"answer": "A" }, { "type": "Best Approach", "question": "You are writing a game
+where characters can change their combat style (Melee, Ranged, Magic) during a
+fight. Which pattern is best?", "options": { "A": "Singleton", "B": "Factory",
+"C": "Strategy", "D": "Encapsulation" }, "answer": "C" } ] }

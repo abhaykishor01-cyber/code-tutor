@@ -1,0 +1,257 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 10,
+    "phaseTitle": "Error Handling: Building Resilient Applications",
+    "description": "Learn to anticipate, catch, and manage runtime errors. Master the try-catch-finally block, create custom error types, and handle asynchronous failures to prevent your applications from crashing.",
+    "estimatedTime": "120 minutes"
+  },
+  "learningObjectives": [
+    "Identify common JavaScript error types like ReferenceError and TypeError.",
+    "Implement robust error boundaries using try, catch, and finally.",
+    "Use the throw statement to create custom exception logic.",
+    "Design and extend the built-in Error class for domain-specific errors.",
+    "Master error handling patterns in asynchronous code and Promises.",
+    "Understand global error listeners for catching unhandled exceptions."
+  ],
+  "prerequisites": [
+    "Phase 4 - Functions and Scope",
+    "Phase 8 - Asynchronous JavaScript (Promises/Async-Await)",
+    "Phase 9 - OOP (Class inheritance for Custom Errors)"
+  ],
+  "introduction": "In programming, things will go wrong. A server might be down, a user might provide 'null' instead of a name, or a variable might be missing. Error handling is the art of planning for these 'bad' scenarios. Instead of letting the entire application crash (a 'fatal error'), we 'catch' the error, handle it gracefully (perhaps by showing a message), and keep the app running.",
+  "conceptExplanation": "JavaScript uses an 'Exception' model. When an error occurs, an Error Object is 'thrown'. If nothing 'catches' it, it bubbles up the call stack until it reaches the browser, which stops your script. Using `try...catch` allows you to create a safety net. The `try` block contains code that might fail, the `catch` block contains the rescue logic, and the `finally` block contains code that must run regardless of what happened (like closing a database connection).",
+  "syntax": "try {\n  // Code that might throw an error\n  const data = JSON.parse(userInput);\n} catch (error) {\n  // Handle the error\n  console.error('Failed to parse:', error.message);\n} finally {\n  // Always runs\n  hideLoadingSpinner();\n}\n\n// Custom Throw\nif (!user) throw new Error('User not found');",
+  "breakdownOfSyntax": {
+    "try": "A block of code to be tested for errors while it is being executed.",
+    "catch (error)": "A block of code to be executed if an error occurs in the try block. The 'error' variable holds the Error Object.",
+    "finally": "A block of code that executes after try/catch, regardless of whether an error was thrown or caught.",
+    "throw": "A keyword used to manually trigger an exception and stop the current execution flow.",
+    "Error Object": "A built-in object providing a 'name' and a 'message' property describing the failure."
+  },
+  "rulesAndKeyPoints": [
+    "The try block must be followed by either a catch block, a finally block, or both.",
+    "Errors bubble up: if a function doesn't catch an error, it passes it to the function that called it.",
+    "The finally block always runs, even if you 'return' from inside the try or catch blocks.",
+    "ReferenceError occurs when you use a variable that hasn't been declared.",
+    "TypeError occurs when a value is not of the expected type (e.g., calling a string as a function).",
+    "SyntaxError occurs when the engine encounters code that breaks the rules of the language.",
+    "In async functions, you must wrap 'await' calls in try/catch to handle Promise rejections.",
+    "Custom errors should extend the built-in Error class to maintain stack trace information.",
+    "Avoid 'silent catches' (empty catch blocks) as they make debugging nearly impossible.",
+    "Use console.error() instead of console.log() for errors to make them stand out in the dev tools."
+  ],
+  "codeExample1": {
+    "title": "Basic Runtime Error Handling",
+    "description": "Catching a TypeError when trying to manipulate an undefined value.",
+    "code": "function formatName(user) {\n  try {\n    console.log('Attempting to format...');\n    return user.name.toUpperCase();\n  } catch (err) {\n    console.log('Error caught: ' + err.name);\n    return 'Anonymous';\n  } finally {\n    console.log('Formatting attempt finished.');\n  }\n}\n\nconsole.log(formatName({ name: 'Alice' }));\nconsole.log(formatName(null));"
+  },
+  "codeExample2": {
+    "title": "Custom Errors and Async Handling",
+    "description": "Creating a specialized Validation error for an async registration flow.",
+    "code": "class ValidationError extends Error {\n  constructor(message) {\n    super(message);\n    this.name = 'ValidationError';\n  }\n}\n\nasync function registerUser(email) {\n  try {\n    if (!email.includes('@')) {\n      throw new ValidationError('Invalid email format');\n    }\n    console.log('Registering ' + email);\n  } catch (err) {\n    if (err instanceof ValidationError) {\n      console.warn('User Input Error:', err.message);\n    } else {\n      console.error('Unexpected System Error:', err);\n    }\n  }\n}\n\nregisterUser('invalid-email');"
+  },
+  "output": "Example 1 Output:\nAttempting to format...\nALICE\nFormatting attempt finished.\nAttempting to format...\nError caught: TypeError\nAnonymous\nFormatting attempt finished.\n\nExample 2 Output:\nUser Input Error: Invalid email format",
+  "stepByStepDryRun": {
+    "method": "try-catch-finally Flow",
+    "code": "try { throw 'Err'; } catch(e) { console.log('Caught'); } finally { console.log('Final'); }",
+    "steps": [
+      "Step 1: Enter 'try' block. The engine encounters the 'throw' keyword.",
+      "Step 2: Normal execution stops immediately. The string 'Err' is sent to the 'catch' block.",
+      "Step 3: The 'catch' block receives 'Err'. It logs 'Caught' to the console.",
+      "Step 4: The 'catch' block finishes. The 'finally' block begins.",
+      "Step 5: The engine logs 'Final' to the console.",
+      "Step 6: Execution continues normally after the finally block."
+    ]
+  },
+  "memoryVisualization": "UNWINDING THE CALL STACK:\n1. Function A calls B. Function B calls C.\n2. Function C throws an Error.\n3. Engine looks for a 'try/catch' in C. (Not found).\n4. Engine 'unwinds' C (removes it from memory stack) and looks in B. (Not found).\n5. Engine 'unwinds' B and looks in A.\n6. Engine finds 'try/catch' in A and moves execution to that catch block.\n7. This process preserves the 'Stack Trace'—a list of exactly where the error traveled through memory.",
+  "realWorldUseCases": [
+    "Form Validation: Throwing specific errors when passwords don't match or fields are empty.",
+    "API Failures: Catching network timeouts in fetch() and showing a 'Try Again' button.",
+    "Data Parsing: Safely using JSON.parse() on data received from external sources that might be malformed.",
+    "Permission Checks: Throwing 'UnauthorizedError' if a user tries to access a restricted page.",
+    "Feature Detection: Wrapping modern browser features in try/catch to provide fallbacks for older browsers."
+  ],
+  "commonMistakes": [
+    "Using catch(e) {} without any code inside (the error disappears and you'll never know why the app failed).",
+    "Thinking 'finally' won't run if you 'return' from 'try'. (It will always run!).",
+    "Trying to catch syntax errors in the same file (Syntax errors prevent the script from running at all).",
+    "Forgetting that asynchronous errors (inside a setTimeout or raw Promise) can't be caught by a synchronous try/catch block.",
+    "Throwing strings instead of Error objects (Error objects provide stack traces; strings do not)."
+  ],
+  "bestPractices": [
+    "Always throw the built-in Error object or a class that extends it.",
+    "Only catch errors you actually know how to handle; let the others bubble up.",
+    "Use 'instanceof' in your catch block to handle different error types differently.",
+    "Add custom properties to your Error classes (like 'statusCode') to pass more information.",
+    "Use 'finally' for cleanup tasks like closing file handles, clearing timers, or hiding loading icons.",
+    "Log errors to an external service (like Sentry or LogRocket) in production environments."
+  ],
+  "frequentlyAskedQuestions": [
+    {
+      "difficulty": "Easy Concept",
+      "question": "What is the difference between an error and an exception?",
+      "answer": "Technically, an 'Error' is an object that represents a problem. An 'Exception' is the act of throwing that Error object to stop the current execution flow."
+    },
+    {
+      "difficulty": "Moderate Concept",
+      "question": "Does the finally block run if the catch block also throws an error?",
+      "answer": "Yes. The finally block is guaranteed to run. After the finally block finishes, the new error from the catch block will then continue to bubble up the call stack."
+    },
+    {
+      "difficulty": "Moderate Practical",
+      "question": "How do you catch an error in a Promise without using async/await?",
+      "answer": "You must use the .catch() method at the end of the promise chain: `fetch(url).then(res => ...).catch(err => console.error(err));`"
+    },
+    {
+      "difficulty": "Hard Practical",
+      "question": "What is 'Error Bubbling'?",
+      "answer": "If an error is thrown inside a function and not caught, the function stops, and the error is 'passed' to the calling function. This continues until a catch block is found or the script crashes at the global level."
+    },
+    {
+      "difficulty": "Moderate Mistake",
+      "question": "Why won't try/catch work around a setTimeout function?",
+      "answer": "Because setTimeout is asynchronous. The 'try' block finishes executing immediately after setting the timer. When the timer eventually expires and the error is thrown, the try/catch block is already gone from the call stack."
+    },
+    {
+      "difficulty": "Hard Mistake",
+      "question": "Can you catch a SyntaxError using try/catch?",
+      "answer": "Generally, no. Syntax errors are discovered during the 'parsing' phase, before the code even begins to execute. Since they happen before the 'try' block runs, they cannot be caught by it."
+    },
+    {
+      "difficulty": "Moderate Coding",
+      "question": "Write a function that throws a 'RangeError' if a number is not between 1 and 10.",
+      "answer": "function checkRange(n) { if(n < 1 || n > 10) throw new RangeError('Must be 1-10'); return true; }"
+    },
+    {
+      "difficulty": "Hard Coding",
+      "question": "Create a custom error class called 'DatabaseError' and throw it inside a try block.",
+      "answer": "class DatabaseError extends Error { constructor(m) { super(m); this.name = 'DatabaseError'; } }\ntry { throw new DatabaseError('Connection failed'); } catch(e) { console.log(e.name); }"
+    }
+  ],
+  "summary": "Phase 10 taught us that errors are inevitable but manageable. We learned how to use try-catch-finally to create safety zones in our code, how to throw custom errors to enforce business logic, and how to handle failures in modern asynchronous workflows.",
+  "keyTakeaways": [
+    "Errors stop execution unless caught.",
+    "try/catch provides a way to handle runtime failures gracefully.",
+    "The finally block is for code that must run no matter what.",
+    "Throwing Error objects is better than throwing strings.",
+    "Use custom Error classes to categorize different types of failures.",
+    "Async/await requires try/catch for error handling.",
+    "Errors 'bubble up' the call stack looking for a handler.",
+    "ReferenceError and TypeError are the most common built-in errors.",
+    "Never leave a catch block empty.",
+    "The stack trace is your best friend for debugging."
+  ],
+  "previewOfNextTopic": "In Phase 11, we explore Modules—the secret to organizing large JavaScript codebases into clean, reusable, and maintainable files using Import and Export.",
+  "mcqs": [
+    {
+      "type": "Theory",
+      "question": "Which block is used to define code that runs whether an error occurred or not?",
+      "options": {
+        "A": "try",
+        "B": "catch",
+        "C": "finally",
+        "D": "error"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Theory",
+      "question": "What happens if an error is thrown but there is no catch block in the entire call stack?",
+      "options": {
+        "A": "The code ignores it and continues.",
+        "B": "The script terminates and logs an 'Uncaught Error'.",
+        "C": "The computer restarts.",
+        "D": "The try block runs again."
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "try { console.log('A'); throw 'B'; } catch(e) { console.log('C'); } finally { console.log('D'); }",
+      "options": {
+        "A": "A, B, C",
+        "B": "A, C, D",
+        "C": "A, D",
+        "D": "C, D"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "function test() { try { return 1; } finally { console.log(2); } } console.log(test());",
+      "options": {
+        "A": "1, 2",
+        "B": "2, 1",
+        "C": "1",
+        "D": "2"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Output Prediction",
+      "question": "What is the name of the error thrown here: null.property = 5;",
+      "options": {
+        "A": "ReferenceError",
+        "B": "TypeError",
+        "C": "SyntaxError",
+        "D": "RangeError"
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "try { setTimeout(() => { throw new Error('Boom'); }, 100); } catch(e) { console.log('Caught!'); }",
+      "options": {
+        "A": "Boom is not a valid error message.",
+        "B": "Catch variable must be named 'error'.",
+        "C": "The error will not be caught because it is inside an async callback.",
+        "D": "The timeout is too short."
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Find the Bug",
+      "question": "if (x < 0) throw 'Negative Number';",
+      "options": {
+        "A": "Strings cannot be thrown.",
+        "B": "It is better to throw 'new Error('Negative Number')' for stack trace support.",
+        "C": "You must use 'return' instead of 'throw'.",
+        "D": "Missing parentheses."
+      },
+      "answer": "B"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "To create a custom error: class MyErr ____ Error { ... }",
+      "options": {
+        "A": "implements",
+        "B": "proto",
+        "C": "extends",
+        "D": "instanceof"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Complete the Code",
+      "question": "Inside a catch block, to access the error's text description: console.log(err.____);",
+      "options": {
+        "A": "text",
+        "B": "desc",
+        "C": "message",
+        "D": "info"
+      },
+      "answer": "C"
+    },
+    {
+      "type": "Best Approach",
+      "question": "What is the best way to handle potential errors in an async function?",
+      "options": {
+        "A": "Use .then() and .catch() on every line.",
+        "B": "Wrap all await calls inside a try/catch block.",
+        "C": "Check if every variable is undefined using if-statements.",
+        "D": "Do nothing and let the global handler catch it."
+      },
+      "answer": "B"
+    }
+  ]
+}

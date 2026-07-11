@@ -1,14 +1,295 @@
 {
-  "metadata": { "phaseNumber": 1, "title": "C Basics: Getting Started" },
-  "learningObjectives": ["Understand C program structure"],
-  "prerequisites": [],
-  "introduction": "C is the foundation of modern systems programming.",
-  "syntax": "#include <stdio.h>\nint main() {\n  printf(\"Hello\");\n  return 0;\n}",
-  "rulesAndKeyPoints": ["main() is the entry point"],
-  "codeExample1": { "title": "Hello World", "code": "#include <stdio.h>\nint main(){ printf(\"Hello, C!\"); return 0; }", "expectedOutput": "Hello, C!" },
-  "commonMistakes": ["Forgetting return 0;"],
-  "bestPractices": ["Always include stdio.h for printf"],
-  "keyTakeaways": ["C compiles to native machine code"],
-  "questionsAndAnswers": [{ "id": "q1", "question": "What header is needed for printf?", "answer": "stdio.h", "difficulty": "Easy" }],
-  "mcqs": [{ "id": "m1", "question": "Which function is the entry point?", "options": {"A":"start","B":"main","C":"init","D":"run"}, "correctOption": "B" }]
+  "metadata": {
+    "phaseNumber": 1,
+    "title": "C Basics, Environment Setup & First Program",
+    "duration": "1 Week",
+    "difficulty": "Beginner"
+  },
+  "learningObjectives": [
+    "Understand the structure and background of a standard C program.",
+    "Set up a compiler environment (GCC, VS Code) successfully.",
+    "Master essential basic tokens: keywords, identifiers, constants, variables, and data types.",
+    "Perform simple input and output operations using standard printf and scanf functions."
+  ],
+  "prerequisites": [
+    "No prior coding experience is required. Basic command line usage is helpful."
+  ],
+  "introduction": "Welcome to C! Developed by Dennis Ritchie in 1972 at Bell Labs, C is a legendary procedural programming language that powers modern systems software, operating systems (like Unix, Linux, and Windows), databases, and embedded systems. This phase provides the foundation for your journey.",
+  "conceptExplanation": "Every C program goes through a multi-stage compilation pipeline: preprocessing (expanding macros), compilation (translating code into assembly), assembly (translating assembly to machine code object files), and linking (combining object files with libraries to produce an executable). We also cover essential data types (int, char, float, double), size specifiers (short, long), and signed/unsigned variants that map directly to physical memory bytes.",
+  "syntax": "#include <stdio.h>\n\nint main() {\n    // Code statements\n    return 0;\n}",
+  "syntaxBreakdown": [
+    "#include <stdio.h>: Preprocessor directive to include standard input/output header file for printf and scanf.",
+    "int main(): The entry point function where execution always begins. It returns an integer status code.",
+    "{ ... }: Braces define the block scope of the main function.",
+    "return 0;: Indicates successful program execution to the host Operating System."
+  ],
+  "rulesAndKeyPoints": [
+    "C is strictly case-sensitive. 'Main' or 'MAIN' is not the same as 'main'.",
+    "Every statement must terminate with a semicolon (;).",
+    "Identifiers must begin with a letter or underscore (_), not a digit.",
+    "Keywords (such as int, char, return) are reserved and cannot be used as variable names."
+  ],
+  "codeExample1": {
+    "title": "Basic Hello World",
+    "code": "#include <stdio.h>\n\nint main() {\n    printf(\"Hello, World!\\n\");\n    return 0;\n}",
+    "explanation": "This program loads the standard I/O library and calls 'printf' to render a greeting card on the user terminal, followed by a newline code."
+  },
+  "codeExample2": {
+    "title": "User Input and Data Types",
+    "code": "#include <stdio.h>\n\nint main() {\n    int age;\n    float score;\n    \n    printf(\"Enter your age: \");\n    scanf(\"%d\", &age);\n    \n    printf(\"Enter your exam score: \");\n    scanf(\"%f\", &score);\n    \n    printf(\"Age: %d, Score: %.2f\\n\", age, score);\n    return 0;\n}",
+    "explanation": "This program showcases declaring local stack variables, using scanf to read terminal input using format specifiers (%d for integers, %f for floats), and printing values back.",
+    "expectedOutput": "Enter your age: 20\nEnter your exam score: 94.5\nAge: 20, Score: 94.50"
+  },
+  "stepByStepDryRun": [
+    "1. Memory Allocation: The system allocates stack bytes for local variable 'age' (4 bytes) and 'score' (4 bytes).",
+    "2. Print Prompt: printf outputs 'Enter your age: ' to stdout.",
+    "3. Read Age: scanf halts execution to wait for integer input. If the user typing '20' is captured, it writes to memory address of &age.",
+    "4. Read Score: scanf waits for decimal input. Stored in score via &score.",
+    "5. Print Final Result: printf substitutes format codes with variable values and flushes buffer."
+  ],
+  "memoryVisualization": {
+    "type": "Stack Memory",
+    "description": "Stack allocation of Phase 1 primitive variables",
+    "nodes": [
+      {
+        "label": "age (int)",
+        "address": "0x7ffee3bf4c08",
+        "value": "20 (4 bytes)",
+        "color": "emerald"
+      },
+      {
+        "label": "score (float)",
+        "address": "0x7ffee3bf4c0c",
+        "value": "94.50 (4 bytes)",
+        "color": "sky"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Writing operating system kernels or drivers where direct hardware mapping and memory controls are required.",
+    "Embedded microcontroller coding (e.g. Arduino, automotive chips) with high performance and minimal memory footprint."
+  ],
+  "commonMistakes": [
+    "Forgetting the ampersand (&) in scanf. For example, writing scanf(\"%d\", age) instead of scanf(\"%d\", &age) causes a segmentation fault or write violation.",
+    "Omitting the semicolon at the end of statement lines, triggering immediate build compile errors."
+  ],
+  "bestPractices": [
+    "Always initialize variables upon declaration to prevent unexpected garbage values.",
+    "Use meaningful lowercase camelCase or snake_case variable names to maintain clean code readability."
+  ],
+  "faqs": [
+    {
+      "question": "Why does scanf need the & operator?",
+      "answer": "The scanf function needs to modify the original variable. To do so, it must know the exact memory address of that variable (passed via &), rather than just a copy of its current value."
+    },
+    {
+      "question": "What is the difference between char, float, and double?",
+      "answer": "A char holds a single byte representing ASCII. A float is a single-precision floating point number (4 bytes), while a double is a double-precision decimal (8 bytes) with more precision."
+    }
+  ],
+  "summary": "Phase 1 introduced the bedrock layout of a standard C program, covering environment configuration, basic compiler stages, system-defined primitive variable storage, and terminal I/O functions.",
+  "keyTakeaways": [
+    "Standard template: main function, standard preprocessor header, status return.",
+    "Ampersand in scanf is essential for address pointer parameters.",
+    "Proper formatting types: %d (integer), %f (float), %c (character), %lf (double)."
+  ],
+  "nextTopicPreview": "In Phase 2, we dive deep into Operators, exploring mathematical calculations, comparison checks, bitwise binary shifting, and precedence hierarchies.",
+  "questionsAndAnswers": [
+    {
+      "id": "q1",
+      "category": "Concept",
+      "difficulty": "Easy",
+      "question": "What are the four primary compilation stages of a C program?",
+      "answer": "The four primary stages are: 1. Preprocessing (handles directives like #include and #define), 2. Compilation (converts preprocessed code to assembly code), 3. Assembly (converts assembly code to machine code object files), and 4. Linking (merges object files with libraries to produce the final executable).",
+      "explanation": "Understanding these compilation stages is critical for troubleshooting preprocessor issues, linking conflicts, and compiler errors."
+    },
+    {
+      "id": "q2",
+      "category": "Concept",
+      "difficulty": "Moderate",
+      "question": "Explain the difference between 'const' and '#define' for declaring constants in C.",
+      "answer": " '#define' is a preprocessor directive that performs literal text substitution before compilation begins. It occupies no memory address. In contrast, 'const' variables are typed, checked by the compiler, follow scope rules, and occupy read-only memory, meaning they have a physical address.",
+      "explanation": "'#define' lacks type safety while 'const' respects scope and C types."
+    },
+    {
+      "id": "q3",
+      "category": "Practical Usage",
+      "difficulty": "Moderate",
+      "question": "Write a short code snippet to swap two integer variables without using a third temporary variable.",
+      "answer": "int a = 5, b = 10;\na = a + b; // a becomes 15\nb = a - b; // b becomes 5\na = a - b; // a becomes 10",
+      "explanation": "This is a classic algorithmic trick. It uses simple arithmetic accumulation and subtraction to swap values in place."
+    },
+    {
+      "id": "q4",
+      "category": "Practical Usage",
+      "difficulty": "Hard",
+      "question": "What will happen if a program reads an integer with scanf(\"%d\", &val) but the user enters a non-numeric string like 'hello'?",
+      "answer": "scanf will fail to match the format specifier, leaving 'val' unassigned (retaining its garbage or previous value). Critically, 'hello' remains in the input buffer, causing subsequent scanf calls to read the same failed token, potentially leading to infinite input loops if unhandled.",
+      "explanation": "scanf returns the number of successfully matched items. Best practice is to check if scanf() == 1."
+    },
+    {
+      "id": "q5",
+      "category": "Common Mistake",
+      "difficulty": "Moderate",
+      "question": "Identify the mistake in: \nchar ch; \nscanf(\"%c\", ch);",
+      "answer": "The ampersand pointer reference (&) is missing. It must be: scanf(\"%c\", &ch);",
+      "explanation": "Without the ampersand, scanf treats the uninitialized value of 'ch' as a target memory pointer address, causing a crash."
+    },
+    {
+      "id": "q6",
+      "category": "Common Mistake",
+      "difficulty": "Hard",
+      "question": "Explain the classic buffer overflow vulnerability associated with reading strings, and why 'scanf(\"%s\", str)' is dangerous.",
+      "answer": "scanf(\"%s\", str) reads characters until a whitespace is found, with no limit. If the user enters more characters than the declared array size of 'str', the extra data overflows into adjacent stack memory, corrupting variables, return addresses, or crashing the process. Safe alternatives include 'fgets'.",
+      "explanation": "Always constrain string bounds when capturing user inputs."
+    },
+    {
+      "id": "q7",
+      "category": "Coding/Application",
+      "difficulty": "Moderate",
+      "question": "Write a full compilable C program that inputs the radius of a circle, computes the area, and prints the result formatted to 3 decimal places.",
+      "answer": "#include <stdio.h>\n#define PI 3.14159265\n\nint main() {\n    double radius, area;\n    printf(\"Enter radius: \");\n    if (scanf(\"%lf\", &radius) == 1) {\n        area = PI * radius * radius;\n        printf(\"Area: %.3f\\n\", area);\n    }\n    return 0;\n}",
+      "explanation": "Demonstrates using standard double specifiers, checking input return values, and using formatting multipliers."
+    },
+    {
+      "id": "q8",
+      "category": "Coding/Application",
+      "difficulty": "Challenge",
+      "question": "Write a C statement or snippet to read a line of text, including spaces, up to a newline character, using ONLY 'scanf'.",
+      "answer": "char buffer[100];\nscanf(\"%99[^\\n]\", buffer);",
+      "explanation": "The specifier %99[^\\n] tells scanf to read a maximum of 99 characters that are NOT newline characters, effectively capturing an entire line safely."
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "m1",
+      "category": "Theory",
+      "question": "Who created the C programming language?",
+      "options": {
+        "A": "Dennis Ritchie",
+        "B": "Bjarne Stroustrup",
+        "C": "Guido van Rossum",
+        "D": "James Gosling"
+      },
+      "correctOption": "A",
+      "explanation": "Dennis Ritchie created C in 1972 at Bell Telephone Laboratories to rewrite the Unix operating system."
+    },
+    {
+      "id": "m2",
+      "category": "Theory",
+      "question": "Which of the following is NOT a valid compilation stage in C?",
+      "options": {
+        "A": "Preprocessing",
+        "B": "Interpretation",
+        "C": "Assembly",
+        "D": "Linking"
+      },
+      "correctOption": "B",
+      "explanation": "C is a fully compiled language, translating raw code straight to machine assets. No interpreter step is involved."
+    },
+    {
+      "id": "m3",
+      "category": "Output Prediction",
+      "question": "What is the output of the following C program?\n\n#include <stdio.h>\nint main() {\n    int a = 10;\n    printf(\"%d\", a);\n    return 0;\n}",
+      "options": {
+        "A": "Garbage value",
+        "B": "Compile Error",
+        "C": "10",
+        "D": "a"
+      },
+      "correctOption": "C",
+      "explanation": "The variable 'a' is initialized to 10 and format printed cleanly."
+    },
+    {
+      "id": "m4",
+      "category": "Output Prediction",
+      "question": "What is the typical size of a 'double' data type on most modern 64-bit platforms?",
+      "options": {
+        "A": "2 Bytes",
+        "B": "4 Bytes",
+        "C": "8 Bytes",
+        "D": "16 Bytes"
+      },
+      "correctOption": "C",
+      "explanation": "Double types guarantee IEEE 754 precision, allocating 8 bytes (64 bits)."
+    },
+    {
+      "id": "m5",
+      "category": "Find the Bug",
+      "question": "Identify the line with the bug:\n\n1: #include <stdio.h>\n2: int main() {\n3:    int score = 100\n4:    printf(\"%d\", score);\n5:    return 0;\n6: }",
+      "options": {
+        "A": "Line 1",
+        "B": "Line 3 (missing semicolon)",
+        "C": "Line 4",
+        "D": "Line 5"
+      },
+      "correctOption": "B",
+      "explanation": "Every C statement must terminate with a semicolon; Line 3 is missing one."
+    },
+    {
+      "id": "m6",
+      "category": "Find the Bug",
+      "question": "What is wrong with this input logic?\n\nint age;\nscanf(\"%d\", age);",
+      "options": {
+        "A": "Format code should be %f",
+        "B": "It is missing the '&' address-of operator for 'age'",
+        "C": "Variable must be double",
+        "D": "scanf is a keyword and cannot be written"
+      },
+      "correctOption": "B",
+      "explanation": "scanf must receive address pointers, otherwise it reads raw memory as offsets, causing faults."
+    },
+    {
+      "id": "m7",
+      "category": "Complete the Code",
+      "question": "Complete the code to print a character stored in 'ch':\n\nchar ch = 'A';\nprintf(\"____\", ch);",
+      "options": {
+        "A": "%d",
+        "B": "%c",
+        "C": "%s",
+        "D": "%f"
+      },
+      "correctOption": "B",
+      "explanation": "The format character specifier '%c' represents character data values."
+    },
+    {
+      "id": "m8",
+      "category": "Complete the Code",
+      "question": "Choose the proper statement to include system file operations support headers:",
+      "options": {
+        "A": "#import <stdio.h>",
+        "B": "#include <stdio.h>",
+        "C": "using namespace std;",
+        "D": "#define stdio.h"
+      },
+      "correctOption": "B",
+      "explanation": "#include is the standard preprocess macro used to pull standard file descriptors."
+    },
+    {
+      "id": "m9",
+      "category": "Best Approach",
+      "question": "What is the best way to declare a constant variable that requires compilation type safety?",
+      "options": {
+        "A": "Using a #define macro statement",
+        "B": "Using the 'const' prefix keyword declaration",
+        "C": "Using global registers",
+        "D": "Never declare constants; type values directly"
+      },
+      "correctOption": "B",
+      "explanation": "The 'const' keyword creates a true typed object that respects scope boundaries, unlike macro preprocessor replacement."
+    },
+    {
+      "id": "m10",
+      "category": "Best Approach",
+      "question": "Why should we avoid utilizing 'gets()' in modern C software development?",
+      "options": {
+        "A": "It does not support reading whitespace characters",
+        "B": "It is obsolete and does not allow limiting characters read, creating extreme buffer overflow risks",
+        "C": "It is too slow compared to standard scanf processes",
+        "D": "It compiles only on Windows systems"
+      },
+      "correctOption": "B",
+      "explanation": "gets() does not take a size boundary argument, making it highly susceptible to buffer overflows."
+    }
+  ]
 }

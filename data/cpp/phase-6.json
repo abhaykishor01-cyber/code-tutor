@@ -1,0 +1,376 @@
+{
+  "phase_metadata": {
+    "phase_number": 6,
+    "title": "Encapsulation & Abstraction",
+    "description": "Master the core pillars of Object-Oriented Programming in C++: shielding internal object state using robust encapsulation and defining pure interfaces to decouple systems via high-level abstractions."
+  },
+  "learning_objectives": [
+    "Understand how encapsulation maintains class invariants and protects internal object state.",
+    "Implement safe getters and setters with appropriate 'const' qualification and argument types.",
+    "Define abstract classes in C++ using pure virtual functions.",
+    "Design robust, decoupled systems utilizing dynamic polymorphism and abstract interface classes.",
+    "Manage the memory layout of polymorphic objects, understanding how the vptr and vtable behave."
+  ],
+  "prerequisites": [
+    "Basic understanding of C++ classes and structures.",
+    "Familiarity with member access specifiers (public, private, protected).",
+    "Basic knowledge of virtual functions and inheritance."
+  ],
+  "introduction": "In C++, building systems that can scale and remain maintainable requires hiding implementation complexity and protecting critical state. This phase covers Encapsulation (hiding how data is stored and controlled) and Abstraction (hiding how a behavior is implemented). Together, these concepts form the foundation of professional object-oriented programming in C++, enabling you to write modular, loosely coupled, and resilient systems.",
+  "concept_explanation": "Encapsulation is the practice of combining data (attributes) and the methods that operate on that data into a single unit (a class) while restricting direct access to the inner workings of that unit. By making data members 'private' and exposing safe, validated 'public' interfaces (getters and setters), we guarantee that an object maintains its integrity (known as keeping its invariants). Abstraction goes a step further by focusing on what an object does rather than how it does it. In C++, we achieve absolute abstraction by writing 'Abstract Classes'—classes containing at least one 'pure virtual function' (declared with '= 0'). Such classes cannot be instantiated on their own; instead, they serve as interfaces (contracts) that child classes must fully implement.",
+  "syntax": "class IInterface {\npublic:\n    virtual ~IInterface() = default; // Virtual destructor required for interfaces\n    virtual void execute_action() = 0; // Pure virtual function\n};\n\nclass ConcreteClass : public IInterface {\nprivate:\n    int m_data{0};\npublic:\n    int get_data() const { return m_data; } // Getter marked const\n    void set_data(int value) {\n        if (value >= 0) { m_data = value; } // Encapsulation: input validation\n    }\n    void execute_action() override { /* Real implementation */ }\n};",
+  "syntax_breakdown": [
+    {
+      "element": "virtual ~IInterface() = default;",
+      "explanation": "Declares a virtual destructor. This is essential when deleting a derived object through a base class pointer to prevent resource and memory leaks."
+    },
+    {
+      "element": "virtual void execute_action() = 0;",
+      "explanation": "The '= 0' suffix declares this as a pure virtual function. It has no implementation here, making the class abstract and establishing an interface contract."
+    },
+    {
+      "element": "int get_data() const",
+      "explanation": "The 'const' qualifier guarantees that this getter function will not modify any member variables of the object, allowing it to be called on const instances."
+    },
+    {
+      "element": "override",
+      "explanation": "A compiler directive ensuring that this function signature matches an inherited virtual function from the base class, catching typo bugs at compile-time."
+    }
+  ],
+  "rules_and_key_points": [
+    "Always use the 'private' access specifier for member data unless there is an extremely specific architectural reason not to.",
+    "If a class contains even one pure virtual function, it becomes abstract and cannot be instantiated.",
+    "Any base class with virtual functions must declare a virtual destructor (either defaulted or custom) to guarantee correct resource cleanup.",
+    "Getters that return simple values should be qualified with 'const'. Getters returning heavy objects should return const references to avoid expensive copies.",
+    "Setters must contain validation logic to protect the class invariants; simple pass-through setters without validation often defeat the purpose of encapsulation."
+  ],
+  "code_example_1_basic": {
+    "title": "Basic Encapsulation and Getters/Setters",
+    "code": "#include <iostream>\n#include <string>\n\nclass BankAccount {\nprivate:\n    std::string owner_name;\n    double balance{0.0};\n\npublic:\n    BankAccount(const std::string& owner, double initial_deposit) \n        : owner_name(owner) {\n        if (initial_deposit >= 0.0) {\n            balance = initial_deposit;\n        }\n    }\n\n    std::string get_owner() const { return owner_name; }\n    double get_balance() const { return balance; }\n\n    void deposit(double amount) {\n        if (amount > 0.0) {\n            balance += amount;\n        }\n    }\n\n    bool withdraw(double amount) {\n        if (amount > 0.0 && balance >= amount) {\n            balance -= amount;\n            return true;\n        }\n        return false;\n    }\n};\n\nint main() {\n    BankAccount account(\"Alice\", 100.0);\n    account.deposit(50.0);\n    if (account.withdraw(30.0)) {\n        std::cout << account.get_owner() << \" has a remaining balance of $\" << account.get_balance() << \"\\n\";\n    }\n    return 0;\n}",
+    "explanation": "This code demonstrates basic encapsulation. The variables 'owner_name' and 'balance' are private, preventing direct modifications like 'account.balance = -99999.0;'. All modification runs through validated member functions like deposit() and withdraw() to ensure logical invariants remain correct.",
+    "expected_output": "Alice has a remaining balance of $120\n",
+    "dry_run": [
+      {
+        "line": "BankAccount account(\"Alice\", 100.0);",
+        "description": "Constructs a BankAccount object on the stack with 'owner_name' initialized to 'Alice' and 'balance' set to 100.0."
+      },
+      {
+        "line": "account.deposit(50.0);",
+        "description": "Calls deposit(50.0). The input check (50.0 > 0.0) succeeds, updating 'balance' to 150.0."
+      },
+      {
+        "line": "account.withdraw(30.0)",
+        "description": "Calls withdraw(30.0). Checks (30.0 > 0.0) and (150.0 >= 30.0) are both true. 'balance' is updated to 120.0, returning true."
+      },
+      {
+        "line": "std::cout << ...",
+        "description": "Calls get_owner() and get_balance() which return safe, read-only copies of the underlying data, outputting the result."
+      }
+    ]
+  },
+  "code_example_2_practical": {
+    "title": "Loose Coupling via Interface Abstraction",
+    "code": "#include <iostream>\n#include <string>\n#include <memory>\n#include <vector>\n\nclass IPaymentProcessor {\npublic:\n    virtual ~IPaymentProcessor() = default;\n    virtual bool process_payment(double amount) = 0;\n};\n\nclass CreditCardProcessor : public IPaymentProcessor {\nprivate:\n    std::string card_number;\n    std::string security_code;\npublic:\n    CreditCardProcessor(std::string card, std::string cvv)\n        : card_number(std::move(card)), security_code(std::move(cvv)) {}\n\n    bool process_payment(double amount) override {\n        std::cout << \"[CreditCard] Processing payment of $\" << amount \n                  << \" using masked card: ****\" << card_number.substr(12) << \"\\n\";\n        return true;\n    }\n};\n\nclass PayPalProcessor : public IPaymentProcessor {\nprivate:\n    std::string email;\npublic:\n    explicit PayPalProcessor(std::string mail) : email(std::move(mail)) {}\n\n    bool process_payment(double amount) override {\n        std::cout << \"[PayPal] Processing payment of $\" << amount \n                  << \" via user account: \" << email << \"\\n\";\n        return true;\n    }\n};\n\nclass ShoppingCart {\nprivate:\n    double total_amount{0.0};\n    std::unique_ptr<IPaymentProcessor> payment_gateway;\npublic:\n    void add_item(double price) {\n        total_amount += price;\n    }\n    void set_payment_method(std::unique_ptr<IPaymentProcessor> processor) {\n        payment_gateway = std::move(processor);\n    }\n    void checkout() {\n        if (payment_gateway && total_amount > 0.0) {\n            if (payment_gateway->process_payment(total_amount)) {\n                std::cout << \"Checkout succeeded! Total charged: $\" << total_amount << \"\\n\";\n                total_amount = 0.0;\n            }\n        } else {\n            std::cout << \"Checkout failed: No payment processor or empty cart.\\n\";\n        }\n    }\n};\n\nint main() {\n    ShoppingCart cart;\n    cart.add_item(49.99);\n    cart.add_item(150.01);\n\n    std::unique_ptr<IPaymentProcessor> user_card = \n        std::make_unique<CreditCardProcessor>(\"1234567812349999\", \"123\");\n\n    cart.set_payment_method(std::move(user_card));\n    cart.checkout();\n    return 0;\n}",
+    "explanation": "This demonstrates decoupling through high-level dynamic polymorphism. The ShoppingCart class relies entirely on the IPaymentProcessor interface abstraction. It does not know or care if the processor uses credit cards, PayPal, or crypto. This allows easy expansion of options without altering ShoppingCart's code.",
+    "expected_output": "[CreditCard] Processing payment of $200 using masked card: ****9999\nCheckout succeeded! Total charged: $200\n",
+    "dry_run": [
+      {
+        "line": "ShoppingCart cart;",
+        "description": "Initializes 'cart' on the stack frame of main with 'total_amount' equal to 0.0 and 'payment_gateway' as an empty unique_ptr."
+      },
+      {
+        "line": "cart.add_item(49.99); cart.add_item(150.01);",
+        "description": "Increments the internal total_amount twice, accumulating to 200.0."
+      },
+      {
+        "line": "std::unique_ptr<IPaymentProcessor> user_card = ...",
+        "description": "Instantiates a CreditCardProcessor on the Heap, returning its address encapsulated inside a smart unique_ptr."
+      },
+      {
+        "line": "cart.set_payment_method(std::move(user_card));",
+        "description": "Moves ownership of the heap-allocated processor into the cart's member variable 'payment_gateway'. 'user_card' becomes null."
+      },
+      {
+        "line": "cart.checkout();",
+        "description": "Invokes process_payment() on the polymorphic gateway pointer. This dynamically dispatches to the overridden function in CreditCardProcessor via the vtable, displaying output and resetting total_amount to 0."
+      }
+    ]
+  },
+  "memory_visualization": {
+    "type": "Stack and Heap Diagram",
+    "description": "Visualization of stack variables containing pointers pointing to dynamically allocated virtual objects in the Heap space.",
+    "entities": [
+      {
+        "name": "cart",
+        "address": "0x7ffee3b4a2bc",
+        "value": "total_amount: 0.0, payment_gateway: 0x9f2a40",
+        "segment": "Stack"
+      },
+      {
+        "name": "*payment_gateway (CreditCardProcessor)",
+        "address": "0x9f2a40",
+        "value": "vptr -> 0x4010d0 (CreditCardProcessor vtable), card_number: \"1234567812349999\", security_code: \"123\"",
+        "segment": "Heap"
+      },
+      {
+        "name": "CreditCardProcessor vtable",
+        "address": "0x4010d0",
+        "value": "vptr targets: [0x4010d0] -> &CreditCardProcessor::process_payment()",
+        "segment": "Data/Read-Only"
+      }
+    ]
+  },
+  "real_world_use_cases": [
+    {
+      "scenario": "Hardware Drivers in OS Development",
+      "description": "An operating system defines an abstract class called 'IGraphicsDriver'. Concrete child classes are written by specific manufacturers (NVIDIA, AMD, Intel) implementing standard commands (e.g., render_frame()). The core OS calls these methods via the abstract interface, without knowing the direct hardware configuration."
+    },
+    {
+      "scenario": "Enterprise Database Connectors",
+      "description": "Application business logic references an 'IDatabaseConnection' interface. Depending on runtime settings, it resolves to concrete implementations like 'PostgreSQLConnection' or 'MongoDBConnection', keeping core system processes safe from low-level API changes."
+    }
+  ],
+  "common_mistakes": [
+    {
+      "mistake": "Leaving the base class destructor non-virtual in an interface class.",
+      "explanation": "If the base class destructor is not virtual, deleting a derived class through an interface pointer will trigger undefined behavior, leaking the resources allocated inside the derived object.",
+      "fix": "Declare 'virtual ~InterfaceName() = default;' inside the public section of the abstract base class."
+    },
+    {
+      "mistake": "Directly exposing private member fields by returning non-const references in getter methods.",
+      "explanation": "Returning a raw mutable reference to a private variable allows callers to bypass all validation rules and directly mutate internal state.",
+      "fix": "Return the field by value, or return it as a const reference: 'const std::string& get_name() const'."
+    }
+  ],
+  "best_practices": [
+    "Design interfaces with high cohesion and narrow focus. Do not bloat an interface with unrelated methods.",
+    "Ensure getters do not change the state of the object; always make them 'const' functions.",
+    "Use smart pointers ('std::unique_ptr' or 'std::shared_ptr') when storing or passing abstract interfaces to guarantee secure lifetime management.",
+    "Always mark overridden methods with the keyword 'override' to catch signature mismatch errors during compiling.",
+    "Keep constructor validation robust. Check parameters and throw an exception or set a fallback state if constructor arguments violate class invariants."
+  ],
+  "frequently_asked_questions": [
+    {
+      "question": "Can an abstract class have a constructor in C++?",
+      "answer": "Yes. Even though you cannot instantiate an abstract class directly, it can contain a constructor. This constructor is called during the construction sequence of derived objects to initialize base class variables."
+    },
+    {
+      "question": "What is the difference between a class and an interface in C++?",
+      "answer": "C++ does not have an explicit 'interface' keyword. Instead, an interface is implemented as an abstract class containing only pure virtual functions and a virtual destructor, with no member variables or implemented methods."
+    }
+  ],
+  "summary": "This phase explored the deep structural patterns of C++ engineering. Through encapsulation, objects act as secure black boxes protecting their internal state from unsafe direct access. Through abstract base classes and pure virtual functions, C++ developers establish architectural contracts. This dynamic polymorphism enforces clear interfaces, decouple applications, and sets up flexible modern code structures.",
+  "key_takeaways": [
+    "Encapsulation ensures code safety by regulating state mutations through getters and setters containing validation logic.",
+    "Abstraction isolates complex details and hides code implementations behind stable interfaces.",
+    "An abstract class is characterized by at least one pure virtual function declared with the '= 0' syntax.",
+    "Always declare a virtual destructor in your interface classes to prevent insidious memory leaks in polymorphic applications."
+  ],
+  "preview_next_topic": "Next, we will venture into Phase 7: Inheritance & Polymorphism, where we explore the exact details of dynamic vs static dispatch, class hierarchies, slicing problems, and multiple inheritance patterns.",
+  "questions": [
+    {
+      "id": "Q1",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Defining Encapsulation",
+      "question": "In your own words, explain how encapsulation protects class invariants. What are class invariants, and why are public fields dangerous to them?",
+      "hint": "Think of a Date class where month must range from 1 to 12.",
+      "answer": "An invariant is a logical condition that must always remain true for an object to be in a valid state (e.g. standard time hours can only range from 0 to 23). Encapsulation protects invariants by making the raw fields private and validating parameters inside setters or constructors, ensuring invalid data can never be assigned. Public fields allow callers to bypass validation entirely, breaking safety."
+    },
+    {
+      "id": "Q2",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Abstract Class Definition",
+      "question": "What syntactic element in a C++ class definition guarantees that a class is abstract and cannot be instantiated directly?",
+      "hint": "It involves a keyword and a specific value suffix.",
+      "answer": "The presence of at least one pure virtual function, defined using the 'virtual' keyword and matching the '= 0' pure specifier syntax (e.g., 'virtual void method() = 0;'), guarantees that a class is abstract."
+    },
+    {
+      "id": "Q3",
+      "difficulty": "Easy-Medium",
+      "type": "Practical",
+      "title": "Const Qualifiers on Getters",
+      "question": "Implement a 'User' class containing a private string field 'username'. Create a correct const-qualified getter for it that returns a const reference to avoid unnecessary copies.",
+      "hint": "Return type must contain 'const' and '&', and the method header must end with 'const'.",
+      "answer": "class User {\nprivate:\n    std::string username;\npublic:\n    User(std::string name) : username(std::move(name)) {}\n    const std::string& get_username() const {\n        return username;\n    }\n};"
+    },
+    {
+      "id": "Q4",
+      "difficulty": "Medium",
+      "type": "Practical",
+      "title": "Designing a Logging Interface",
+      "question": "Write an abstract logger interface named 'ILogger' with a pure virtual function 'log_message(const std::string& message)'. Provide a concrete class 'ConsoleLogger' implementing that interface.",
+      "hint": "Do not forget the virtual destructor in the interface class.",
+      "answer": "class ILogger {\npublic:\n    virtual ~ILogger() = default;\n    virtual void log_message(const std::string& message) = 0;\n};\n\nclass ConsoleLogger : public ILogger {\npublic:\n    void log_message(const std::string& message) override {\n        std::cout << \"[Log]: \" << message << \"\\n\";\n    }\n};"
+    },
+    {
+      "id": "Q5",
+      "difficulty": "Medium",
+      "type": "Debug",
+      "title": "The Slicing & Destructor Trap",
+      "question": "Identify two crucial architectural bugs in the following C++ code snippet:\n\n```cpp\nclass Shape {\npublic:\n    ~Shape() {}\n    virtual void draw() = 0;\n};\n```",
+      "hint": "Check the destructor type and look for public memory leaks during inheritance hierarchies.",
+      "answer": "1. The base class 'Shape' does not declare a virtual destructor. When a subclass is deleted polymorphically via a 'Shape*', dynamic memory cleanups are bypassed, causing undefined behavior.\n2. The destructor should be virtual, like: 'virtual ~Shape() = default;'."
+    },
+    {
+      "id": "Q6",
+      "difficulty": "Medium-Hard",
+      "type": "Debug",
+      "title": "Fixing Const Correctness in Getters",
+      "question": "Why does this class fail to compile when utilized in a const context?\n\n```cpp\nclass Product {\nprivate:\n    double price{0.0};\npublic:\n    Product(double p) : price(p) {}\n    double get_price() { return price; }\n};\n\nvoid print_product(const Product& p) {\n    std::cout << p.get_price();\n}\n```",
+      "hint": "Check the constness of the print function parameter relative to the signature of 'get_price()'.",
+      "answer": "The function 'print_product' accepts a 'const Product& p', meaning only const-qualified member functions can be called on 'p'. However, 'get_price()' lacks a 'const' qualifier, causing a compiler error. Fix it by changing the signature to: 'double get_price() const { return price; }'."
+    },
+    {
+      "id": "Q7",
+      "difficulty": "Hard",
+      "type": "Application",
+      "title": "Audio Device Abstraction",
+      "question": "Design an abstract class 'IAudioDevice' with 'play()' and 'stop()' interfaces. Create a 'Headphone' implementation that manages sound levels safely, ensuring play() prints an error message if the private 'volume' integer field is higher than 85.",
+      "hint": "Validate safe volume levels inside a 'set_volume(int)' method before permitting play operations.",
+      "answer": "class IAudioDevice {\npublic:\n    virtual ~IAudioDevice() = default;\n    virtual void play() = 0;\n    virtual void stop() = 0;\n};\n\nclass Headphone : public IAudioDevice {\nprivate:\n    int volume{50};\npublic:\n    void set_volume(int vol) {\n        if (vol >= 0 && vol <= 100) { volume = vol; }\n    }\n    void play() override {\n        if (volume > 85) {\n            std::cout << \"Volume exceeds safety limits (85). Access denied.\\n\";\n        } else {\n            std::cout << \"Playing sound at safe level \" << volume << \"\\n\";\n        }\n    }\n    void stop() override {\n        std::cout << \"Audio stopped.\\n\";\n    }\n};"
+    },
+    {
+      "id": "Q8",
+      "difficulty": "Challenge",
+      "type": "Application",
+      "title": "Encapsulated Matrix Engine",
+      "question": "Implement an encapsulated class 'Matrix2D' representing a 2D integer matrix of static size 2x2. Direct member modifications must be prevented. The class must expose an safe write function: 'set_element(size_t row, size_t col, int val)' and read function: 'get_element(size_t row, size_t col) const' that throw a 'std::out_of_range' exception if indexes exceed the 2x2 bounds.",
+      "hint": "Utilize a private 2D std::array array, and validate rows/columns against safe boundaries before mutations.",
+      "answer": "#include <array>\n#include <stdexcept>\n\nclass Matrix2D {\nprivate:\n    std::array<std::array<int, 2>, 2> data{{{0, 0}, {0, 0}}};\npublic:\n    void set_element(size_t row, size_t col, int val) {\n        if (row >= 2 || col >= 2) {\n            throw std::out_of_range(\"Index out of bounds\");\n        }\n        data[row][col] = val;\n    }\n    int get_element(size_t row, size_t col) const {\n        if (row >= 2 || col >= 2) {\n            throw std::out_of_range(\"Index out of bounds\");\n        }\n        return data[row][col];\n    }\n};"
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "MCQ1",
+      "type": "Theory",
+      "question": "Which of the following descriptions best summarizes the direct core purpose of 'Encapsulation'?",
+      "options": {
+        "A": "Hiding implementation complexity from the user via virtual functions.",
+        "B": "Bundling data and operations inside class entities and protecting internal object invariants via restricted private visibility.",
+        "C": "Creating dynamic linkages through polymorphic pointer resolutions at runtime.",
+        "D": "Splitting code structures across multiple header and source files."
+      },
+      "answer": "B",
+      "explanation": "Encapsulation bundles state with behavior and protects data integrity by allowing controlled modifications through standard validated accessor methods."
+    },
+    {
+      "id": "MCQ2",
+      "type": "Theory",
+      "question": "What is the consequence of declaring a virtual function with '= 0' inside a class definition?",
+      "options": {
+        "A": "The class can only contain static methods.",
+        "B": "The class cannot be used as a base class.",
+        "C": "The function gets evaluated during precompilation phase to optimize speed.",
+        "D": "The class becomes abstract and cannot be instantiated directly on stack or heap."
+      },
+      "answer": "D",
+      "explanation": "The '= 0' indicates a pure virtual function, turning the enclosing class into an abstract class which cannot be directly instantiated."
+    },
+    {
+      "id": "MCQ3",
+      "type": "Output Prediction",
+      "question": "What is the expected output of executing this code?\n\n```cpp\n#include <iostream>\nclass Counter {\nprivate:\n    int val{10};\npublic:\n    int get_val() const { return val; }\n    void increment() { val += 5; }\n};\nint main() {\n    const Counter c;\n    // c.increment(); (commented out)\n    std::cout << c.get_val();\n}\n```",
+      "options": {
+        "A": "0",
+        "B": "10",
+        "C": "15",
+        "D": "Compilation Error because Counter object is const"
+      },
+      "answer": "B",
+      "explanation": "The Counter object is instantiated as const, which is legal. Since we called 'get_val()' which is const-qualified, it executes and prints the initial value 10."
+    },
+    {
+      "id": "MCQ4",
+      "type": "Output Prediction",
+      "question": "What will be printed when the following program is run?\n\n```cpp\n#include <iostream>\nclass Base {\npublic:\n    virtual void show() { std::cout << \"Base\"; }\n};\nclass Derived : public Base {\npublic:\n    void show() override { std::cout << \"Derived\"; }\n};\nint main() {\n    Derived d;\n    Base b = d;\n    b.show();\n}\n```",
+      "options": {
+        "A": "Derived",
+        "B": "Base",
+        "C": "Compilation Error",
+        "D": "Undefined behavior"
+      },
+      "answer": "B",
+      "explanation": "Assigning 'd' to 'Base b' causes object slicing. The 'Derived' object state is truncated to fit into a plain 'Base' object on the stack, and virtual dispatch is lost, resulting in outputting 'Base'."
+    },
+    {
+      "id": "MCQ5",
+      "type": "Output Prediction",
+      "question": "Given this hierarchy, predict the output:\n\n```cpp\n#include <iostream>\nclass Parent {\npublic:\n    virtual void message() { std::cout << \"P\"; }\n};\nclass Child : public Parent {\npublic:\n    void message() override { std::cout << \"C\"; }\n};\nint main() {\n    Parent* ptr = new Child();\n    ptr->message();\n    delete ptr;\n}\n```",
+      "options": {
+        "A": "P",
+        "B": "C",
+        "C": "PC",
+        "D": "CP"
+      },
+      "answer": "B",
+      "explanation": "Since 'ptr' is a base class pointer pointing to a derived class object, the runtime uses the vtable to dynamically dispatch the call to Child's overridden message method, outputting 'C'."
+    },
+    {
+      "id": "MCQ6",
+      "type": "Find the Bug",
+      "question": "Find the bug in this abstract class definition:\n\n```cpp\nclass IEngine {\npublic:\n    IEngine() = default;\n    virtual void start() = 0;\n    void stop() = 0;\n};\n```",
+      "options": {
+        "A": "IEngine constructor cannot be defaulted.",
+        "B": "A class cannot mix pure and non-pure virtual interfaces.",
+        "C": "The 'stop' function is declared pure virtual but does not have the 'virtual' keyword.",
+        "D": "Destructors cannot be virtual when base constructors are explicit."
+      },
+      "answer": "C",
+      "explanation": "Only functions explicitly declared with the 'virtual' keyword can be marked as pure virtual. The compiler will complain that a non-virtual function cannot be initialized with '= 0'."
+    },
+    {
+      "id": "MCQ7",
+      "type": "Find the Bug",
+      "question": "What security/design risk does the following getter method present?\n\n```cpp\nclass UserProfile {\nprivate:\n    std::vector<int> private_keys{101, 202, 303};\npublic:\n    std::vector<int>& get_keys() { return private_keys; }\n};\n```",
+      "options": {
+        "A": "The vector cannot be copied out of class bounds.",
+        "B": "The return type lacks const-qualification, allowing external callers to directly modify the private vector without validation.",
+        "C": "It leaks memory from heap allocations.",
+        "D": "Passing vector types from classes violates scope structures."
+      },
+      "answer": "B",
+      "explanation": "Returning a non-const reference 'std::vector<int>&' allows external code to mutate private data directly (e.g., 'profile.get_keys().clear()'), violating encapsulation principles."
+    },
+    {
+      "id": "MCQ8",
+      "type": "Complete the Code",
+      "question": "Which keywords are missing in the blank spots to ensure complete virtual polymorphism?\n\n```cpp\nclass Vehicle {\npublic:\n    virtual ~Vehicle() = default;\n    virtual void run() = 0;\n};\nclass Car : public Vehicle {\npublic:\n    void run() _________ {\n        std::cout << \"Driving\";\n    }\n};\n```",
+      "options": {
+        "A": "final",
+        "B": "override",
+        "C": "virtual",
+        "D": "explicit"
+      },
+      "answer": "B",
+      "explanation": "Using 'override' specifies to the compiler that the function is an implementation of a virtual method from the parent class, catching potential typo errors."
+    },
+    {
+      "id": "MCQ9",
+      "type": "Complete the Code",
+      "question": "Complete the abstract constructor structure for initial setting of database paths:\n\n```cpp\nclass IDatabase {\nprotected:\n    std::string db_path;\npublic:\n    IDatabase(std::string path) : ____________(std::move(path)) {}\n    virtual ~IDatabase() = default;\n};\n```",
+      "options": {
+        "A": "db_path",
+        "B": "std::string",
+        "C": "path",
+        "D": "virtual"
+      },
+      "answer": "A",
+      "explanation": "The constructor uses the member initializer list to initialize the protected variable 'db_path' using the parameter 'path' passed to it during derivation setup."
+    },
+    {
+      "id": "MCQ10",
+      "type": "Best Approach",
+      "question": "When designing dynamic systems in C++ involving polymorphism, what is the best approach for managing the deletion of objects via pointers to interface classes?",
+      "options": {
+        "A": "Using manual global delete expressions and casting interfaces to raw subclasses.",
+        "B": "Declaring a non-virtual destructor in the interface to save space inside the vtable.",
+        "C": "Using 'std::unique_ptr' or 'std::shared_ptr' combined with declaring a virtual destructor in the base interface class.",
+        "D": "Relying on garbage collection processes since modern compilers resolve polymorphic structures automatically."
+      },
+      "answer": "C",
+      "explanation": "Smart pointers automate heap resource lifecycles, and a virtual base class destructor ensures that subclass-specific resources are safely cleaned up when deleted through base pointers."
+    }
+  ]
+}

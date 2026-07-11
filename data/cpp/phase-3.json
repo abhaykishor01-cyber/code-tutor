@@ -1,0 +1,400 @@
+{
+  "phase_metadata": {
+    "phase_number": 3,
+    "title": "Constructors & Destructors",
+    "description": "Mastering the lifecycle of C++ objects, modern resource acquisition (RAII), constructor delegation, overloading, deep copying, and deterministic resource release."
+  },
+  "learning_objectives": [
+    "Understand the complete lifetime of a C++ class instance from memory allocation to destruction.",
+    "Master the differences between Default, Parameterized, and Copy Constructors.",
+    "Properly implement Constructor Member Initialization Lists to prevent double-initialization and enable const/reference fields.",
+    "Resolve resource management bugs by implementing custom Copy Constructors and Destructors (Rule of Three).",
+    "Prevent memory leaks and dangling pointers using deterministic Destructor execution.",
+    "Leverage Modern C++ techniques such as constructor delegation and defaulted/deleted constructors."
+  ],
+  "prerequisites": [
+    "Phase 2: Fundamental Classes & Objects",
+    "Understanding of raw pointers and memory address concepts",
+    "Basic control structures and C++ syntax"
+  ],
+  "introduction": "In C++, object lifetime is absolute and deterministic. Unlike languages with garbage collection, C++ gives developers precise control over when an object is initialized and when its resources are freed. This deterministic model is governed by Constructors and Destructors. Together, they form the bedrock of C++ resource management, enabling a robust paradigm known as Resource Acquisition Is Initialization (RAII). This module will guide you from the foundational concepts of object creation to the advanced techniques of modern resource safety.",
+  "concept_explanation": "When a C++ object is declared, the system reserves memory for it, but the state of that memory is initially raw and uninitialized. A Constructor is a special member function automatically called by the runtime to set up this raw memory into a valid state. Conversely, when an object goes out of scope or is explicitly deleted, a Destructor is called to clean up any resources the object held. Constructors can be overloaded to support different initialization methods. The Copy Constructor guarantees that when one object is duplicated from another, resources are copied correctly (often requiring deep copies for dynamically allocated heap memory). A critical element of efficient constructor writing is the Member Initialization List. Instead of assigning values inside the constructor body, modern C++ prefers initialization lists because they construct variables directly in place, preventing unnecessary default constructor calls and allowing initialization of const or reference members.",
+  "syntax": "class ClassName {\nprivate:\n    const int m_id;\n    int* m_data;\npublic:\n    // 1. Default Constructor\n    ClassName() : m_id(0), m_data(nullptr) {}\n\n    // 2. Parameterized Constructor with Member Initialization List\n    ClassName(int id, int value) : m_id(id), m_data(new int(value)) {}\n\n    // 3. Constructor Delegation\n    ClassName(int id) : ClassName(id, -1) {}\n\n    // 4. Copy Constructor (Deep Copy)\n    ClassName(const ClassName& other) : m_id(other.m_id), m_data(other.m_data ? new int(*other.m_data) : nullptr) {}\n\n    // 5. Destructor\n    ~ClassName() {\n        delete m_data;\n    }\n};",
+  "syntax_breakdown": [
+    {
+      "element": "ClassName() : m_id(0), m_data(nullptr) {}",
+      "explanation": "Default Constructor. It initializes the class members to safe default values. Note that because m_id is const, it MUST be initialized here via the member initialization list."
+    },
+    {
+      "element": ": m_id(id), m_data(new int(value))",
+      "explanation": "The Member Initialization List. Indicated by a colon following the constructor signature. It initializes members directly with arguments before the constructor body (brackets) executes."
+    },
+    {
+      "element": "ClassName(int id) : ClassName(id, -1) {}",
+      "explanation": "Constructor Delegation. Introduces a way for one constructor to call another constructor of the same class, minimizing code duplication."
+    },
+    {
+      "element": "ClassName(const ClassName& other)",
+      "explanation": "The Copy Constructor. It takes a constant reference to another object of the same type. This is crucial for avoiding shallow copy bugs when classes manage raw heap resources."
+    },
+    {
+      "element": "~ClassName()",
+      "explanation": "The Destructor. Identified by a tilde (~) prefix. It takes no parameters, returns nothing, and is automatically triggered to free allocated resources when the object's lifespan ends."
+    }
+  ],
+  "rules_and_key_points": [
+    "Constructors have the exact same name as the class and do not specify any return type, not even void.",
+    "If you declare any custom constructor (parameterized or copy), the compiler will NOT generate a default constructor for you automatically unless you explicitly request it with '= default;'.",
+    "Member variables are always initialized in the order of their declaration within the class header file, NOT the order they appear in the member initialization list.",
+    "A destructor must never throw an exception. Throwing from a destructor during stack unwinding will immediately terminate the program via std::terminate.",
+    "The Rule of Three: If your class requires a custom Destructor, Copy Constructor, or Copy Assignment Operator, it almost certainly requires all three."
+  ],
+  "code_example_1_basic": {
+    "title": "Basic Class Lifecycle Logger",
+    "code": "#include <iostream>\n#include <string>\n\nclass Tracker {\nprivate:\n    std::string m_label;\npublic:\n    // Default Constructor\n    Tracker() : m_label(\"Default\") {\n        std::cout << \"[Default Constructor] Created: \" << m_label << \"\\n\";\n    }\n\n    // Parameterized Constructor\n    Tracker(std::string label) : m_label(std::move(label)) {\n        std::cout << \"[Parameterized Constructor] Created: \" << m_label << \"\\n\";\n    }\n\n    // Copy Constructor\n    Tracker(const Tracker& other) : m_label(other.m_label + \" (Copy)\") {\n        std::cout << \"[Copy Constructor] Cloned: \" << m_label << \"\\n\";\n    }\n\n    // Destructor\n    ~Tracker() {\n        std::cout << \"[Destructor] Destroyed: \" << m_label << \"\\n\";\n    }\n};\n\nint main() {\n    std::cout << \"-- Scope Entry --\\n\";\n    Tracker t1;\n    Tracker t2(\"Custom\");\n    Tracker t3 = t2; // Calls Copy Constructor\n    std::cout << \"-- Scope Exit Looming --\\n\";\n    return 0;\n}",
+    "explanation": "This basic example shows exactly when constructors and destructors trigger during a typical execution flow. Object t3 is copy-constructed directly from t2. Notice that objects are destroyed in the exact reverse order of their construction (t3, then t2, then t1).",
+    "expected_output": "-- Scope Entry --\n[Default Constructor] Created: Default\n[Parameterized Constructor] Created: Custom\n[Copy Constructor] Cloned: Custom (Copy)\n-- Scope Exit Looming --\n[Destructor] Destroyed: Custom (Copy)\n[Destructor] Destroyed: Custom\n[Destructor] Destroyed: Default\n",
+    "dry_run": [
+      {
+        "line": "Tracker t1;",
+        "description": "Allocates local space on the stack for Tracker t1. Triggers the Default Constructor. m_label is initialized to \"Default\", and the message is printed."
+      },
+      {
+        "line": "Tracker t2(\"Custom\");",
+        "description": "Allocates space for Tracker t2. Triggers Parameterized Constructor. m_label is initialized to \"Custom\", and the message is printed."
+      },
+      {
+        "line": "Tracker t3 = t2;",
+        "description": "Allocates space for Tracker t3. Since t3 is initialized using an existing Tracker (t2), the Copy Constructor is called. m_label is set to \"Custom (Copy)\"."
+      },
+      {
+        "line": "return 0;",
+        "description": "Main function scope closes. The stack frames of local variables are popped in reverse order: t3 is destroyed first, then t2, and finally t1."
+      }
+    ]
+  },
+  "code_example_2_practical": {
+    "title": "RAII Dynamic Integer Array (Deep Copy Implementation)",
+    "code": "#include <iostream>\n#include <algorithm>\n\nclass DynamicBuffer {\nprivate:\n    size_t m_size;\n    int* m_data;\npublic:\n    // Default Constructor\n    DynamicBuffer() : m_size(0), m_data(nullptr) {\n        std::cout << \"Constructed empty buffer.\\n\";\n    }\n\n    // Parameterized Constructor (Acquires heap memory)\n    DynamicBuffer(size_t size) : m_size(size), m_data(size > 0 ? new int[size]{} : nullptr) {\n        std::cout << \"Constructed buffer of size \" << m_size << \".\\n\";\n    }\n\n    // Copy Constructor (Deep Copy logic to prevent memory sharing)\n    DynamicBuffer(const DynamicBuffer& other) : m_size(other.m_size), m_data(other.m_size > 0 ? new int[other.m_size] : nullptr) {\n        if (m_data) {\n            std::copy(other.m_data, other.m_data + m_size, m_data);\n        }\n        std::cout << \"Deep-copied buffer of size \" << m_size << \".\\n\";\n    }\n\n    // Destructor (Ensures dynamic memory is cleaned up correctly)\n    ~DynamicBuffer() {\n        delete[] m_data;\n        std::cout << \"Destroyed buffer of size \" << m_size << \" and freed allocated memory.\\n\";\n    }\n\n    void setValue(size_t index, int value) {\n        if (index < m_size) {\n            m_data[index] = value;\n        }\n    }\n\n    void print() const {\n        std::cout << \"Buffer contents: \";\n        for (size_t i = 0; i < m_size; ++i) {\n            std::cout << m_data[i] << \" \";\n        }\n        std::cout << \"\\n\";\n    }\n};\n\nint main() {\n    std::cout << \"Creating original buffer...\\n\";\n    DynamicBuffer original(3);\n    original.setValue(0, 10);\n    original.setValue(1, 20);\n    original.setValue(2, 30);\n\n    std::cout << \"Creating copy of buffer...\\n\";\n    DynamicBuffer clone = original; // Triggers Deep Copy\n\n    std::cout << \"Modifying copy...\\n\";\n    clone.setValue(0, 99);\n\n    std::cout << \"Original \";\n    original.print();\n    std::cout << \"Copy \";\n    clone.print();\n\n    std::cout << \"Exiting application main...\\n\";\n    return 0;\n}",
+    "explanation": "This shows a production-grade RAII object representing dynamic arrays. Without the custom copy constructor, copying 'original' to 'clone' would copy only the raw 'm_data' address (shallow copy). Modifying the clone would modify the original, and exiting scope would trigger a double-free crash. Deep copying ensures isolated data storage.",
+    "expected_output": "Creating original buffer...\nConstructed buffer of size 3.\nCreating copy of buffer...\nDeep-copied buffer of size 3.\nModifying copy...\nOriginal Buffer contents: 10 20 30 \nCopy Buffer contents: 99 20 30 \nExiting application main...\nDestroyed buffer of size 3 and freed allocated memory.\nDestroyed buffer of size 3 and freed allocated memory.\n",
+    "dry_run": [
+      {
+        "line": "DynamicBuffer original(3);",
+        "description": "Constructs original on Stack. m_size is set to 3. New integer array of size 3 is allocated on Heap (e.g. 0x55d7f341a2a0). Values are value-initialized to 0."
+      },
+      {
+        "line": "original.setValue(...);",
+        "description": "Sets elements in Heap memory at 0x55d7f341a2a0 to: [0]: 10, [1]: 20, [2]: 30."
+      },
+      {
+        "line": "DynamicBuffer clone = original;",
+        "description": "Calls Copy Constructor. Allocates a fresh array of size 3 on Heap (e.g. 0x55d7f341a2f0). Elements are copied one-by-one from original's heap array to clone's heap array."
+      },
+      {
+        "line": "clone.setValue(0, 99);",
+        "description": "Modifies the cloned array's first index in its separate heap allocation (0x55d7f341a2f0). Original remains totally untouched."
+      },
+      {
+        "line": "return 0;",
+        "description": "Destruction phase triggers. clone is destroyed first; delete[] frees 0x55d7f341a2f0. original is destroyed next; delete[] frees 0x55d7f341a2a0. No leaks, no double-free errors."
+      }
+    ]
+  },
+  "memory_visualization": {
+    "type": "Stack and Heap Layout Map",
+    "description": "Visualizing execution memory during Code Example 2 at the point right before main returns.",
+    "entities": [
+      {
+        "name": "original",
+        "address": "0x7ffee3b4a200",
+        "value": "[m_size: 3, m_data: 0x55d7f341a2a0]",
+        "segment": "Stack"
+      },
+      {
+        "name": "clone",
+        "address": "0x7ffee3b4a218",
+        "value": "[m_size: 3, m_data: 0x55d7f341a2f0]",
+        "segment": "Stack"
+      },
+      {
+        "name": "original Heap Array",
+        "address": "0x55d7f341a2a0",
+        "value": "[10, 20, 30]",
+        "segment": "Heap"
+      },
+      {
+        "name": "clone Heap Array",
+        "address": "0x55d7f341a2f0",
+        "value": "[99, 20, 30]",
+        "segment": "Heap"
+      }
+    ]
+  },
+  "real_world_use_cases": [
+    {
+      "scenario": "Network Connection Sockets",
+      "description": "A socket descriptor class opens a connection in its parameterized constructor and automatically closes that connection safely in its destructor when the handler object goes out of scope."
+    },
+    {
+      "scenario": "Dynamic String Classes",
+      "description": "Standard library containers like std::string or custom game engine strings use copy constructors to perform deep-copy management of memory, ensuring dynamic characters are cloned reliably."
+    },
+    {
+      "scenario": "Thread and Lock Synchronization",
+      "description": "Classes like std::lock_guard use the constructor to acquire a lock (mutex lock) and their destructor to automatically release the lock, ensuring deadlocks can never occur if functions exit prematurely."
+    }
+  ],
+  "common_mistakes": [
+    {
+      "mistake": "Unintentional Shallow Copying causing Double-Frees",
+      "explanation": "If you do not define a copy constructor for classes managing heap memory, the compiler generates a default shallow-copy version. Both objects point to the same memory. When both exit scope, both try to call 'delete' on the same pointer.",
+      "fix": "Implement a proper copy constructor that allocates independent heap memory and copies data contents over explicitly (Deep Copy)."
+    },
+    {
+      "mistake": "Assignment in Constructor Body instead of Member Initialization List",
+      "explanation": "Assigning values inside the constructor brackets (e.g. m_val = val;) is actually a double operation: default-constructing m_val first, then calling its assignment operator. It also fails compile-time constraints for const or reference members.",
+      "fix": "Use member initialization syntax: ClassName(Type val) : m_val(val) {}"
+    },
+    {
+      "mistake": "Incorrect Order of Member Initialization List",
+      "explanation": "Writing member variables in the initialization list in a different order than their class declaration. Because the compiler processes initialization by class header order, this can create undefined values if one variable relies on another.",
+      "fix": "Always order member variables in the initialization list to match their exact sequence of declaration inside the class header."
+    }
+  ],
+  "best_practices": [
+    "Always prefer member initialization lists over assignment statements inside constructor bodies.",
+    "Follow the Rule of Three/Five: If you need to manage raw allocations, implement destructors, copy-constructors, copy-assignments, or use RAII containers like std::unique_ptr to avoid writing them entirely (Rule of Zero).",
+    "Mark single-argument constructors with the 'explicit' keyword to prevent accidental, expensive implicit conversions.",
+    "Never call virtual functions from inside a constructor or destructor, as the dynamic type of the object is not fully formed or already torn down.",
+    "Declare destructors as 'noexcept' implicitly or explicitly to ensure complete safety during stack-unwinding exceptions."
+  ],
+  "frequently_asked_questions": [
+    {
+      "question": "Why can't we declare a Destructor with parameters?",
+      "answer": "Destructors are called automatically by the runtime when objects go out of scope or are deleted. Since the programmer is not calling them manually, there is no way to pass arguments to them. Thus, destructors can never have parameters or return values."
+    },
+    {
+      "question": "What is Constructor Delegation and when should we use it?",
+      "answer": "Constructor Delegation is a technique where one constructor calls another constructor from the same class within its initialization list. It is used to consolidate common initialization logic, reducing code duplication and maintenance costs."
+    },
+    {
+      "question": "What is the difference between copy constructor and copy assignment operator?",
+      "answer": "A copy constructor is used when a brand new object is being constructed as a copy of an existing one (e.g. MyClass a = b;). The copy assignment operator is used when both objects already exist and you want to replace the data of one with the other (e.g. a = b;)."
+    }
+  ],
+  "summary": "In this phase, we explored C++ Constructors and Destructors, demystifying object lifespans, resource acquisition, and deallocation. We highlighted the critical differences between deep copies and shallow copies, and why utilizing member initialization lists is non-negotiable in production-level modern C++ development.",
+  "key_takeaways": [
+    "Constructors turn raw memory into organized objects; Destructors clean up allocated assets automatically.",
+    "Member initialization lists are faster, bypass double-initialization overhead, and allow initializing const and references.",
+    "Failing to handle copies of dynamic resources causes dangerous double-free vulnerabilities and memory leaks.",
+    "Objects are dismantled in the exact reverse order of their creation."
+  ],
+  "preview_next_topic": "Next, we will venture into Phase 4: Compile-Time & Runtime Polymorphism, exploring inheritance, virtual tables, dynamic dispatch, and interface design principles.",
+  "questions": [
+    {
+      "id": "Q1",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Initialization vs Assignment",
+      "question": "Why is it mathematically and performance-wise better to initialize class member variables using the member initialization list rather than assigning them inside the constructor's curly braces?",
+      "hint": "Think about the lifecycle of a class member before the constructor body code begins running.",
+      "answer": "When using the constructor body for assignment, the member variables are first default-constructed by the system. Then, their assignment operators are invoked to overwrite that initial default state, resulting in a duplicate operations overhead. In contrast, member initialization lists construct the members in-place directly with the arguments supplied, resulting in a single step of initialization. Furthermore, const variables and reference types cannot be re-assigned, making initialization lists strictly mandatory for classes containing them."
+    },
+    {
+      "id": "Q2",
+      "difficulty": "Easy",
+      "type": "Concept",
+      "title": "Implicit vs Explicit Constructors",
+      "question": "What is the purpose of the C++ 'explicit' keyword when prefixing a constructor, and what kind of runtime bugs does it prevent?",
+      "hint": "Consider a class possessing a constructor with a single parameter (e.g. MyString(int size)).",
+      "answer": "In C++, any constructor taking a single parameter acts as an implicit converter from the parameter's type to the class type. For example, if you have a function taking a 'MyString' object, and a constructor 'MyString(int size)', passing the number 42 to that function will cause C++ to silently construct a MyString of size 42. Prefixing the constructor with the keyword 'explicit' disables this implicit conversion behavior, forcing developers to construct objects explicitly (e.g. MyString(42)) and avoiding silent performance degradation or nonsensical argument coercion."
+    },
+    {
+      "id": "Q3",
+      "difficulty": "Easy-Medium",
+      "type": "Common mistake debug",
+      "title": "The Missing Initialization Bug",
+      "question": "Review the code below. Explain why this class will cause a compiler error and how to fix it.\n\nclass Config {\nprivate:\n    const int m_id;\n    double& m_systemRef;\npublic:\n    Config(int id, double& ref) {\n        m_id = id;\n        m_systemRef = ref;\n    }\n};",
+      "hint": "Check the types of class member variables and look closely at where they are assigned.",
+      "answer": "The compiler will fail because 'm_id' is constant (const) and 'm_systemRef' is a reference. In C++, both const and references are immutable and MUST be bound/initialized during construction. They cannot be initialized inside the body of the constructor using assignment operators. The fix is to use the Member Initialization List:\n\nConfig(int id, double& ref) : m_id(id), m_systemRef(ref) {}"
+    },
+    {
+      "id": "Q4",
+      "difficulty": "Medium",
+      "type": "Practical usage coding",
+      "title": "Developing a Basic RAII File Handle",
+      "question": "Write a C++ class named 'FileHandler' that takes a file name (std::string) in its parameterized constructor, opens it using std::ofstream, and guarantees the file is safely closed when the handler is destroyed. Prevent object copying.",
+      "hint": "To prevent copying, mark the Copy Constructor as '= delete;' and include <fstream>.",
+      "answer": "#include <fstream>\n#include <string>\n\nclass FileHandler {\nprivate:\n    std::ofstream m_file;\npublic:\n    FileHandler(const std::string& filename) : m_file(filename) {}\n    \n    ~FileHandler() {\n        if (m_file.is_open()) {\n            m_file.close();\n        }\n    }\n\n    // Prevent copying\n    FileHandler(const FileHandler&) = delete;\n    FileHandler& operator=(const FileHandler&) = delete;\n\n    void write(const std::string& text) {\n        if (m_file.is_open()) {\n            m_file << text;\n        }\n    }\n};"
+    },
+    {
+      "id": "Q5",
+      "difficulty": "Medium",
+      "type": "Practical usage coding",
+      "title": "Constructing with Delegation",
+      "question": "Write a C++ class named 'Point3D' representing coordinates (x, y, z). Implement a default constructor that initializes all values to 0 by delegating to a parameterized constructor taking three floats. Also implement a two-parameter constructor that delegates to the three-parameter constructor (setting z to 0.0f).",
+      "hint": "Delegating constructors are invoked in the initialization list using the class name itself, like ': Point3D(val1, val2, val3)'.",
+      "answer": "class Point3D {\nprivate:\n    float m_x, m_y, m_z;\npublic:\n    // Target Parameterized Constructor\n    Point3D(float x, float y, float z) : m_x(x), m_y(y), m_z(z) {}\n\n    // 2-Parameter Delegating Constructor\n    Point3D(float x, float y) : Point3D(x, y, 0.0f) {}\n\n    // Default Delegating Constructor\n    Point3D() : Point3D(0.0f, 0.0f, 0.0f) {}\n};"
+    },
+    {
+      "id": "Q6",
+      "difficulty": "Medium-Hard",
+      "type": "Common mistake debug",
+      "title": "Undefined Execution Order",
+      "question": "Explain the critical bug in the constructor sequence below. What value will 'm_bufferSize' contain, and why?\n\nclass DataStream {\nprivate:\n    size_t m_bufferSize;\n    int* m_buffer;\npublic:\n    DataStream(size_t limit) : m_buffer(new int[limit]), m_bufferSize(limit) {}\n};",
+      "hint": "Look closely at the declaration order of member variables in the private section versus their order in the initialization list.",
+      "answer": "In C++, the member variables are always initialized in the order of their declaration in the class header, NOT the order written in the member initialization list. In this class, 'm_bufferSize' is declared before 'm_buffer'. Therefore, 'm_bufferSize' is initialized first. However, the initialization code reads: 'm_buffer(new int[limit]), m_bufferSize(limit)'. If the list attempted to use 'm_bufferSize' to allocate 'm_buffer', it would cause a crash because 'm_bufferSize' is initialized second. While this specific example assigns both to 'limit' directly and won't crash instantly, it represents a highly fragile design. If 'm_buffer' had been initialized as 'new int[m_bufferSize]', it would have allocated memory using garbage data because 'm_bufferSize' was not yet assigned! Ensure list order always matches declaration order."
+    },
+    {
+      "id": "Q7",
+      "difficulty": "Hard",
+      "type": "Coding/application",
+      "title": "Implementing Deep Copy Protection",
+      "question": "Implement a C++ class named 'SimpleString' that stores a C-style string dynamically on the heap. Write a default constructor, a parameterized constructor that takes 'const char*', a copy constructor that performs a deep copy, and a destructor to release the string memory.",
+      "hint": "Use standard C-string functions like strlen and strcpy (or std::copy) to manage the memory allocations cleanly.",
+      "answer": "#include <cstring>\n#include <algorithm>\n\nclass SimpleString {\nprivate:\n    char* m_str;\npublic:\n    SimpleString() : m_str(nullptr) {\n        m_str = new char[1];\n        m_str[0] = '\\0';\n    }\n\n    SimpleString(const char* s) {\n        if (s) {\n            m_str = new char[std::strlen(s) + 1];\n            std::strcpy(m_str, s);\n        } else {\n            m_str = new char[1];\n            m_str[0] = '\\0';\n        }\n    }\n\n    // Deep Copy Constructor\n    SimpleString(const SimpleString& other) {\n        m_str = new char[std::strlen(other.m_str) + 1];\n        std::strcpy(m_str, other.m_str);\n    }\n\n    ~SimpleString() {\n        delete[] m_str;\n    }\n\n    const char* c_str() const { return m_str; }\n};"
+    },
+    {
+      "id": "Q8",
+      "difficulty": "Challenge",
+      "type": "Coding/application",
+      "title": "Self-Cleaning Shared Counter Simulation",
+      "question": "Write a C++ class 'SharedResource' mimicking reference counting. It should allocate an integer counter on the heap shared between all copies. The parameterized constructor sets its value and initializes reference count to 1. Each copy construction increments the reference count. The destructor decrements the count and deletes the shared integer resource only when the count reaches 0. Avoid using std::shared_ptr for this exercise.",
+      "hint": "You will need to maintain two pointers: one pointing to the actual int value, and one pointing to a tracking block (an int* acting as the ref counter) on the heap.",
+      "answer": "#include <iostream>\n\nclass SharedResource {\nprivate:\n    int* m_value;\n    int* m_refCount;\npublic:\n    SharedResource(int val) : m_value(new int(val)), m_refCount(new int(1)) {}\n\n    // Copy Constructor increments tracking counters\n    SharedResource(const SharedResource& other) : m_value(other.m_value), m_refCount(other.m_refCount) {\n        if (m_refCount) {\n            (*m_refCount)++;\n        }\n    }\n\n    ~SharedResource() {\n        if (m_refCount) {\n            (*m_refCount)--;\n            if (*m_refCount == 0) {\n                delete m_value;\n                delete m_refCount;\n                std::cout << \"Resources freed permanently.\\n\";\n            }\n        }\n    }\n\n    int getValue() const { return *m_value; }\n    int getRefCount() const { return *m_refCount; }\n};"
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "MCQ1",
+      "type": "Theory",
+      "question": "If you define a custom constructor taking one or more parameters for a class, which of the following statements is true regarding the default constructor?",
+      "options": {
+        "A": "The compiler will still automatically generate a default constructor for you.",
+        "B": "The compiler will not generate a default constructor automatically; you must define it manually if you need one.",
+        "C": "The program will fail to compile unless you immediately provide a destructor.",
+        "D": "The compiler will generate a default constructor only if all member variables are declared as references."
+      },
+      "answer": "B",
+      "explanation": "Declaring any custom constructor instructs the compiler that you want custom control over how instances of your class are instantiated. Therefore, the automatic generation of the implicit default constructor is suppressed."
+    },
+    {
+      "id": "MCQ2",
+      "type": "Theory",
+      "question": "Why must reference parameters and const fields in a class be initialized via the Member Initialization List?",
+      "options": {
+        "A": "Because they are stored on the heap segment instead of the stack segment.",
+        "B": "Because they cannot be reassigned after they are constructed; they must be bound at the moment of creation.",
+        "C": "Because the compiler cannot verify their sizes inside the destructor.",
+        "D": "Because initializing them inside the constructor body causes a stack overflow error."
+      },
+      "answer": "B",
+      "explanation": "Both 'const' variables and reference types must be initialized at the point of creation because they are legally immutable thereafter. They cannot be assigned values inside the constructor's curly braces."
+    },
+    {
+      "id": "MCQ3",
+      "type": "Output Prediction",
+      "question": "Consider the following code:\n\n#include <iostream>\nstruct Item {\n    Item() { std::cout << \"1\"; }\n    Item(int x) { std::cout << \"2\"; }\n};\nint main() {\n    Item items[3];\n}",
+      "options": {
+        "A": "111",
+        "B": "222",
+        "C": "123",
+        "D": "Does not compile"
+      },
+      "answer": "A",
+      "explanation": "Declaring a native array of objects (items[3]) without explicit initialization will trigger the default constructor once for each of the array's elements. Thus, '1' is printed three times."
+    },
+    {
+      "id": "MCQ4",
+      "type": "Output Prediction",
+      "question": "What is the output of the following C++ program?\n\n#include <iostream>\nclass Base {\npublic:\n    Base() { std::cout << \"A\"; }\n    ~Base() { std::cout << \"B\"; }\n};\nvoid run() {\n    Base obj;\n}\nint main() {\n    run();\n    std::cout << \"C\";\n}",
+      "options": {
+        "A": "ACB",
+        "B": "ABC",
+        "C": "CAB",
+        "D": "BCA"
+      },
+      "answer": "B",
+      "explanation": "When run() is called, 'obj' is constructed, printing 'A'. Before run() returns, 'obj' falls out of scope, invoking its destructor and printing 'B'. Finally, execution returns to main, printing 'C'. The complete output is 'ABC'."
+    },
+    {
+      "id": "MCQ5",
+      "type": "Output Prediction",
+      "question": "What does the following snippet print?\n\n#include <iostream>\nstruct Probe {\n    Probe() { std::cout << \"D\"; }\n    Probe(const Probe&) { std::cout << \"C\"; }\n};\nint main() {\n    Probe p1;\n    Probe p2 = p1;\n}",
+      "options": {
+        "A": "DD",
+        "B": "CC",
+        "C": "DC",
+        "D": "CD"
+      },
+      "answer": "C",
+      "explanation": "p1 is created using the default constructor, which prints 'D'. p2 is initialized as a copy of p1, which triggers the Copy Constructor and prints 'C'. Together they output 'DC'."
+    },
+    {
+      "id": "MCQ6",
+      "type": "Find the Bug",
+      "question": "Identify the critical issue in this constructor initialization logic:\n\nclass Sound {\nprivate:\n    int* m_buffer;\npublic:\n    Sound() : m_buffer(new int[100]) {}\n    ~Sound() { delete m_buffer; }\n};",
+      "options": {
+        "A": "The constructor fails to initialize the pointer.",
+        "B": "The destructor uses 'delete' instead of 'delete[]' to release memory allocated with 'new[]'.",
+        "C": "The constructor has a memory leak because it does not assign values in curly braces.",
+        "D": "Sound should have no destructor whatsoever."
+      },
+      "answer": "B",
+      "explanation": "Memory allocated using 'new[]' must be deallocated using 'delete[]'. Using single-object 'delete' on a heap-allocated array leads to undefined behavior, memory corruption, or runtime crashes."
+    },
+    {
+      "id": "MCQ7",
+      "type": "Find the Bug",
+      "question": "Why does the code below fail to compile?\n\nclass Lock {\nprivate:\n    const int m_key;\npublic:\n    Lock(int key) {\n        m_key = key;\n    }\n};",
+      "options": {
+        "A": "Lock constructors must be defined outside the class.",
+        "B": "m_key is marked as 'const' and cannot be assigned a value inside the constructor body.",
+        "C": "We must specify 'public' for class fields.",
+        "D": "Int types cannot be const inside a class."
+      },
+      "answer": "B",
+      "explanation": "Constant members must be initialized directly inside the constructor initialization list before the constructor body code runs. They are immutable and cannot be assigned to inside the body."
+    },
+    {
+      "id": "MCQ8",
+      "type": "Complete the Code",
+      "question": "Fill in the blank below to properly implement a deep-copying constructor:\n\nclass Box {\nprivate:\n    int* m_val;\npublic:\n    Box(int v) : m_val(new int(v)) {}\n    Box(const Box& other) : _________________ {\n    }\n    ~Box() { delete m_val; }\n};",
+      "options": {
+        "A": "m_val(other.m_val)",
+        "B": "m_val(new int(*other.m_val))",
+        "C": "m_val(&other.m_val)",
+        "D": "m_val(other.m_val ? other.m_val : nullptr)"
+      },
+      "answer": "B",
+      "explanation": "'m_val(new int(*other.m_val))' allocates a fresh integer on the heap, extracts the value pointed to by the other object (*other.m_val), and initializes the new heap slot with that value. This is a robust deep copy."
+    },
+    {
+      "id": "MCQ9",
+      "type": "Complete the Code",
+      "question": "What syntax completes the delegation constructor for class Client?\n\nclass Client {\nprivate:\n    std::string m_name;\npublic:\n    Client(std::string name) : m_name(std::move(name)) {}\n    Client() : ____________________ {}\n};",
+      "options": {
+        "A": "Client(std::string(\"Guest\"))",
+        "B": "Client(\"Guest\")",
+        "C": "this->Client(\"Guest\")",
+        "D": "m_name(\"Guest\")"
+      },
+      "answer": "B",
+      "explanation": "Constructor delegation utilizes class-initializer syntax directly in the member list: ': Client(\"Guest\")'. This calls the parameterized constructor of the same class."
+    },
+    {
+      "id": "MCQ10",
+      "type": "Best Approach",
+      "question": "When designing high-performance modern C++ applications, what is the recommended way to handle simple resource ownership (such as a dynamic pointer) inside user-defined classes?",
+      "options": {
+        "A": "Always manage resources manually using raw pointers, raw 'new', and raw 'delete' operators.",
+        "B": "Use standard library RAII wrappers like std::unique_ptr or std::vector instead of raw pointers to automatically manage lifetimes without custom destructors.",
+        "C": "Avoid writing destructors completely and let the program leak memory to maximize CPU performance.",
+        "D": "Declare all objects as global pointers to prevent stack execution costs."
+      },
+      "answer": "B",
+      "explanation": "Following the 'Rule of Zero' in modern C++ suggests utilizing smart resource containers (such as std::unique_ptr or std::vector) to manage heap assets. This automates object copying/destruction mechanics, making code more reliable and easier to read."
+    }
+  ]
+}

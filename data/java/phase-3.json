@@ -1,0 +1,208 @@
+{ "phase_metadata": { "phase_number": 3, "phase_name": "Control Flow",
+"filename": "java_phase3_control_flow.json", "version": "2.0", "java_version":
+"21 LTS" }, "learning_objectives": [ "Understand how to direct program execution
+using decision-making statements.", "Master the syntax and usage of traditional
+and modern switch expressions.", "Implement repetitive tasks using various loop
+structures.", "Control loop behavior using break, continue, and labels.",
+"Choose the correct control flow structure for specific logic requirements." ],
+"prerequisites": [ "Understanding of Java basic data types and variables.",
+"Knowledge of relational and logical operators (==, !=, >, <, &&, ||)." ],
+"introduction": "By default, a Java program runs from top to bottom. Control
+flow statements allow you to break this linear path. You can jump over code,
+choose between different paths, or repeat a block of code multiple times. This
+is where logic enters your programming.", "concept_explanation": {
+"decision_making": "Decision-making statements (if-else and switch) allow your
+program to execute specific blocks of code based on a condition. An 'if'
+statement evaluates a boolean expression. A 'switch' statement compares a single
+value against multiple possible constants.", "iteration": "Iteration statements
+(loops) repeat a block of code. 'for' loops are best when you know the number of
+repetitions. 'while' loops are best when repeating until a condition changes.
+'do-while' guarantees the code runs at least once.", "branching": "Branching
+statements (break, continue) alter the loop's path. 'break' exits the loop
+entirely, while 'continue' skips the rest of the current iteration and moves to
+the next one." }, "syntax": [ { "structure": "if-else if-else", "code": "if
+(condition) {\n // code\n} else if (otherCondition) {\n // code\n} else {\n //
+code\n}" }, { "structure": "Switch Expression (Java 14+)", "code": "type result
+= switch (variable) {\n case VAL1 -> output1;\n case VAL2, VAL3 -> output2;\n
+default -> defaultOutput;\n};" }, { "structure": "Enhanced For Loop", "code":
+"for (Type item : collection) {\n // code\n}" } ], "syntax_breakdown": {
+"if_statement": "The 'if' keyword is followed by a boolean condition in
+parentheses. If true, the curly braces block executes.", "switch_expression":
+"Unlike the old switch statement, the switch expression uses the arrow (->)
+syntax, doesn't require break statements to prevent fall-through, and can return
+a value.", "labeled_break": "A label is an identifier followed by a colon
+(labelName:). A 'break labelName;' statement exits the specific loop marked by
+that label, which is useful for nested loops." }, "rules_and_key_points": [ "An
+'if' condition must always result in a boolean (true/false).", "The 'else' block
+is optional and executes only if all preceding conditions are false.",
+"Traditional switch statements require a 'break' to prevent 'fall-through'
+(executing subsequent cases).", "Switch expressions using '->' do not have
+fall-through and are generally safer.", "The 'for' loop initialization happens
+once; the condition is checked before every iteration; the update happens after
+every iteration.", "The 'do-while' loop checks the condition after the block
+executes, ensuring at least one run.", "The enhanced for loop (for-each) is
+read-only regarding the collection structure; you cannot modify the collection
+size during iteration.", "A 'continue' statement stops the current iteration and
+jumps to the update/condition check of the loop.", "Infinite loops occur if the
+loop condition never becomes false; avoid these by ensuring a clear exit path.",
+"Variables declared inside a loop or if-block are local to that block and cannot
+be accessed outside." ], "code_example_1": { "title": "Basic Grade Checker
+(if-else and traditional switch)", "description": "This program demonstrates
+simple branching logic using if-else and a traditional switch statement.",
+"code": "public class GradeSystem {\n public static void main(String[] args) {\n
+int score = 85;\n char grade;\n\n // Using if-else to determine grade\n if
+(score >= 90) {\n grade = 'A';\n } else if (score >= 80) {\n grade = 'B';\n }
+else {\n grade = 'F';\n }\n\n System.out.println("Score: " + score);\n\n //
+Using traditional switch to give feedback\n switch (grade) {\n case 'A':\n
+System.out.println("Excellent work!");\n break;\n case 'B':\n
+System.out.println("Good job!");\n break;\n default:\n System.out.println("Keep
+trying.");\n }\n }\n}", "output": "Score: 85\nGood job!" }, "code_example_2": {
+"title": "Modern Switch and Loop Control", "description": "Demonstrating Java 21
+Switch Expressions and Labeled Breaks in nested loops.", "code": "public class
+ModernControl {\n public static void main(String[] args) {\n String day =
+"WEDNESDAY";\n\n // Switch Expression (Yielding a value)\n String typeOfDay =
+switch (day) {\n case "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY" ->
+"Weekday";\n case "SATURDAY", "SUNDAY" -> "Weekend";\n default -> "Unknown";\n
+};\n \n System.out.println(day + " is a " + typeOfDay);\n\n // Labeled Break
+Example\n outerLoop:\n for (int i = 1; i <= 3; i++) {\n for (int j = 1; j <= 3;
+j++) {\n if (i == 2 && j == 2) {\n System.out.println("Breaking outer loop at
+i=2, j=2");\n break outerLoop;\n }\n System.out.println("i: " + i + ", j: " +
+j);\n }\n }\n }\n}", "output": "WEDNESDAY is a Weekday\ni: 1, j: 1\ni: 1,
+j: 2\ni: 1, j: 3\ni: 2, j: 1\nBreaking outer loop at i=2, j=2" },
+"step_by_step_dry_run": "In the nested loop example: 1. i=1 starts. Inner loop
+runs for j=1, 2, 3. Prints all. 2. i increments to 2. 3. Inner loop starts. j=1
+prints. 4. Inner loop hits j=2. The condition (i==2 && j==2) is now TRUE. 5.
+'break outerLoop' is triggered. Instead of just exiting the 'j' loop, it
+terminates the 'i' loop entirely. Program continues after the outerLoop block.",
+"memory_visualization": "When a loop runs: 1. Stack Frame: The loop control
+variable (like 'int i') is created on the Stack. 2. Scope: As soon as the loop
+finishes, 'i' is popped off the stack and is no longer accessible. 3. Heap: If
+the loop creates objects, they stay in the Heap until Garbage Collection, but
+the references in the Stack are removed when the block closes.",
+"real_world_use_cases": [ "Menu Navigation: Using switch statements to handle
+user menu selections.", "Data Processing: Using for-each loops to iterate
+through a list of customer transactions.", "Validation: Using while loops to
+repeatedly ask for a password until it meets security criteria.", "Game Loops:
+Using a 'while(running)' loop to keep a game engine active until the player
+quits." ], "common_mistakes": [ "Using '=' instead of '==' in an if condition
+(though Java prevents this for non-boolean types, it's common in other
+languages).", "Forgetting the 'break' in traditional switch statements, leading
+to fall-through.", "Placing a semicolon after the if condition: if(x > 5); { ...
+} - this makes the block execute regardless of the condition.", "Infinite loops
+caused by failing to update the loop counter (e.g., forgetting i++).",
+"Off-by-one errors: Using '<=' when '<' was intended, causing the loop to run
+one extra time." ], "best_practices": [ "Prefer Switch Expressions (->) over
+traditional switch statements for cleaner, safer code.", "Always use curly
+braces {} for if/else and loops, even if there is only one line of code.", "Keep
+loop bodies small; if a loop is too long, move the logic into a separate
+method.", "Use the enhanced for loop (for-each) whenever you don't need the
+index of the elements.", "Avoid deep nesting (e.g., an 'if' inside a 'for'
+inside an 'if'); try to use 'return' or 'continue' to 'fail fast' and flatten
+the code." ], "frequently_asked_questions": [ { "question": "What is the
+difference between break and continue?", "answer": "'break' stops the loop
+immediately. 'continue' stops only the current iteration and jumps to the next
+cycle of the loop." }, { "question": "When should I use a while loop vs a for
+loop?", "answer": "Use a 'for' loop when you know exactly how many times to
+repeat (e.g., 1 to 10). Use a 'while' loop when the exit condition depends on a
+logic state (e.g., until a file is fully read)." } ], "summary": "Control flow
+is the heart of logic in Java. By mastering 'if-else' for branching, 'switch'
+for multiple fixed options, and 'loops' for repetition, you can build programs
+that react to data and handle complex tasks efficiently. Modern Java (21)
+provides enhanced switch features that make this logic even more robust.",
+"key_takeaways": [ "If-else handles boolean-based branching.", "Switch
+expressions are the modern way to handle multi-way branches.", "For loops are
+for fixed iterations.", "While loops are for conditional iterations.", "Do-while
+guarantees one execution.", "Enhanced for loops simplify array/collection
+traversal.", "Break exits loops; Continue skips iterations.", "Labels allow
+control over nested loops.", "Scope limits variable visibility to the block
+where they are defined.", "Logic should be readable and avoid excessive
+nesting." ], "preview_of_next_topic": "In Phase 4, we will dive into 'Arrays',
+where you will learn how to store and manage multiple values in a single
+variable and how to use the loops we learned today to process that data.",
+"questions": [ { "id": 1, "difficulty": "Easy", "type": "Concept", "question":
+"What is the primary difference between a 'while' loop and a 'do-while' loop?",
+"answer": "The primary difference is the timing of the condition check. A
+'while' loop checks the condition before executing the block, meaning it might
+never run if the condition is initially false. A 'do-while' loop executes the
+block first and then checks the condition, guaranteeing that the code inside
+runs at least once." }, { "id": 2, "difficulty": "Easy", "type": "Concept",
+"question": "In a switch expression (Java 14+), what does the arrow (->) replace
+compared to the traditional switch?", "answer": "The arrow (->) replaces both
+the colon (:) and the 'break' statement. It indicates that if the case matches,
+only the expression or block to the right of the arrow will execute, and then
+the switch will immediately terminate without falling through to other cases."
+}, { "id": 3, "difficulty": "Medium", "type": "Practical Usage", "question":
+"Write a code snippet that uses an enhanced for loop to print all elements of an
+integer array named 'numbers'.", "answer": "int[] numbers =
+{1, 2, 3, 4, 5};\nfor (int num : numbers) {\n System.out.println(num);\n}" }, {
+"id": 4, "difficulty": "Hard", "type": "Practical Usage", "question": "Create a
+program that prints numbers from 1 to 20, but skips multiples of 3 using the
+'continue' keyword and stops completely if the number hits 17 using 'break'.",
+"answer": "for (int i = 1; i <= 20; i++) {\n if (i == 17) break;\n if (i % 3
+== 0) continue;\n System.out.print(i + " ");\n} \n// Expected
+Output: 1 2 4 5 7 8 10 11 13 14 16" }, { "id": 5, "difficulty": "Medium",
+"type": "Common Mistake", "question": "What is wrong with this code: 'if (x
+= 10) { ... }' assuming x is an int?", "answer": "The error is using the
+assignment operator (=) instead of the equality operator (==). In Java, an 'if'
+condition must be a boolean. 'x = 10' returns 10 (an int), not a boolean, so the
+code will fail to compile. The correct version is 'if (x == 10)'." }, { "id": 6,
+"difficulty": "Hard", "type": "Common Mistake", "question": "Explain the danger
+of 'fall-through' in a traditional switch statement and how to prevent it.",
+"answer": "Fall-through occurs when a case in a traditional switch statement
+does not end with a 'break'. Java will continue executing the code for all
+subsequent cases regardless of whether they match the variable, until it hits a
+'break' or the end of the switch. This often leads to logical bugs. It is
+prevented by adding 'break;' at the end of every case or by using the modern
+switch expression (->)." }, { "id": 7, "difficulty": "Medium", "type": "Coding",
+"question": "Write a nested loop that prints a 3x3 grid of asterisks ().",
+"answer": "for (int i = 0; i < 3; i++) {\n for (int j = 0; j < 3; j++) {\n
+System.out.print(" ");\n }\n System.out.println();\n}" }, { "id": 8,
+"difficulty": "Hard", "type": "Challenge", "question": "Using a labeled break,
+write a program that searches for the number 5 in a 2D array and stops all loops
+as soon as it's found.", "answer": "int[][] matrix = {{1, 2}, {5, 4},
+{3, 6}};\nsearch: \nfor (int i = 0; i < matrix.length; i++) {\n for (int j = 0;
+j < matrix[i].length; j++) {\n if (matrix[i][j] == 5) {\n
+System.out.println("Found 5 at row " + i);\n break search;\n }\n }\n}" } ],
+"mcqs": [ { "id": 1, "question": "Which loop is guaranteed to execute at least
+once?", "options": { "A": "for loop", "B": "while loop", "C": "do-while loop",
+"D": "enhanced for loop" }, "answer": "C", "explanation": "The do-while loop
+evaluates its condition after the code block has executed." }, { "id": 2,
+"question": "What happens if a traditional switch case does not have a break
+statement?", "options": { "A": "Compile-time error", "B": "The program crashes",
+"C": "It falls through to the next case", "D": "It automatically exits the
+switch" }, "answer": "C", "explanation": "This behavior is known as
+fall-through, where execution continues into subsequent cases." }, { "id": 3,
+"question": "What is the output of: for(int i=0; i<3; i++) { if(i==1) continue;
+System.out.print(i); }", "options": { "A": "012", "B": "02", "C": "12", "D":
+"01" }, "answer": "B", "explanation": "When i is 1, the continue statement skips
+the print and moves to the next iteration (i=2)." }, { "id": 4, "question":
+"Which keyword is used in a switch expression to return a value from a block of
+code?", "options": { "A": "return", "B": "give", "C": "yield", "D": "break" },
+"answer": "C", "explanation": "In Java switch expressions, 'yield' is used to
+return a value when a multi-line block is used in a case." }, { "id": 5,
+"question": "What is the result of the following code? int x = 5; if(x > 2)
+System.out.print("A"); if(x > 4) System.out.print("B");", "options": { "A": "A",
+"B": "B", "C": "AB", "D": "None" }, "answer": "C", "explanation": "Both 'if'
+conditions are independent and both evaluate to true." }, { "id": 6, "question":
+"Identify the bug: for(int i=0; i<10; i--); { System.out.print(i); }",
+"options": { "A": "The semicolon after for loop", "B": "i-- causes an infinite
+loop", "C": "i is not initialized correctly", "D": "Both A and B" }, "answer":
+"D", "explanation": "The i-- makes the condition i<10 always true (infinite
+loop), and the semicolon makes the for loop body empty." }, { "id": 7,
+"question": "Identify the bug: switch(x) { case 1 -> {
+System.out.println("One"); } } (where x is 1)", "options": { "A": "Missing
+break", "B": "Missing default case (if x is not 1)", "C": "Invalid arrow
+syntax", "D": "Braces are not allowed" }, "answer": "B", "explanation": "Switch
+expressions must be exhaustive; if 'x' can be anything other than 1, a 'default'
+case is required." }, { "id": 8, "question": "Complete the code for an infinite
+while loop: while(____) { }", "options": { "A": "1", "B": "true", "C": "x == x",
+"D": "null" }, "answer": "B", "explanation": "In Java, the while condition must
+be a boolean 'true' for an infinite loop." }, { "id": 9, "question": "Complete
+the code to exit only the inner loop: outer: for(...) { for(...) { if(cond)
+____; } }", "options": { "A": "break outer", "B": "break", "C": "continue
+outer", "ed": "return" }, "answer": "B", "explanation": "A simple 'break' exits
+the innermost loop currently executing." }, { "id": 10, "question": "Which
+approach is best for iterating through an array without needing the index?",
+"options": { "A": "Traditional for loop", "B": "While loop", "C": "Enhanced for
+loop", "D": "Do-while loop" }, "answer": "C", "explanation": "The enhanced for
+loop (for-each) is specifically designed for clean, index-free iteration." } ] }

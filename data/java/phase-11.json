@@ -1,0 +1,47 @@
+{ "phase_metadata": { "phase_number": 11, "phase_name": "Generics",
+"description": "Master Type Safety and Reusability by learning how to create
+classes, interfaces, and methods that operate on types as parameters.",
+"java_version": "21 LTS" }, "learning_objectives": [ "Understand the necessity
+of Generics for compile-time type safety", "Create custom Generic classes and
+methods", "Implement Bounded Type Parameters to restrict allowed types", "Master
+Wildcards (?, extends, super) for flexible API design", "Understand Type Erasure
+and its impact on runtime behavior", "Learn the naming conventions for type
+parameters (T, E, K, V)" ], "prerequisites": [ "Phase 5: OOP Basics", "Phase 7:
+Polymorphism", "Phase 10: Collections Framework" ], "introduction": "Before
+Generics (Java 5), collections stored 'Object' types, requiring manual casting
+and risking 'ClassCastException' at runtime. Generics allow you to abstract over
+types. They enable you to write a single class or method that can work with
+different data types while providing strict compile-time checks, ensuring that
+your code is both reusable and safe.", "concept_explanation": { "what_is_it":
+"Generics mean 'parameterized types'. They allow a type (like Integer, String,
+or a custom class) to be a parameter to methods, classes, and interfaces.",
+"why_do_we_need_it": "1. Type Safety: Catch errors at compile time instead of
+runtime. 2. Elimination of Casts: No need to manually cast objects from a
+collection. 3. Code Reusability: Write an algorithm once and apply it to
+different types.", "how_it_works": "You define a placeholder (usually a single
+uppercase letter) in angle brackets <>. When you instantiate the class or call
+the method, you replace that placeholder with a concrete type.",
+"bounded_types": "Sometimes you want to limit the types used. For example, a
+math utility should only work with subclasses of 'Number'. We use <T extends
+Number> to achieve this.", "wildcards": "The question mark '?' represents an
+unknown type. \n1. Unbounded: 'List" }, "answer": "B" }, { "question": "Predict
+the result of: \nList list1 = new ArrayList<>(); \nList list2 = new
+ArrayList<>(); \nSystem.out.print(list1.getClass() == list2.getClass());",
+"options": { "A": "true", "B": "false", "C": "Compilation Error", "D": "Runtime
+Error" }, "answer": "A" }, { "question": "Find the bug: \npublic class MyGeneric
+{\n public T create() { return new T(); }\n}", "options": { "A": "Methods cannot
+return T", "B": "T is not a valid class name", "C": "You cannot instantiate a
+type parameter directly (new T())", "D": "Constructor of T must be public" },
+"answer": "C" }, { "question": "Find the bug: \npublic  void test(T t) { \n if
+(t instanceof T) { } \n}", "options": { "A": "T is missing angle brackets", "B":
+"instanceof cannot be used with a type parameter due to erasure", "C": "t cannot
+be null", "D": "void methods cannot use generics" }, "answer": "B" }, {
+"question": "Complete the code: \npublic ____  T getFirst(List list) { return
+list.get(0); }", "options": { "A": "class", "B": "static", "C": "final", "D":
+"No keyword needed, but 'static' is common" }, "answer": "B" }, { "question":
+"Complete the code for a bounded type: \nclass NumericBox { }", "options": {
+"A": "implements", "B": "extends", "C": "super", "D": "instanceof" }, "answer":
+"B" }, { "question": "Best Approach: You are writing a library method that reads
+elements from a collection of Dogs and makes them bark. What signature is
+best?", "options": { "A": "void makeBark(List dogs)", "B": "void makeBark(List
+dogs)" }, "answer": "B" } ] }

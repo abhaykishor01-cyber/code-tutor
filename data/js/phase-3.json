@@ -1,0 +1,349 @@
+{
+  "phaseNumber": 3,
+  "phaseName": "Control Flow",
+  "description": "Master JavaScript branching, conditional execution paths, logical evaluation optimizations, and modern switch patterns.",
+  "learningObjectives": [
+    "Explain how the JavaScript engine handles conditional branching and bytecode jumps under the hood.",
+    "Apply strict comparison principles inside control flow expressions to avoid type-coercion bugs.",
+    "Deploy logical short-circuiting and nullish coalescing operators to establish safe fallback values and guard variables.",
+    "Implement clean, modern branching architectures using the switch(true) pattern and guard clauses.",
+    "Resolve common control flow issues such as switch-case fall-throughs and conditional assignments."
+  ],
+  "prerequisites": [
+    "Phase 1: Variables, Scope, and Temporal Dead Zone",
+    "Phase 2: Operators and Truthy/Falsy values"
+  ],
+  "introduction": "By default, the JavaScript engine executes instructions sequentially, moving line by line from top to bottom. Control flow mechanisms break this rigid structure. They allow developers to build dynamic decision-making systems into their applications, executing distinct branches of code depending on evaluated expression values and logic states.",
+  "conceptExplanation": "Under the hood, control flow blocks are translated into branching operations in the engine's bytecode. When JavaScript code is processed by compilers like V8, conditional blocks (such as if/else and switch) compile into bytecode jump instructions (e.g., JumpIfTrue, JumpIfFalse). The engine first evaluates the condition, pushing a boolean or truthy/falsy conversion onto the stack. If the value matches the jump instruction trigger, the program pointer skips directly to the target block's memory address, skipping the alternate blocks entirely. This execution model underpins short-circuiting logic too: when evaluating a logical AND (&&) expression, if the left-hand operand evaluates to a falsy value, the engine halts evaluation immediately and does not resolve the right-hand operand, preventing runtime TypeErrors when accessing deep nested properties on nullish items.",
+  "syntax": "if (condition) {\n  // Code block executes if condition evaluates to truthy\n} else if (otherCondition) {\n  // Code block executes if previous conditions were falsy and otherCondition is truthy\n} else {\n  // Fallback block executes when all conditions evaluate to falsy\n}\n\nswitch (expression) {\n  case matchValue:\n    // Executed if expression === matchValue\n    break;\n  default:\n    // Executed if no matches are found\n}\n\nconst value = condition ? expressionIfTrue : expressionIfFalse;",
+  "syntaxBreakdown": "In the syntax of 'if', the condition is wrapped in parentheses and evaluates dynamically to a boolean value. In 'switch', strict equality (===) comparison is enforced between the evaluation of the expression and the target value of each case block. The 'break' keyword prevents case fall-through, immediately ending the evaluation sequence inside the block. The ternary operator uses a conditional expression followed by a question mark, then the true path expression, a colon, and the false path expression.",
+  "rulesAndKeyPoints": [
+    "JavaScript conditionals evaluate statements down to a truthy or falsy value; they do not require an absolute boolean true/false.",
+    "The switch statement uses strict comparison (===) to match cases, which means matching will fail if data types differ.",
+    "Always include a default case in switch statements to establish a safe fallback path for unanticipated states.",
+    "Omitting the break or return statement inside a case triggers immediate fall-through, executing subsequent cases sequentially regardless of matches.",
+    "Ternary expressions are expressions that yield a value, which allows direct variable assignments inline.",
+    "Avoid nesting multiple ternary operators together; nested ternary logic severely impacts team readability and code maintainability.",
+    "The logical AND (&&) operator short-circuits and evaluates to the first falsy operand, or the final operand if all are truthy.",
+    "The logical OR (||) operator short-circuits and evaluates to the first truthy operand, or the final operand if all are falsy.",
+    "The nullish coalescing operator (??) only falls back to the right-hand side when the left side is null or undefined.",
+    "Avoid variable assignment operations (=) inside conditional boundaries as it usually indicates a typo for comparison (===)."
+  ],
+  "codeExample1": {
+    "title": "Configuring Fallbacks and Guarding Property Accesses",
+    "code": "function getSafeDashboardTheme(config) {\n  const userIsActive = config && config.user && config.user.isActive;\n  if (!userIsActive) {\n    return 'guest-theme';\n  }\n  const configuredTheme = config.theme ?? 'default-dark';\n  return configuredTheme;\n}\n\nconst nullConfig = null;\nconst userConfig = { user: { isActive: true }, theme: 'sunset-neon' };\nconst minimalConfig = { user: { isActive: true } };\n\nconsole.log(getSafeDashboardTheme(nullConfig));\nconsole.log(getSafeDashboardTheme(userConfig));\nconsole.log(getSafeDashboardTheme(minimalConfig));",
+    "description": "This application of control flow leverages logical AND short-circuiting to prevent null-property access errors, paired with the nullish coalescing operator to assign safe fallback configurations.",
+    "expectedOutput": "guest-theme\nsunset-neon\ndefault-dark"
+  },
+  "codeExample2": {
+    "title": "Using the Switch-True Pattern for Complex Range Calculations",
+    "code": "function classifyScore(score) {\n  switch (true) {\n    case (score < 0 || score > 100):\n      return 'Invalid Score';\n    case (score >= 90):\n      return 'Excellent';\n    case (score >= 70):\n      return 'Passing';\n    default:\n      return 'Requires Improvement';\n  }\n}\n\nconsole.log(classifyScore(-10));\nconsole.log(classifyScore(95));\nconsole.log(classifyScore(82));\nconsole.log(classifyScore(55));",
+    "description": "Evaluating dynamic numeric range patterns can look convoluted with standard if/else hierarchies. The switch(true) pattern matches computed Boolean cases directly against the value of true.",
+    "expectedOutput": "Invalid Score\nExcellent\nPassing\nRequires Improvement"
+  },
+  "dryRun": [
+    {
+      "step": 1,
+      "explanation": "The function classifyScore is invoked with arguments: score = 82. The outer switch expression is evaluated. Since we passed switch(true), the control flow evaluates cases looking for one that yields true.",
+      "state": "score: 82, switchExpression: true"
+    },
+    {
+      "step": 2,
+      "explanation": "Evaluate first case block: (score < 0 || score > 100) -> (82 < 0 || 82 > 100) -> (false || false) -> false. Skip this case block because false does not equal true.",
+      "state": "case1: false"
+    },
+    {
+      "step": 3,
+      "explanation": "Evaluate second case block: (score >= 90) -> (82 >= 90) -> false. Skip this case block.",
+      "state": "case2: false"
+    },
+    {
+      "step": 4,
+      "explanation": "Evaluate third case block: (score >= 70) -> (82 >= 70) -> true. This evaluates to true, matching the target switch expression true. Execution enters this case block.",
+      "state": "case3: true"
+    },
+    {
+      "step": 5,
+      "explanation": "The block returns 'Passing' immediately, stopping execution of the switch block and function and preventing execution of the default code.",
+      "state": "returnedValue: 'Passing'"
+    }
+  ],
+  "memoryVisualization": "===[ Execution Context Stack ]===\n| [Call Context: getSafeDashboardTheme] -> Local Variable Environment: { config: Object@0xAA1, userIsActive: true, configuredTheme: 'sunset-neon' }\n| [Global Execution Context] -> Global Object: { ... }\n=================================\n\n===[ Heap Allocations ]===\nAddress: 0xAA1 => {\n  user: {\n    isActive: true\n  },\n  theme: 'sunset-neon'\n}\n\n===[ Bytecode Instruction Flow (Conceptual V8 Jumps) ]===\n- Evaluates: config && config.user && config.user.isActive\n- If falsey: Jump to bytecode address of error response\n- If truthy: Advance program counter to default assignment block\n- Return: Returns the finalized local value to caller stack frame",
+  "realWorldUseCases": [
+    "API gateway response validators tracking payload formats and headers.",
+    "Form error warning triggers running custom validation rules when input states update.",
+    "Application theme load handlers extracting local system themes and applying fallbacks.",
+    "Role-based secure route navigation guards protecting sensitive application pathways."
+  ],
+  "commonMistakes": [
+    {
+      "title": "Strict Type Matching Mismatches in Switch Cases",
+      "badCode": "function checkLevel(level) {\n  switch (level) {\n    case 1:\n      return 'Level One';\n    default:\n      return 'Unknown';\n  }\n}\nconsole.log(checkLevel('1'));",
+      "goodCode": "function checkLevel(level) {\n  switch (Number(level)) {\n    case 1:\n      return 'Level One';\n    default:\n      return 'Unknown';\n  }\n}\nconsole.log(checkLevel('1'));",
+      "explanation": "Switch statements execute comparisons under strict equality (===). Passing a string \"1\" against the numerical case 1 resolves to false, bypassing the match completely. Convert arguments to matching types beforehand."
+    },
+    {
+      "title": "Accidental Variable Assignments within If Statements",
+      "badCode": "let userRole = 'member';\nif (userRole = 'admin') {\n  console.log('Granted Admin Access');\n}",
+      "goodCode": "let userRole = 'member';\nif (userRole === 'admin') {\n  console.log('Granted Admin Access');\n}",
+      "explanation": "Using a single assignment operator (=) instead of a comparison operator (===) assigns the string 'admin' to userRole. The expression evaluates to the assigned string 'admin' which is a truthy value, bypassing security conditions."
+    },
+    {
+      "title": "Unintended Value Erasure Using Logical OR Fallbacks",
+      "badCode": "function setupLayout(config) {\n  const borderSize = config.border || 5;\n  return borderSize;\n}\nconsole.log(setupLayout({ border: 0 }));",
+      "goodCode": "function setupLayout(config) {\n  const borderSize = config.border ?? 5;\n  return borderSize;\n}\nconsole.log(setupLayout({ border: 0 }));",
+      "explanation": "The logical OR (||) check assesses the left operand's truthiness. When valid numerical values like 0 are used, they are treated as falsy, meaning the code defaults to the right-hand value (5) erroneously. Use ?? to protect numeric 0 and empty strings."
+    }
+  ],
+  "bestPractices": [
+    "Utilize early return statements (guard clauses) to reduce indentation nesting inside complex validation scenarios.",
+    "Default to using the nullish coalescing operator (??) over the logical OR (||) when defining fallback values to protect zero and empty strings.",
+    "Avoid nesting multiple ternary operators together; refactor them into separate, descriptive variables or if blocks.",
+    "Never forget the break or return statement in switch expressions unless a multi-match fall-through system is intentional.",
+    "Consider replacing massive if/else systems with object maps (lookup objects) for cleaner, faster O(1) state resolution."
+  ],
+  "faqs": [
+    {
+      "question": "Why do logical evaluation operators like && or || return actual values instead of boolean results?",
+      "answer": "JavaScript logical operators are short-circuit operators. They assess each operand sequentially and return the precise value of the last operand evaluated when the overall expression's value is finalized, preserving the operand's original type."
+    },
+    {
+      "question": "Is there a measurable performance difference between switch statements and long if-else ladders?",
+      "answer": "For basic conditions, the performance difference is negligible. However, for a high volume of condition cases, JavaScript engines can compile switch structures into jump tables or hash indexes, making execution access fast compared to evaluating large linear if-else branches."
+    },
+    {
+      "question": "Do nested brackets inside an if condition create block scope for internal executions?",
+      "answer": "The condition itself inside the parentheses does not form a block scope, but the block following the conditional declaration defined by curly braces ({ ... }) introduces block scope for variables declared with let and const."
+    }
+  ],
+  "summary": "Control flow is the fundamental mechanism that allows JavaScript programs to execute conditionally. By mastering modern conditional execution, short-circuit rules, strict comparisons, and structural patterns like guard clauses, developers can write safer, clearer, and more efficient systems.",
+  "keyTakeaways": [
+    "JavaScript compiles conditional branching down to bytecode Jump instructions to skip alternate memory tracks.",
+    "Short-circuit operators assess logical paths lazily and immediately return evaluated operand values.",
+    "Switch statements execute using strict comparison (===) and fall through without explicit control breaks.",
+    "The nullish coalescing (??) operator handles safe default assignments without overriding falsy 0 or empty string configurations.",
+    "Leveraging guard clauses dramatically improves logical layout readability and eliminates deep nesting issues."
+  ],
+  "previewOfNextTopic": "In Phase 4, we will learn about Iteration and Loops, uncovering how to repeatedly run statement blocks using for, while, and do-while loops.",
+  "questions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "Coding",
+      "format": "Write a function",
+      "questionText": "Write a function named `isEligibleDriver(age, hasLicense)` that returns `true` if the driver is at least 16 years of age AND holds a valid license, otherwise returns `false`.",
+      "explanation": "Use the logical AND (&&) operator to combine both constraints into a single assertion statement.",
+      "codeContext": "",
+      "solutionCode": "function isEligibleDriver(age, hasLicense) {\n  return age >= 16 && hasLicense;\n}"
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "Conceptual",
+      "format": "Short Answer",
+      "questionText": "Describe why `0 && 'hello'` outputs `0`, whereas `0 || 'hello'` outputs `'hello'`.",
+      "explanation": "The logical AND operator (`&&`) evaluates the left side (`0`). Since `0` is falsy, it short-circuits and immediately returns `0`. The logical OR operator (`||`) sees a falsy `0` on the left, so it evaluates and returns the right-side value (`'hello'`).",
+      "codeContext": "",
+      "solutionCode": ""
+    },
+    {
+      "id": "q3",
+      "difficulty": "Medium",
+      "type": "Refactoring",
+      "format": "Refactor nested blocks",
+      "questionText": "Refactor the deeply nested logical statement inside `evaluateAccess` into a readable system using clean early guard clauses.",
+      "explanation": "By checking for negative or invalid states early, you can return values immediately to simplify flow and readability.",
+      "codeContext": "function evaluateAccess(user) {\n  if (user) {\n    if (user.isActive) {\n      if (user.isAdmin) {\n        return 'Full Access';\n      }\n    }\n  }\n  return 'Denied';\n}",
+      "solutionCode": "function evaluateAccess(user) {\n  if (!user || !user.isActive) {\n    return 'Denied';\n  }\n  if (user.isAdmin) {\n    return 'Full Access';\n  }\n  return 'Denied';\n}"
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "Debug",
+      "format": "Find the switch bug",
+      "questionText": "This scale evaluator logic prints 'Invalid rating' for valid inputs. Identify why this bug happens and fix the function code.",
+      "explanation": "The developer passed `rating` to the switch context, but cases were declared as conditions. Since a numeric rating (like 4) is compared strictly (===) to the evaluated boolean case outputs (e.g. true), it fails to match. The switch must evaluate `switch(true)`.",
+      "codeContext": "function evaluateScale(rating) {\n  let description;\n  switch (rating) {\n    case (rating >= 4):\n      description = 'Great';\n      break;\n    case (rating >= 2):\n      description = 'OK';\n      break;\n    default:\n      description = 'Invalid rating';\n  }\n  return description;\n}\nevaluateScale(4);",
+      "solutionCode": "function evaluateScale(rating) {\n  let description;\n  switch (true) {\n    case (rating >= 4):\n      description = 'Great';\n      break;\n    case (rating >= 2):\n      description = 'OK';\n      break;\n    default:\n      description = 'Invalid rating';\n  }\n  return description;\n}"
+    },
+    {
+      "id": "q5",
+      "difficulty": "Hard",
+      "type": "Coding",
+      "format": "Implement dynamic discount calculations",
+      "questionText": "Write a function `calculateFare(distance, age)` where base fare is 10. Rules: kids under 5 ride free (fare 0), seniors over 65 get a 50% discount, and for distances over 20km, a surcharge of 5 is added to the base fare *before* applying any discount.",
+      "explanation": "Combine range and condition assertions in sequential order, computing base price with distance factors first, then applying any modifier based on age.",
+      "codeContext": "",
+      "solutionCode": "function calculateFare(distance, age) {\n  if (age < 5) return 0;\n  let fare = distance > 20 ? 15 : 10;\n  if (age > 65) {\n    fare *= 0.5;\n  }\n  return fare;\n}"
+    },
+    {
+      "id": "q6",
+      "difficulty": "Hard",
+      "type": "Debug",
+      "format": "Prevent runtime errors and evaluate logic",
+      "questionText": "Debug this logical assignment system to ensure that empty string preferences are not overridden by defaults, and that undefined inputs do not throw syntax/runtime errors.",
+      "explanation": "Change logical OR (||) to nullish coalescing (??) to protect blank strings, and add defensive checks or optional chaining to guard the configuration object parsing.",
+      "codeContext": "function getTitle(config) {\n  // Bug: fails to keep configured empty titles (\"\"), and crashes on null configs\n  return config.title || 'User';\n}",
+      "solutionCode": "function getTitle(config) {\n  return config?.title ?? 'User';\n}"
+    },
+    {
+      "id": "q7",
+      "difficulty": "Challenge",
+      "type": "Refactoring",
+      "format": "Pattern mapping",
+      "questionText": "Refactor this repetitive switch statement into a clean object lookup dictionary that handles unexpected commands cleanly.",
+      "explanation": "Map command keys directly to action strings. Use nullish coalescing to safely return the fallback option when keys do not exist.",
+      "codeContext": "function executeCommand(cmd) {\n  switch (cmd) {\n    case 'play':\n      return 'Playing audio';\n    case 'pause':\n      return 'Paused audio';\n    case 'stop':\n      return 'Stopped audio';\n    default:\n      return 'Unsupported Action';\n  }\n}",
+      "solutionCode": "function executeCommand(cmd) {\n  const commands = {\n    play: 'Playing audio',\n    pause: 'Paused audio',\n    stop: 'Stopped audio'\n  };\n  return commands[cmd] ?? 'Unsupported Action';\n}"
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "Coding",
+      "format": "Dynamic rules engine evaluation",
+      "questionText": "Write a dynamic processor function `meetsRules(record, rules)` where `rules` is an array of criteria containing `{ field, operator, value }`. Operators supported are '===' and '>'. Return true if all criteria evaluate to true.",
+      "explanation": "Iterate across arrays using functional helpers like `every`, evaluating conditions using structured branching patterns.",
+      "codeContext": "",
+      "solutionCode": "function meetsRules(record, rules) {\n  return rules.every(rule => {\n    const targetVal = record[rule.field];\n    if (rule.operator === '===') {\n      return targetVal === rule.value;\n    }\n    if (rule.operator === '>') {\n      return targetVal > rule.value;\n    }\n    return false;\n  });\n}"
+    }
+  ],
+  "mcqs": [
+    {
+      "id": "mcq1",
+      "type": "Theory",
+      "questionText": "What value does the logical AND (&&) operator evaluate to in an execution context containing multiple truthy parameters?",
+      "options": {
+        "A": "The logical boolean 'true'.",
+        "B": "The final evaluated truthy expression value.",
+        "C": "The first truthy expression value in the evaluation chain.",
+        "D": "An array containing all resolved operand parameters."
+      },
+      "correctOption": "B",
+      "explanation": "The logical AND (&&) operator assesses operands left-to-right. If all evaluate to truthy, it returns the final resolved expression."
+    },
+    {
+      "id": "mcq2",
+      "type": "Theory",
+      "questionText": "Which statement accurately describes how matching is evaluated inside a switch-case statement?",
+      "options": {
+        "A": "Values undergo loose validation rules (==), converting matching values automatically.",
+        "B": "Values must evaluate strictly to the boolean 'true' to execute block states.",
+        "C": "Values are compared using strict equality comparison (===).",
+        "D": "String cases are automatically converted to lowercase before execution."
+      },
+      "correctOption": "C",
+      "explanation": "JavaScript switch blocks perform strict comparison (===). Both the data type and value must match for a case to execute."
+    },
+    {
+      "id": "mcq3",
+      "type": "Output Prediction",
+      "questionText": "What value is printed to the console upon running the following code block?",
+      "options": {
+        "A": "Default Limit",
+        "B": "0",
+        "C": "undefined",
+        "D": "null"
+      },
+      "correctOption": "B",
+      "explanation": "The nullish coalescing operator (??) only returns the right-side fallback if the left side is null or undefined. Since 0 is a defined number, it is returned.",
+      "codeContext": "const userLimit = 0;\nconst configValue = userLimit ?? 'Default Limit';\nconsole.log(configValue);"
+    },
+    {
+      "id": "mcq4",
+      "type": "Output Prediction",
+      "questionText": "What does this conditional snippet evaluate to inside the console terminal?",
+      "options": {
+        "A": "Basic Access",
+        "B": "Pro Access",
+        "C": "Admin Access",
+        "D": "Guest"
+      },
+      "correctOption": "B",
+      "explanation": "The first condition resolves to false, bypassing the first branch. The second nested condition resolves to true, executing and returning 'Pro Access'.",
+      "codeContext": "const score = 75;\nconst output = score >= 90 ? 'Admin Access' : score >= 50 ? 'Pro Access' : 'Basic Access';\nconsole.log(output);"
+    },
+    {
+      "id": "mcq5",
+      "type": "Output Prediction",
+      "questionText": "What is printed to the console upon running this switch logic?",
+      "options": {
+        "A": "One\nTwo\nDefault",
+        "B": "One\nTwo",
+        "C": "One",
+        "D": "Default"
+      },
+      "correctOption": "B",
+      "explanation": "The matching case '1' has no break statement. This triggers a fall-through, executing the next case ('2') and logging 'Two' before hitting a break.",
+      "codeContext": "const value = '1';\nswitch (value) {\n  case '1':\n    console.log('One');\n  case '2':\n    console.log('Two');\n    break;\n  default:\n    console.log('Default');\n}"
+    },
+    {
+      "id": "mcq6",
+      "type": "Find the Bug",
+      "questionText": "Why does the checkStatus function trigger a reference error or print unexpected access levels for non-admin users?",
+      "options": {
+        "A": "The double ampersand syntax requires brackets inside conditions.",
+        "B": "The assignment operator (=) inside the condition overwrites the role property and evaluates to 'admin', which is truthy.",
+        "C": "The condition checks string variables with standard variable scopes.",
+        "D": "Switch statements are required here instead of if statements."
+      },
+      "correctOption": "B",
+      "explanation": "Using single equal assignment (=) instead of triple equal comparison (===) assigns the string 'admin' to the user's role. This assignment evaluates to 'admin', which is truthy, triggering the if block.",
+      "codeContext": "function checkStatus(user) {\n  if (user.role = 'admin') {\n    return 'Access Granted';\n  }\n  return 'Access Denied';\n}"
+    },
+    {
+      "id": "mcq7",
+      "type": "Find the Bug",
+      "questionText": "Why does this code log 'Error: Function is missing' instead of successfully running?",
+      "options": {
+        "A": "Short-circuit execution rules cause evaluation to stop immediately since validation fails on the first falsy check.",
+        "B": "The call statement throws structural scope errors.",
+        "C": "Logical operators cannot process functions.",
+        "D": "Logical OR (||) was used when Nullish Coalescing (??) was required."
+      },
+      "correctOption": "A",
+      "explanation": "Because `isActive` is false, the logical AND (&&) operator short-circuits immediately. The second expression `runTask()` is never evaluated or executed.",
+      "codeContext": "let isActive = false;\nlet executed = false;\nfunction runTask() { executed = true; }\nconst result = isActive && runTask();\nif (!executed) console.log('Error: Function is missing');"
+    },
+    {
+      "id": "mcq8",
+      "type": "Complete the Code",
+      "questionText": "Which operator correctly completes this line to ensure that an empty string (\"\") from configuredTitle is preserved, instead of falling back to 'Default'?",
+      "options": {
+        "A": "||",
+        "B": "&&",
+        "C": "??",
+        "D": "?"
+      },
+      "correctOption": "C",
+      "explanation": "The nullish coalescing operator (??) only triggers the fallback on null or undefined, preserving empty strings (\"\") and numerical zeros.",
+      "codeContext": "const configuredTitle = '';\nconst title = configuredTitle ___ 'Default';"
+    },
+    {
+      "id": "mcq9",
+      "type": "Complete the Code",
+      "questionText": "Which operator pair completes this guard statement to safely log 'OK' only if the nested property address.zip exists?",
+      "options": {
+        "A": "?, ?",
+        "B": "||, ||",
+        "C": "&&, &&",
+        "D": "??, ??"
+      },
+      "correctOption": "C",
+      "explanation": "Using logical AND (&&) acts as a safety guard. If user or user.address is nullish, it short-circuits safely rather than throwing a TypeError.",
+      "codeContext": "const user = { address: { zip: '12345' } };\nif (user ___ user.address ___ user.address.zip) {\n  console.log('OK');\n}"
+    },
+    {
+      "id": "mcq10",
+      "type": "Best Approach",
+      "questionText": "What refactoring technique is considered a best practice for clean control flow when dealing with deeply nested if-else structures?",
+      "options": {
+        "A": "Combine nested layers into one multi-line ternary expression.",
+        "B": "Use early exits (guard clauses) to handle error and edge cases first.",
+        "C": "Convert all conditions into complex bitwise expressions.",
+        "D": "Declare nested if branches within separate nested loops."
+      },
+      "correctOption": "B",
+      "explanation": "Using guard clauses allows you to handle validation failures and edge cases early, reducing indentation and making code easier to read."
+    }
+  ]
+}

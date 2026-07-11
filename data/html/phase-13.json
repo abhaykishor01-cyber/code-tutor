@@ -1,0 +1,196 @@
+{ "phase_metadata": { "phase_number": 13, "phase_name": "Advanced CSS",
+"description": "Master professional CSS techniques including Custom Properties,
+maintainable naming conventions with BEM, complex calculations, and visual
+filters.", "technology_stack": "CSS3" }, "learning_objectives": [ "Implement and
+manage CSS Variables (Custom Properties) for consistent theming.", "Understand
+the difference between CSS Reset and Normalize.css.", "Apply the BEM (Block,
+Element, Modifier) methodology for scalable code.", "Calculate CSS Specificity
+scores to resolve styling conflicts.", "Use the calc() function for dynamic
+layout measurements.", "Apply visual effects using CSS Filters like blur,
+grayscale, and brightness." ], "prerequisites": [ "Phase 7: CSS Selectors (Basic
+understanding of classes and IDs)", "Phase 8: CSS Units (px, rem, vh, vw)" ],
+"introduction": "Writing CSS is easy, but writing maintainable CSS for large
+projects is a challenge. In this phase, we move beyond basic styling into the
+'Engineer' mindset. You will learn how to store values in variables, name your
+classes so they don't clash using BEM, and use mathematical functions to create
+dynamic designs. These are the tools used by professional developers at
+companies like Google and Facebook to keep their code clean and scalable.",
+"concept_explanation": { "css_variables": "CSS Variables, also known as Custom
+Properties, allow you to store a value (like a color or font size) in one place
+and reuse it throughout your stylesheet. They start with a double dash (--).",
+"the_root_selector": "The :root pseudo-class represents the highest level in the
+document (the  tag). We define variables here so they are available globally
+across the entire website.", "bem_methodology": "BEM stands for Block, Element,
+Modifier. It is a naming convention that makes CSS easier to read and maintain.
+For example: .card (Block), .card__title (Element), .card--featured
+(Modifier).", "css_specificity": "Specificity is a weight assigned to a CSS
+selector. If multiple rules point to the same element, the one with the highest
+specificity wins. The hierarchy is: Inline styles > IDs >
+Classes/Attributes/Pseudo-classes > Elements.", "calc_function": "The calc()
+function allows you to perform mathematical operations (+, -, , /) directly in
+your CSS. It is perfect for mixing units, such as '100% minus 20px'.",
+"css_filters": "Filters allow you to apply graphical effects like blur, color
+shifting, or brightness to elements (usually images) without using Photoshop.",
+"reset_vs_normalize": "A 'Reset' removes all default browser styling (making
+everything plain), while 'Normalize' keeps useful defaults but ensures they look
+the same across all browsers (Chrome, Safari, Firefox)." }, "syntax": {
+"css_variables": ":root { --main-color: #3498db; }\n.box { background-color:
+var(--main-color); }", "calc_function": "width: calc(100% - 50px);",
+"bem_naming": ".block { }\n.block__element { }\n.block--modifier { }",
+"css_filters": "filter: blur(5px) grayscale(100%);" }, "syntax_breakdown": {
+"--variable-name": "The identifier for a custom property. Must start with two
+dashes.", "var()": "The function used to retrieve the value of a CSS variable.",
+"calc()": "The function that evaluates a mathematical expression. Note:
+Operators like + and - must have spaces around them.", "__": "Double underscore
+in BEM used to separate the Block from the Element.", "--": "Double hyphen in
+BEM used to separate a Block or Element from its Modifier.", ":root": "A
+pseudo-class used to define variables globally (highest specificity for
+variables)." }, "rules_and_key_points": [ "CSS Variables are case-sensitive
+(--MainColor is different from --maincolor).", "Always provide a fallback value
+in var(): var(--bg, white).", "In calc(), you MUST have spaces around + and -
+(e.g., calc(100% - 10px) is valid, calc(100%-10px) is not).", "BEM blocks should
+be able to stand alone and be reused.", "Specificity scores: ID = 100,
+Class/Pseudo-class = 10, Element = 1.", "Inline styles have a specificity
+of 1000.", "!important overrides everything but is considered a bad practice in
+most cases.", "Filters can be chained together: filter: contrast(2)
+brightness(0.5);", "CSS Variables are reactive; if changed in JavaScript, the UI
+updates automatically.", "Reset/Normalize should be the first CSS file loaded in
+your HTML." ], "code_example_1": { "title": "Global Variables and Theming",
+"description": "This example demonstrates how to set up global colors and use
+them throughout a page using the :root selector.", "code": "/ Global Variable
+Definition /\n:root {\n --primary-color: #ff4757;\n --secondary-color:
+#2f3542;\n --text-white: #ffffff;\n --padding-standard: 20px;\n}\n\nbody {\n
+background-color: var(--secondary-color);\n color: var(--text-white);\n padding:
+var(--padding-standard);\n}\n\n.btn {\n background-color:
+var(--primary-color);\n color: var(--text-white);\n padding: 10px
+var(--padding-standard);\n border: none;\n border-radius: 5px;\n cursor:
+pointer;\n}\n\n.btn:hover {\n / Brightening the primary color slightly on hover
+/\n filter: brightness(1.2);\n}" }, "code_example_2": { "title": "BEM and
+Dynamic Layouts", "description": "Applying BEM naming conventions to a card
+component and using calc() for layout precision.", "code": "/ BEM: Block (card)
+/\n.card {\n width: 300px;\n background: white;\n border: 1px solid #ddd;\n
+overflow: hidden;\n}\n\n/ BEM: Element (image inside card) /\n.card__image {\n
+width: 100%;\n height: 200px;\n object-fit: cover;\n filter:
+grayscale(50%);\n}\n\n/ BEM: Element (content area) /\n.card__content {\n /
+Using calc to ensure perfect padding regardless of border /\n padding: calc(10px
++ 1rem);\n}\n\n/ BEM: Modifier (special version of card) /\n.card--featured {\n
+border: 2px solid gold;\n transform: scale(1.05);\n}\n\n/ BEM: Element within a
+Modifier /\n.card--featured .card__content {\n background-color: #fff9e6;\n}" },
+"visual_output": "The first example creates a dark-themed page with a red
+button. When the button is hovered, it glows brighter. The second example
+creates a white card with a partially grayed-out image. If the class
+'card--featured' is added, the card becomes slightly larger with a gold
+border.", "step_by_step_dry_run": "1. The browser parses the CSS and finds the
+:root block.\n2. It stores values like #ff4757 into the keyword
+--primary-color.\n3. It reaches the .btn class and sees
+var(--primary-color).\n4. The browser replaces var() with the actual hex code
+#ff4757.\n5. When calc(10px + 1rem) is encountered, the browser checks the
+current font size (usually 16px). It calculates 10 + 16 = 26px and applies that
+as padding.\n6. For filters, the browser applies a post-processing effect on the
+rendered pixels of the image/element.", "real_world_use_cases": [ "Dark Mode
+Theming: Swapping variable values in :root via JavaScript to change the entire
+site colors instantly.", "Design Systems: Creating a standardized 'Language' of
+spacing and colors used by multiple teams.", "Dynamic Sidebars: Using calc(100vh
+- 60px) to make a sidebar fill the screen minus the height of the navbar.",
+"Image Galleries: Using filters like blur() on background images to make text
+overlays more readable." ], "common_mistakes_students_make": [ "Not adding
+spaces around + or - in calc(). This results in the property being ignored.",
+"Defining variables in a specific class and then trying to use them in a parent
+or sibling class (Variables follow inheritance).", "Using BEM incorrectly by
+nesting too deep: .card__content__title__icon (Avoid this; use .card__icon
+instead).", "Confusing Reset and Normalize: Overwriting Normalize styles when
+they expected a blank slate.", "Miscalculating specificity: Thinking a long
+chain of classes will beat an ID selector (It won't)." ], "best_practices": [
+"Define all your global variables in :root for easy access.", "Use BEM to avoid
+'CSS Spaghetti' where changing one class breaks another element.", "Comment your
+variable sections (e.g., / Colors /, / Spacing /).", "Use calc() for layouts
+that involve mixing fixed (px) and fluid (%) units.", "Keep specificity as low
+as possible; avoid using IDs for styling.", "Use Normalize.css as a base for
+cross-browser consistency." ], "frequently_asked_questions": [ { "question":
+"Can I use CSS variables in IE11?", "answer": "No, CSS Variables are not
+supported in Internet Explorer. They work in all modern browsers like Chrome,
+Edge, Firefox, and Safari." }, { "question": "Why use BEM when I can just nest
+selectors in SASS?", "answer": "BEM keeps specificity low and makes classes
+independent. Deeply nested selectors in SASS create high specificity which is
+hard to override later." }, { "question": "Is filter: blur() bad for
+performance?", "answer": "Heavy use of filters, especially blur, can slow down
+page rendering on mobile devices because it requires significant CPU/GPU power."
+} ], "summary": "Phase 13 covers advanced techniques that separate professional
+developers from hobbyists. We explored CSS Variables for theming, BEM for clean
+class naming, Specificity for conflict resolution, calc() for math, and Filters
+for visual effects. Mastering these tools ensures your code remains clean as
+your website grows.", "key_takeaways": [ "Variables make global changes instant
+and easy.", ":root is the go-to place for global property storage.", "BEM
+prevents class name collisions and keeps code readable.", "Specificity is a
+score: ID(100) > Class(10) > Element(1).", "Spaces are mandatory around + and -
+in calc().", "Filters can modify images directly in the browser.",
+"Normalize.css is better than Reset for preserving useful browser defaults.",
+"Custom properties are inherited by child elements.", "BEM modifiers enable
+variation without code duplication.", "Advanced CSS is about scalability and
+maintenance." ], "preview_of_the_next_topic": "In Phase 14, we will introduce
+CSS Frameworks. You will learn how to use pre-written CSS libraries like
+Bootstrap and Tailwind CSS to build professional websites in half the time.",
+"questions": [ { "difficulty": "Easy", "topic": "Concept", "question": "What
+pseudo-class is typically used to define global CSS variables and why?",
+"answer": "The :root pseudo-class is used because it corresponds to the 
+element, making all variables defined there available globally throughout the
+entire document." }, { "difficulty": "Moderate", "topic": "Concept", "question":
+"Calculate the specificity score of the following selector: div.container
+#submit-btn:hover", "answer": "The score is 111. (ID '#submit-btn' = 100, Class
+'.container' = 10, Pseudo-class ':hover' = 10, Element 'div' = 1). Total: 100
++ 10 + 10 + 1 = 121. (Correction: Classes and Pseudo-classes are both 10)." }, {
+"difficulty": "Easy-Medium", "topic": "Coding", "question": "Complete the code
+to make the container width fill the screen but leave exactly 40px of space on
+each side.", "answer": "width: calc(100% - 80px); / 40px left + 40px right */"
+}, { "difficulty": "Medium", "topic": "Debug", "question": "The following code
+is not working. The text color is not changing to blue. Why? \n\n.card {
+--text-color: blue; }\nbody { color: var(--text-color); }", "answer": "Variables
+are inherited from parent to child. Since the variable --text-color is defined
+in .card, it is only available to .card and its children. The body is a
+parent/ancestor of .card, so it cannot access the variable. Move the variable to
+:root to fix it." }, { "difficulty": "Medium", "topic": "Optimize", "question":
+"Refactor this non-BEM code into BEM methodology: \n\n\n \n Edit\n", "answer":
+"\n \n Edit\n" }, { "difficulty": "Medium-Hard", "topic": "Modify", "question":
+"Modify the code so that when an image is hovered, it turns completely grayscale
+and slightly blurred.", "answer": "img:hover { filter: grayscale(100%)
+blur(2px); }" }, { "difficulty": "Hard", "topic": "Predict Output", "question":
+"Which color will the text be? \n\n#title { color: red; }\n.header .main-title {
+color: blue; }\nh1 { color: green !important; }", "answer": "The text will be
+green because !important overrides all other specificity rules, including IDs
+and class chains." }, { "difficulty": "Challenge", "topic": "Small
+Implementation", "question": "Write a CSS snippet using variables to define a
+primary spacing of 16px, then use that variable in a calc() function to set a
+margin of exactly double that spacing.", "answer": ":root { --spacing: 16px;
+}\n.box { margin: calc(var(--spacing) * 2); }" } ], "mcqs": [ { "question":
+"What is the correct syntax to define a CSS variable?", "options": { "A":
+"variable-color: #000;", "B": "@color: #000;", "C": "--main-color: #000;", "D":
+"$main-color: #000;" }, "answer": "C" }, { "question": "In BEM, what does the
+double underscore (__) represent?", "options": { "A": "A Modifier", "B": "A
+Block", "C": "An Element", "D": "A Comment" }, "answer": "C" }, { "question":
+"Which specificity score is the highest?", "options": { "A": "0, 1, 0, 0 (One
+ID)", "B": "0, 0, 2, 0 (Two Classes)", "C": "0, 0, 0, 5 (Five Elements)", "D":
+"1, 0, 0, 0 (Inline Style)" }, "answer": "D" }, { "question": "Why would
+calc(50%-10px) fail to work?", "options": { "A": "Percent and pixels cannot be
+mixed", "B": "Missing spaces around the minus sign", "C": "calc() only works
+with addition", "D": "calc() is not supported in modern browsers" }, "answer":
+"B" }, { "question": "What does filter: sepia(100%) do?", "options": { "A":
+"Makes the element transparent", "B": "Adds a reddish-brown vintage tint", "C":
+"Inverts the colors", "D": "Rotates the element" }, "answer": "B" }, {
+"question": "Find the bug: :root { --font-size: 1.2rem } .text { font-size:
+--font-size; }", "options": { "A": "Missing semicolon in :root", "B": "The unit
+rem is invalid", "C": "Variable must be called using var() function", "D":
+"font-size cannot use variables" }, "answer": "C" }, { "question": "Predict the
+output of specificity: '.nav .link' vs '.nav-link'", "options": { "A": "The
+first is stronger (20 vs 10)", "B": "The second is stronger (10 vs 2)", "C":
+"They are equal", "D": "The browser chooses the one defined first" }, "answer":
+"A" }, { "question": "Complete the BEM: A button 'modifier' for a disabled state
+should be named...", "options": { "A": ".btn__disabled", "B": ".disabled-btn",
+"C": ".btn--disabled", "D": ".btn_disabled" }, "answer": "C" }, { "question":
+"Which filter makes an image look 'blurry'?", "options": { "A": "filter:
+opaque(5px);", "B": "filter: blur(5px);", "C": "filter: shadow(5px);", "D":
+"filter: clear(5px);" }, "answer": "B" }, { "question": "Best Approach: You need
+to create a layout that works across all browsers but has consistent spacing
+defaults. Should you use Reset or Normalize?", "options": { "A": "Reset (blank
+slate is always better)", "B": "Normalize (consistent starting point across
+browsers)", "C": "Neither, browsers are fine as they are", "D": "Use both at the
+same time" }, "answer": "B" } ] }

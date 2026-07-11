@@ -1,0 +1,512 @@
+{
+  "phaseMetadata": {
+    "phaseNumber": 4,
+    "phaseName": "Control Flow, Loops & Branching",
+    "duration": "8-10 Hours"
+  },
+  "learningObjectives": [
+    "Master conditional branching with if, elif, and else statements.",
+    "Implement iterative logic using while and for loops.",
+    "Control loop execution with break, continue, and pass.",
+    "Leverage the range() function for precise iteration.",
+    "Utilize the loop-else clause for search-and-find operations.",
+    "Design complex nested logic for data processing tasks."
+  ],
+  "prerequisites": [
+    "Variables, Data Types, and Operators (Phase 1 & 2)",
+    "String basics and indexing (Phase 3)"
+  ],
+  "introduction": "Control flow is the backbone of any software application. Without it, programs are just linear scripts. In this phase, we move beyond simple commands to build logic that makes decisions and repeats tasks, allowing your Python scripts to react dynamically to user input and changing data states.",
+  "conceptExplanation": "Control flow determines the order in which individual statements, instructions, or function calls are executed. We use branching to route program execution based on specific conditions and looping to execute blocks of code repeatedly until a specific exit criterion is met.",
+  "syntax": "if condition:\n    # code\nelif another_condition:\n    # code\nelse:\n    # code\n\nwhile condition:\n    # code\n\nfor item in collection:\n    # code",
+  "syntaxBreakdown": [
+    "if: Checks a boolean expression and executes code if True.",
+    "elif: Short for 'else if', provides an alternative check if the previous if/elif failed.",
+    "else: The fallback block executed if all preceding conditions are False.",
+    "for: Iterates over a sequence (list, range, string).",
+    "while: Repeats until the condition becomes False.",
+    "break: Exits the nearest enclosing loop immediately.",
+    "continue: Skips to the next iteration of the loop.",
+    "pass: A null operation used as a placeholder."
+  ],
+  "rulesAndKeyPoints": [
+    "Python blocks are defined by indentation; inconsistent spaces will raise an IndentationError.",
+    "The range(start, stop, step) function generates an immutable sequence of numbers.",
+    "The 'for' loop is the preferred way to iterate over known collections.",
+    "Always ensure a 'while' loop has a mechanism to eventually satisfy the condition to avoid infinite loops.",
+    "A loop's 'else' clause executes only if the loop finishes naturally (not via break).",
+    "Comparison operators (==, !=, <, >) are essential for condition building.",
+    "Nested control structures increase complexity; flatten logic when possible.",
+    "Use 'pass' in stub functions or empty classes during initial development.",
+    "Variable scoping in loops: variables defined in a loop persist in the local function scope.",
+    "Short-circuit evaluation applies to 'and'/'or' conditions."
+  ],
+  "codeExample1": {
+    "title": "Simple Branching Logic",
+    "code": "score = 85\nif score >= 90:\n    grade = 'A'\nelif score >= 80:\n    grade = 'B'\nelse:\n    grade = 'C'\nprint(f'Grade: {grade}')",
+    "explanation": "Demonstrates tiered branching using if/elif/else to assign a grade based on an integer score.",
+    "output": "Grade: B"
+  },
+  "codeExample2": {
+    "title": "Data Processing with Loops",
+    "code": "transactions = [100, -50, 200, -10, 500]\nbalance = 0\nfor amount in transactions:\n    if amount < 0:\n        continue\n    balance += amount\nprint(f'Final Balance: {balance}')",
+    "explanation": "Calculates a final account balance by iterating through a transaction list and skipping negative amounts using continue.",
+    "output": "Final Balance: 800"
+  },
+  "dryRunSteps": [
+    {
+      "stepNumber": 1,
+      "lineOfCode": "balance = 0",
+      "lineNumber": 2,
+      "explanation": "Initialize the accumulator variable.",
+      "variablesState": {
+        "balance": "0"
+      }
+    },
+    {
+      "stepNumber": 2,
+      "lineOfCode": "for amount in transactions:",
+      "lineNumber": 3,
+      "explanation": "Start loop with index 0, value 100.",
+      "variablesState": {
+        "amount": "100",
+        "balance": "0"
+      }
+    },
+    {
+      "stepNumber": 3,
+      "lineOfCode": "balance += amount",
+      "lineNumber": 6,
+      "explanation": "Add 100 to balance.",
+      "variablesState": {
+        "amount": "100",
+        "balance": "100"
+      }
+    },
+    {
+      "stepNumber": 4,
+      "lineOfCode": "if amount < 0: continue",
+      "lineNumber": 4,
+      "explanation": "Process negative value -50; skip addition.",
+      "variablesState": {
+        "amount": "-50",
+        "balance": "100"
+      }
+    }
+  ],
+  "memoryVisualization": {
+    "description": "Visualizing how integer state is modified within the local frame during loop iteration.",
+    "elements": [
+      {
+        "id": "v1",
+        "label": "balance",
+        "type": "stack",
+        "value": "800"
+      },
+      {
+        "id": "v2",
+        "label": "transactions",
+        "type": "heap",
+        "value": "[100, -50, 200, -10, 500]"
+      },
+      {
+        "id": "v3",
+        "label": "amount",
+        "type": "stack",
+        "value": "500"
+      }
+    ]
+  },
+  "realWorldUseCases": [
+    "Financial systems: Filtering transactions or calculating interest.",
+    "Inventory Management: Checking stock thresholds using if statements.",
+    "Automation: Automating file system cleanups using loops.",
+    "Data Analysis: Parsing sensor logs for specific anomaly thresholds."
+  ],
+  "commonMistakes": [
+    "Infinite while loops due to missing update statements.",
+    "Off-by-one errors in range() limits.",
+    "Confusing '=' (assignment) with '==' (comparison).",
+    "Indenting incorrectly, leading to logical errors or syntax crashes."
+  ],
+  "bestPractices": [
+    "Prefer 'for' loops over 'while' loops whenever the number of iterations is known.",
+    "Use descriptive variable names in loops (e.g., 'for user in users').",
+    "Keep loop bodies clean and move complex logic into helper functions.",
+    "Avoid modifying the list you are currently iterating over."
+  ],
+  "faqs": [
+    {
+      "question": "When should I use pass?",
+      "answer": "Use 'pass' when you need a syntactically correct block but have no logic yet, such as in an abstract class or empty function."
+    },
+    {
+      "question": "Is there a performance difference between for and while?",
+      "answer": "For-loops are generally faster in Python because they are optimized for iteration over sequences using internal C iterators."
+    }
+  ],
+  "summary": "Control flow enables decision-making and repetition. Mastery involves choosing the right loop type for the dataset size and ensuring conditional logic handles all edge cases effectively.",
+  "keyTakeaways": [
+    "If/elif/else dictates direction.",
+    "For handles fixed iterations.",
+    "While handles condition-driven loops.",
+    "Break/continue allow granular control over loop flow.",
+    "Indentation is part of the syntax."
+  ],
+  "previewOfNextTopic": "Functions: Abstracting logic into reusable blocks, handling scope, and parameters.",
+  "mcqs": [
+    {
+      "id": "m1",
+      "type": "theory",
+      "question": "What happens if a loop exhausts its items in Python?",
+      "options": [
+        {
+          "key": "A",
+          "text": "It throws an error"
+        },
+        {
+          "key": "B",
+          "text": "It executes the else clause"
+        },
+        {
+          "key": "C",
+          "text": "It skips the next block"
+        },
+        {
+          "key": "D",
+          "text": "It goes into an infinite state"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "The loop-else clause is a unique Python feature that runs when a loop completes naturally."
+    },
+    {
+      "id": "m2",
+      "type": "theory",
+      "question": "Which of the following is true regarding range(1, 10, 2)?",
+      "options": [
+        {
+          "key": "A",
+          "text": "It includes 10"
+        },
+        {
+          "key": "B",
+          "text": "It generates 1, 3, 5, 7, 9"
+        },
+        {
+          "key": "C",
+          "text": "It fails if start is smaller than stop"
+        },
+        {
+          "key": "D",
+          "text": "It returns a list"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "range generates numbers starting from start, incrementing by step, until just before stop."
+    },
+    {
+      "id": "m3",
+      "type": "output_prediction",
+      "question": "What is the output of: x = 0\nwhile x < 3:\n    x += 1\nelse:\n    print(x)",
+      "options": [
+        {
+          "key": "A",
+          "text": "0"
+        },
+        {
+          "key": "B",
+          "text": "1"
+        },
+        {
+          "key": "C",
+          "text": "3"
+        },
+        {
+          "key": "D",
+          "text": "Nothing"
+        }
+      ],
+      "correctAnswer": "C",
+      "explanation": "The loop runs until x is 3, then the else block runs, printing the current value of x."
+    },
+    {
+      "id": "m4",
+      "type": "output_prediction",
+      "question": "Predict output: for i in range(2):\n    print(i)\n    i = 5",
+      "options": [
+        {
+          "key": "A",
+          "text": "0 1 5 5"
+        },
+        {
+          "key": "B",
+          "text": "0 1"
+        },
+        {
+          "key": "C",
+          "text": "0 5"
+        },
+        {
+          "key": "D",
+          "text": "2 2"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "Modifying the loop variable 'i' inside the loop does not affect the iterator of the for-loop."
+    },
+    {
+      "id": "m5",
+      "type": "output_prediction",
+      "question": "What does this print?\nfor i in range(3):\n    if i == 1: continue\n    print(i, end='')",
+      "options": [
+        {
+          "key": "A",
+          "text": "012"
+        },
+        {
+          "key": "B",
+          "text": "02"
+        },
+        {
+          "key": "C",
+          "text": "1"
+        },
+        {
+          "key": "D",
+          "text": "0"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "When i is 1, the 'continue' statement triggers, skipping the print statement for that iteration."
+    },
+    {
+      "id": "m6",
+      "type": "find_the_bug",
+      "question": "Find the bug: \nx = 10\nwhile x > 0\n    print(x)\n    x -= 1",
+      "options": [
+        {
+          "key": "A",
+          "text": "Missing colon"
+        },
+        {
+          "key": "B",
+          "text": "x -= 1 is wrong"
+        },
+        {
+          "key": "C",
+          "text": "x starts at 10"
+        },
+        {
+          "key": "D",
+          "text": "No bug"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "Python requires a colon after the while condition."
+    },
+    {
+      "id": "m7",
+      "type": "find_the_bug",
+      "question": "Identify error: for x in [1, 2]:\nif x == 1:\nprint('found')",
+      "options": [
+        {
+          "key": "A",
+          "text": "Indentation"
+        },
+        {
+          "key": "B",
+          "text": "if syntax"
+        },
+        {
+          "key": "C",
+          "text": "list definition"
+        },
+        {
+          "key": "D",
+          "text": "print syntax"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "The 'if' and 'print' statements must be indented relative to the 'for' loop."
+    },
+    {
+      "id": "m8",
+      "type": "complete_the_code",
+      "question": "Complete to print even numbers:\nfor i in range(10):\n    if ________:\n        print(i)",
+      "options": [
+        {
+          "key": "A",
+          "text": "i % 2 == 0"
+        },
+        {
+          "key": "B",
+          "text": "i / 2 == 0"
+        },
+        {
+          "key": "C",
+          "text": "i % 2 == 1"
+        },
+        {
+          "key": "D",
+          "text": "i = 2"
+        }
+      ],
+      "correctAnswer": "A",
+      "explanation": "The modulo operator (%) returns the remainder of division; % 2 == 0 identifies even numbers."
+    },
+    {
+      "id": "m9",
+      "type": "complete_the_code",
+      "question": "What fills the blank to stop at 5?\nfor i in range(10):\n    if i > 5:\n        _______",
+      "options": [
+        {
+          "key": "A",
+          "text": "return"
+        },
+        {
+          "key": "B",
+          "text": "break"
+        },
+        {
+          "key": "C",
+          "text": "stop"
+        },
+        {
+          "key": "D",
+          "text": "continue"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "The break statement terminates the loop entirely."
+    },
+    {
+      "id": "m10",
+      "type": "best_approach",
+      "question": "Which is the most efficient way to repeat code 5 times?",
+      "options": [
+        {
+          "key": "A",
+          "text": "while loop with counter"
+        },
+        {
+          "key": "B",
+          "text": "for i in range(5)"
+        },
+        {
+          "key": "C",
+          "text": "manual copy-paste"
+        },
+        {
+          "key": "D",
+          "text": "if-else chain"
+        }
+      ],
+      "correctAnswer": "B",
+      "explanation": "The range-based for loop is the standard, readable, and efficient way to perform a known number of repetitions."
+    }
+  ],
+  "codeQuestions": [
+    {
+      "id": "q1",
+      "difficulty": "Easy",
+      "type": "Write a program",
+      "title": "Countdown Timer",
+      "question": "Write a loop that counts down from 5 to 1 and prints 'Liftoff!' at the end.",
+      "solutionCode": "for i in range(5, 0, -1):\n    print(i)\nprint('Liftoff!')",
+      "hints": [
+        "Use range(start, stop, step)"
+      ],
+      "explanation": "The range function allows negative steps to iterate backwards."
+    },
+    {
+      "id": "q2",
+      "difficulty": "Easy",
+      "type": "Complete missing code",
+      "title": "Odd Filter",
+      "question": "Print only odd numbers from 1 to 10.",
+      "codeTemplate": "for i in range(1, 11):\n    if ________:\n        print(i)",
+      "solutionCode": "for i in range(1, 11):\n    if i % 2 != 0:\n        print(i)",
+      "hints": [
+        "Check remainder when divided by 2"
+      ],
+      "explanation": "The modulo operator determines parity."
+    },
+    {
+      "id": "q3",
+      "difficulty": "Easy-Medium",
+      "type": "Debug existing code",
+      "title": "Summation Fix",
+      "question": "This code aims to sum 1 to 5 but fails. Fix it.",
+      "buggyCode": "sum = 0\nfor i in range(1, 6):\nsum += i\nprint(sum)",
+      "solutionCode": "total = 0\nfor i in range(1, 6):\n    total += i\nprint(total)",
+      "hints": [
+        "Look at indentation",
+        "Avoid shadowing the built-in sum() function"
+      ],
+      "explanation": "Correct indentation is vital, and renaming 'sum' prevents shadowing the global sum function."
+    },
+    {
+      "id": "q4",
+      "difficulty": "Medium",
+      "type": "Write a program",
+      "title": "Vowel Counter",
+      "question": "Count the number of vowels in a string using a loop.",
+      "solutionCode": "text = 'python coding'\nvowels = 'aeiou'\ncount = 0\nfor char in text:\n    if char in vowels:\n        count += 1\nprint(count)",
+      "hints": [
+        "Iterate over the string",
+        "Use the 'in' operator for checking membership"
+      ],
+      "explanation": "The 'in' operator is efficient for checking if a character belongs to a predefined set."
+    },
+    {
+      "id": "q5",
+      "difficulty": "Medium",
+      "type": "Modify existing code",
+      "title": "Early Exit",
+      "question": "Modify a loop to stop execution as soon as it finds a negative number in a list of integers.",
+      "solutionCode": "nums = [10, 20, -5, 30]\nfor n in nums:\n    if n < 0:\n        print('Negative found!')\n        break",
+      "hints": [
+        "Use the break keyword"
+      ],
+      "explanation": "Break exits the entire loop block, saving processing time."
+    },
+    {
+      "id": "q6",
+      "difficulty": "Medium-Hard",
+      "type": "Small implementation",
+      "title": "Nested Triangle",
+      "question": "Use nested loops to print a triangle of stars (size 5).",
+      "solutionCode": "for i in range(1, 6):\n    print('*' * i)",
+      "hints": [
+        "Strings can be multiplied by integers in Python"
+      ],
+      "explanation": "Using string repetition avoids deep nesting and makes the code cleaner."
+    },
+    {
+      "id": "q7",
+      "difficulty": "Hard",
+      "type": "Write a program",
+      "title": "Prime Checker",
+      "question": "Write a loop to check if a number (e.g., 29) is prime.",
+      "solutionCode": "num = 29\nis_prime = True\nfor i in range(2, int(num**0.5) + 1):\n    if num % i == 0:\n        is_prime = False\n        break\nprint(is_prime)",
+      "hints": [
+        "Check divisors only up to square root of num"
+      ],
+      "explanation": "Mathematical optimization: a non-prime number must have a divisor less than its square root."
+    },
+    {
+      "id": "q8",
+      "difficulty": "Challenge",
+      "type": "Optimize code",
+      "title": "Transaction Filter",
+      "question": "Given a list of transactions, calculate total positive earnings using a filter and loop, ensuring you skip any transactions labelled 'pending'.",
+      "solutionCode": "transactions = [(100, 'done'), (-50, 'done'), (200, 'pending'), (50, 'done')]\ntotal = 0\nfor amount, status in transactions:\n    if status == 'pending':\n        continue\n    if amount > 0:\n        total += amount\nprint(total)",
+      "hints": [
+        "Use tuple unpacking in the for loop",
+        "Use continue to skip 'pending'"
+      ],
+      "explanation": "Tuple unpacking makes the code readable, and control statements help manage multiple logic constraints."
+    }
+  ]
+}

@@ -1,0 +1,228 @@
+{ "phase_metadata": { "phase_number": 6, "title": "Inheritance and the Object
+Class", "description": "Master the art of creating class hierarchies, reusing
+code through the extends keyword, and understanding the root of all Java
+classes.", "java_version": "21 (LTS)" }, "learning_objectives": [ "Understand
+the 'IS-A' relationship in Object-Oriented Programming", "Implement single
+inheritance using the extends keyword", "Utilize the super keyword to access
+parent members and constructors", "Perform Method Overriding to redefine
+behavior in subclasses", "Apply the final keyword to prevent inheritance or
+overriding", "Use the instanceof operator for type checking", "Override methods
+from the java.lang.Object class like toString() and equals()" ],
+"prerequisites": [ "Basic knowledge of Classes and Objects (Phase 5)",
+"Understanding of methods and return types", "Familiarity with access modifiers
+(briefly covered in basics)" ], "introduction": { "concept": "Inheritance",
+"definition": "Inheritance is a mechanism in Java where one class (the subclass
+or child) acquires the properties and behaviors (fields and methods) of another
+class (the superclass or parent).", "why_we_need_it": "It promotes code
+reusability and establishes a natural hierarchy. Instead of writing the same
+code for 'Car' and 'Truck', you put common code in a 'Vehicle' class and let
+both inherit from it.", "is_a_relationship": "Inheritance represents the IS-A
+relationship. For example, a Dog IS-A Animal, a Manager IS-A Employee." },
+"concept_explanation": { "extends_keyword": "The 'extends' keyword is used to
+create a subclass. In Java, a class can extend only one other class (Single
+Inheritance).", "super_keyword": "The 'super' keyword refers to the immediate
+parent class object. It is used to call parent constructors, parent methods, or
+access parent fields that might be hidden by the subclass.",
+"method_overriding": "Overriding occurs when a subclass provides a specific
+implementation for a method already defined in its superclass. The method
+signature must be identical.", "final_keyword": "When applied to a class,
+'final' prevents it from being extended. When applied to a method, it prevents
+it from being overridden.", "object_class": "Every class in Java implicitly
+extends the 'java.lang.Object' class. It is the root of the entire class
+hierarchy.", "instanceof_operator": "A comparison operator used to test whether
+an object is an instance of a specific class or subclass." }, "syntax": {
+"inheritance_declaration": "class Subclass extends Superclass { ... }",
+"super_constructor_call": "super(parameters);", "method_overriding_annotation":
+"@Override\npublic void methodName() { ... }", "instanceof_check": "if (object
+instanceof ClassName) { ... }" }, "syntax_breakdown": { "extends": "Indicates
+that the class is deriving from a base class.", "super": "A reference variable
+used to point to the parent class object.", "@Override": "An annotation that
+tells the compiler the method is intended to override a parent method. It helps
+catch errors if the signature doesn't match.", "final": "A modifier that makes a
+component unchangeable." }, "rules_and_key_points": [ "Java does not support
+multiple inheritance with classes (one child, one parent).", "Private members of
+the superclass are NOT inherited directly by the subclass.", "Constructors are
+not inherited, but the parent constructor is called during subclass
+instantiation.", "The call to super() must be the first statement in a subclass
+constructor.", "A subclass can add its own new fields and methods in addition to
+inherited ones.", "Overriding methods must have the same name, return type, and
+parameters.", "An overriding method cannot have a more restrictive access
+modifier (e.g., cannot change public to private).", "Static methods cannot be
+overridden; they are 'hidden' if redefined.", "The final keyword on a class
+prevents it from being a parent.", "The Object class provides methods like
+equals(), hashCode(), and toString() to all Java objects." ], "code_example_1":
+{ "title": "Basic Inheritance (The IS-A Relationship)", "description": "A simple
+example showing how a Dog class inherits from an Animal class.", "code": "class
+Animal {\n String name;\n\n void eat() {\n System.out.println("This animal eats
+food.");\n }\n}\n\n// Dog 'extends' Animal, inheriting name and eat()\nclass Dog
+extends Animal {\n void bark() {\n System.out.println("The dog barks.");\n
+}\n}\n\npublic class Main {\n public static void main(String[] args) {\n Dog
+myDog = new Dog();\n myDog.name = "Buddy"; // Inherited field\n myDog.eat(); //
+Inherited method\n myDog.bark(); // Subclass specific method\n }\n}", "output":
+"This animal eats food.\nThe dog barks." }, "code_example_2": { "title": "Method
+Overriding and the 'super' Keyword", "description": "A practical example showing
+a payroll-like structure where a Manager gets a different bonus calculation.",
+"code": "class Employee {\n String name;\n double salary;\n\n Employee(String
+name, double salary) {\n this.name = name;\n this.salary = salary;\n }\n\n void
+displayDetails() {\n System.out.println("Employee: " + name + ", Salary: $" +
+salary);\n }\n\n double calculateBonus() {\n return salary * 0.10; // 10%
+default bonus\n }\n}\n\nclass Manager extends Employee {\n double teamSize;\n\n
+Manager(String name, double salary, double teamSize) {\n // Calling the parent
+constructor using super\n super(name, salary);\n this.teamSize = teamSize;\n
+}\n\n @Override\n void displayDetails() {\n // Using super to call the parent's
+version of displayDetails\n super.displayDetails();\n System.out.println("Team
+Size: " + teamSize);\n }\n\n @Override\n double calculateBonus() {\n // Managers
+get 20% bonus instead of 10%\n return salary * 0.20;\n }\n}\n\npublic class
+CompanyApp {\n public static void main(String[] args) {\n Employee emp = new
+Employee("Alice", 50000);\n Manager mgr = new Manager("Bob", 80000, 10);\n\n
+emp.displayDetails();\n System.out.println("Bonus: $" +
+emp.calculateBonus());\n\n System.out.println("-----------------");\n\n
+mgr.displayDetails();\n System.out.println("Bonus: $" + mgr.calculateBonus());\n
+}\n}", "output": "Employee: Alice, Salary: $50000.0\nBonus:
+$5000.0\n-----------------\nEmployee: Bob, Salary: $80000.0\nTeam
+Size: 10.0\nBonus: $16000.0" }, "dry_run": { "step_1": "Manager mgr = new
+Manager("Bob", 80000, 10); is called.", "step_2": "The Manager constructor
+executes super("Bob", 80000);, moving control to the Employee constructor.",
+"step_3": "Employee constructor initializes 'name' and 'salary' fields in the
+object memory.", "step_4": "Control returns to Manager constructor, which
+initializes 'teamSize'.", "step_5": "mgr.displayDetails() is called. Since
+Manager overrides it, the Manager version runs.", "step_6": "Inside
+Manager.displayDetails(), super.displayDetails() calls the Employee version to
+print name/salary.", "step_7": "Manager's displayDetails continues to print the
+teamSize." }, "memory_visualization": { "stack": "Contains the reference
+variable 'mgr'.", "heap": "A single object of type 'Manager' is created. Inside
+this object space, memory is allocated for inherited fields (name, salary) and
+specific fields (teamSize). Even though it's one object, it contains the full
+'state' of the parent.", "method_area": "Contains the class metadata for
+Employee and Manager, including pointers to the overridden method table
+(vtable)." }, "real_world_use_cases": [ "E-commerce: 'Product' is a superclass;
+'Electronics' and 'Clothing' are subclasses with specific attributes.", "UI
+Frameworks: A generic 'Component' class has draw() and click() methods, while
+'Button' or 'Slider' provides specific implementations.", "Game Development: A
+'Character' superclass handles movement; 'Player' and 'Enemy' inherit movement
+but define different attack logic." ], "common_mistakes": [ "Trying to extend
+multiple classes: Java only allows one parent class.", "Forgetting to call
+super() in a subclass constructor when the parent doesn't have a default
+(no-arg) constructor.", "Thinking private methods can be overridden: They
+cannot, as they aren't visible to the subclass.", "Changing the method signature
+(parameters) while intending to override: This creates a 'Method Overload'
+instead of an 'Override'.", "Using '==' to compare object contents instead of
+overriding the equals() method from the Object class." ], "best_practices": [
+"Always use the @Override annotation when overriding to ensure compile-time
+checking.", "Follow the 'Liskov Substitution Principle': A subclass should be
+able to stand in for a superclass without breaking the program.", "Use 'final'
+for methods that are critical to security or logic and should never be changed
+by a subclass.", "Keep the inheritance hierarchy shallow (don't go 10 levels
+deep) to maintain readability.", "Override toString() in your classes to provide
+a meaningful string representation of objects." ], "frequently_asked_questions":
+[ { "question": "Can a subclass access private fields of a superclass?",
+"answer": "No. Subclasses only inherit public and protected members. To access
+private fields, the subclass must use public getter and setter methods provided
+by the parent." }, { "question": "What is the difference between Overloading and
+Overriding?", "answer": "Overloading happens in the same class (same name,
+different parameters). Overriding happens in a subclass (same name, same
+parameters, same return type)." }, { "question": "What happens if I don't use
+super() in my constructor?", "answer": "The Java compiler automatically inserts
+a call to the parent's no-argument constructor: super();. If the parent doesn't
+have a no-argument constructor, you will get a compile-time error." } ],
+"summary": "Inheritance is the backbone of Java's reusability, allowing classes
+to share code through hierarchies. By using 'extends', 'super', and '@Override',
+developers can build complex systems that are easy to maintain and extend
+without duplicating logic.", "key_takeaways": [ "Inheritance uses the 'extends'
+keyword.", "Java supports single inheritance only for classes.", "The 'super'
+keyword accesses parent constructors and members.", "Method overriding allows
+specialized behavior in subclasses.", "The @Override annotation prevents
+signature mismatch errors.", "Final classes cannot be inherited; final methods
+cannot be overridden.", "The 'instanceof' operator checks an object's type at
+runtime.", "All classes inherit from the Object class by default.",
+"Constructors are not inherited but are called in sequence (parent first).",
+"Inheritance should model an 'IS-A' relationship." ], "preview_of_next_topic":
+"In Phase 7, we will explore Polymorphism, which allows us to treat objects of
+different subclasses as objects of a common superclass, enabling dynamic and
+flexible code execution.", "questions_and_answers": [ { "difficulty": "Easy",
+"type": "Concept", "question": "What is the main purpose of inheritance in
+Java?", "answer": "The main purpose is code reusability and establishing a
+relationship between classes. It allows a new class to use the methods and
+fields of an existing class, reducing redundancy and making the code easier to
+maintain." }, { "difficulty": "Moderate", "type": "Concept", "question":
+"Explain why Java does not support multiple inheritance with classes.",
+"answer": "Java avoids multiple inheritance to prevent the 'Diamond Problem'. If
+a class could extend two parents that both have a method with the same
+signature, the compiler wouldn't know which version to inherit, leading to
+ambiguity and complexity." }, { "difficulty": "Moderate", "type": "Practical
+Usage", "question": "When should you use the 'super' keyword in a constructor?",
+"answer": "You must use 'super(...)' when the parent class does not have a
+default (no-argument) constructor, or when you specifically want to pass
+arguments to a parameterized constructor in the parent class to initialize its
+fields." }, { "difficulty": "Hard", "type": "Practical Usage", "question": "If a
+class 'Child' extends 'Parent', and both have a static method called 'show()',
+is this method overriding?", "answer": "No, this is called 'Method Hiding'.
+Static methods belong to the class, not the instance. Therefore, they cannot be
+overridden in the traditional OOP sense. The version of the method called
+depends on the reference type, not the actual object type." }, { "difficulty":
+"Moderate", "type": "Common Mistake", "question": "What is the error in this
+code: 'class A extends final B {}'?", "answer": "The error is that class B is
+marked as 'final'. In Java, a 'final' class cannot be extended by any other
+class. This is a security and design feature to prevent modification of class
+behavior." }, { "difficulty": "Hard", "type": "Common Mistake", "question": "A
+subclass method has 'private' access but overrides a 'public' method in the
+parent. Is this allowed?", "answer": "No. When overriding, the subclass method
+cannot reduce the visibility of the parent method. Since 'private' is more
+restrictive than 'public', the compiler will throw an error. You can, however,
+make it more visible (e.g., overriding a protected method as public)." }, {
+"difficulty": "Moderate", "type": "Coding/Application", "question": "Write a
+snippet showing how to use the 'instanceof' operator safely.", "answer": "if
+(myObject instanceof Dog) {\n Dog d = (Dog) myObject;\n d.bark();\n} // This
+ensures we only cast and call bark() if the object is actually a Dog." }, {
+"difficulty": "Hard", "type": "Coding/Application", "question": "How do you
+correctly override the toString() method for a class 'Book' with fields 'title'
+and 'author'?", "answer": "@Override\npublic String toString() {\n return "Book
+[Title=" + title + ", Author=" + author + "]";\n} // This replaces the default
+Object implementation (which returns classname@hashcode) with useful data." } ],
+"practice_activities": [ { "type": "Write a program", "task": "Create a class
+'Shape' with a method area(). Create a subclass 'Circle' that overrides area()
+to calculate the area of a circle using Math.PI." }, { "type": "Complete missing
+code", "task": "Given a parent 'Vehicle' with a constructor taking 'brand',
+write a 'Car' subclass constructor that correctly passes 'brand' to the parent."
+}, { "type": "Debug existing code", "task": "Fix a code snippet where a subclass
+tries to override a final method in the parent class." }, { "type": "Optimize
+code", "task": "Refactor two separate classes, 'Smartphone' and 'Laptop', into a
+hierarchy using a common 'ElectronicDevice' superclass." }, { "type": "Modify
+existing code", "task": "Add a toString() and equals() method to an existing
+'User' class to allow proper comparison and printing." }, { "type": "Predict
+output using code", "task": "Determine what happens when a parent reference
+points to a child object and an overridden method is called." }, { "type":
+"Small implementation", "task": "Implement a 'Logger' system where 'FileLogger'
+and 'ConsoleLogger' inherit from a base 'Logger' class." } ], "mcqs": [ {
+"question": "Which keyword is used to inherit a class in Java?", "options": {
+"A": "implements", "B": "extends", "C": "inherits", "D": "includes" }, "answer":
+"B" }, { "question": "Which class is the superclass of every class in Java?",
+"options": { "A": "String", "B": "System", "C": "Object", "D": "Main" },
+"answer": "C" }, { "question": "What will be the output?\nclass A { void m() {
+System.out.print("A"); } }\nclass B extends A { void m() {
+System.out.print("B"); } }\n...\nA obj = new B(); obj.m();", "options": { "A":
+"A", "B": "B", "C": "Compile Error", "D": "Runtime Error" }, "answer": "B" }, {
+"question": "Which statement about the 'super' keyword is FALSE?", "options": {
+"A": "It can be used to call parent constructors.", "B": "It must be the first
+statement in a constructor.", "C": "It can be used to access private members of
+the parent.", "D": "It can call the parent's version of an overridden method."
+}, "answer": "C" }, { "question": "What happens if a class is declared as
+'final'?", "options": { "A": "It cannot be instantiated.", "B": "It cannot be
+inherited.", "C": "All its methods must be static.", "D": "It must be inherited
+to be used." }, "answer": "B" }, { "question": "Identify the bug:\nclass Parent
+{ void hello() {} }\nclass Child extends Parent { @Override int hello() {
+return 1; } }", "options": { "A": "Method name must be different.", "B":
+"@Override is used incorrectly.", "C": "Return type must be the same (void) as
+the parent.", "D": "Parent class must be abstract." }, "answer": "C" }, {
+"question": "Predict the output:\nclass P { P() { System.out.print("1"); }
+}\nclass C extends P { C() { System.out.print("2"); } }\n...\nnew C();",
+"options": { "A": "12", "B": "21", "C": "2", "D": "1" }, "answer": "A" }, {
+"question": "How do you check if an object 'ref' is of type 'String'?",
+"options": { "A": "ref.isType(String)", "B": "ref == String", "C": "ref
+instanceof String", "D": "String.check(ref)" }, "answer": "C" }, { "question":
+"Complete the code: class Manager ____ Employee { }", "options": { "A":
+"extend", "B": "extending", "C": "extends", "D": "is" }, "answer": "C" }, {
+"question": "What is the best approach to represent a 'Square' that is a
+'Rectangle'?", "options": { "A": "Make Square the parent of Rectangle.", "B":
+"Make Rectangle the parent of Square.", "C": "Keep them unrelated.", "D": "Use
+the final keyword on both." }, "answer": "B" } ] }
