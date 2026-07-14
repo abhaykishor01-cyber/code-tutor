@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/ui/Nav";
+import Footer from "@/components/ui/Footer";
 
 export const metadata: Metadata = {
   title: "CodeTutor — Learn to Code, Properly",
@@ -25,17 +26,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body>
+      <body className="min-h-screen flex flex-col">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-gold-500 focus:text-navy-950 focus:px-4 focus:py-2 focus:rounded-lg"
         >
           Skip to content
         </a>
+
         <Nav />
-        <main id="main-content" className="max-w-6xl mx-auto px-6 py-10">
+
+        <main
+          id="main-content"
+          className="mx-auto w-full max-w-6xl flex-1 px-6 py-10"
+        >
           {children}
         </main>
+
+        <Footer />
       </body>
     </html>
   );
